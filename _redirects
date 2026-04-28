@@ -1,6 +1,10 @@
-# Old `/kids.html` URLs continue to work (silently serve the new root).
-/kids.html              /                200
-/kids                   /                200
-/hub                    /                200
-/gamehq                 /gamehq.html     200
+# Routing map (post 2026-04-28 reorg):
+#   /             → Game HQ (index.html, the home)
+#   /hub.html     → 24-tab Hub (was kids.html)
+#   /gamehq.html  → preserved alias of the Game HQ
+#   /playground.html → React multiplayer
+/kids.html              /hub.html        200
+/kids                   /hub.html        200
+/hub                    /hub.html        200
+/gamehq                 /                200
 /play                   /playground.html 200
