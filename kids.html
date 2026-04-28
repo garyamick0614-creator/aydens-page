@@ -61,7 +61,7 @@
   </h1>
 </header>
 
-<h2>☀️ Weather around Scottsburg</h2>
+<h2>☀️ Weather — Austin · Scottsburg · Crothersville</h2>
 <div class="grid grid-3" id="weatherGrid">
   <div class="card weather"><div class="city">Loading…</div></div>
 </div>
@@ -79,14 +79,21 @@
 </div>
 
 <div class="grid grid-2" style="margin-top:14px">
+  <section class="card news" style="border-color:rgba(244,114,182,.5)">
+    <h2 style="margin:0 0 10px">🎮 Kid-safe gaming</h2>
+    <ul class="feed" id="gamingFeed"><li class="muted">Loading gaming posts…</li></ul>
+  </section>
+
   <section class="card news">
     <h2 style="margin:0 0 10px">📰 Kid-safe news</h2>
     <ul class="feed" id="newsFeed"><li class="muted">Loading headlines…</li></ul>
   </section>
+</div>
 
+<div style="margin-top:14px">
   <section class="card traffic">
-    <h2 style="margin:0 0 10px">🚗 Indiana traffic</h2>
-    <ul class="feed" id="trafficFeed"><li class="muted">Loading traffic events…</li></ul>
+    <h2 style="margin:0 0 10px">🚗 Indiana traffic — Scott County area</h2>
+    <ul class="feed" id="trafficFeed"><li class="muted">Loading traffic events for Scott / Jackson / Clark / Washington / Jefferson…</li></ul>
   </section>
 </div>
 
@@ -109,14 +116,14 @@ window.__KIDS_BUILD = '2026-04-27T22:30Z-strict-filter-v2';
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  // === Weather: Scottsburg + 4 nearby cities (lat/lon hard-coded) ===
+  // === Weather: primary 3 (Gary's request) + nearby fallbacks ===
   const CITIES = [
-    { name: 'Scottsburg', lat: 38.6856, lon: -85.7705 },
-    { name: 'Seymour',    lat: 38.9595, lon: -85.8903 },
-    { name: 'Columbus',   lat: 39.2014, lon: -85.9214 },
-    { name: 'Louisville', lat: 38.2527, lon: -85.7585 },
-    { name: 'Indianapolis', lat: 39.7684, lon: -86.1581 },
-    { name: 'Cincinnati', lat: 39.1031, lon: -84.5120 },
+    { name: 'Austin',       lat: 38.7561, lon: -85.8089 },
+    { name: 'Scottsburg',   lat: 38.6856, lon: -85.7705 },
+    { name: 'Crothersville',lat: 38.8011, lon: -85.8392 },
+    { name: 'Seymour',      lat: 38.9595, lon: -85.8903 },
+    { name: 'Columbus',     lat: 39.2014, lon: -85.9214 },
+    { name: 'Louisville',   lat: 38.2527, lon: -85.7585 },
   ];
   function emoji(code) {
     if (code == null) return '🌤';

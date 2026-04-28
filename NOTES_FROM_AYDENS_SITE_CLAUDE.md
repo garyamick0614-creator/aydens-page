@@ -1,48 +1,77 @@
-# Notes for the other Claude session
+# Handoff — aydens-page is now yours
 
-Written 2026-04-27 by the Claude session that built Ayden's site at `C:\Users\American Rental\Desktop\aydens site`.
+Written 2026-04-27 by the Claude session that built the initial Ayden's Page.
+Gary explicitly handed the project to you. I'm out; this file is everything you
+need to pick up cleanly.
 
-## What's live
+## Live state
 
-- GitHub: https://github.com/garyamick0614-creator/aydens-page
-- Netlify: https://aydens-page.netlify.app
-- Multi-file static site, deployed via Netlify CLI linked workspace.
+- **Site:** https://aydens-page.netlify.app — production deploy `1bae92d`
+- **Repo:** https://github.com/garyamick0614-creator/aydens-page (public, owner `garyamick0614-creator`)
+- **Netlify project:** `aydens-page` on team `BabysittingPortal` (id `bd3b23d8-aab5-4906-88bc-f35c2f5376b5`)
+- **Local:** `C:\Users\American Rental\Desktop\aydens site` — linked to that Netlify project via `.netlify/state.json`
+- Working tree is clean as of this handoff. Everything committed and pushed.
 
-## What I'd love your help with on the home server (no rush, all optional)
+## What's wired up
 
-These are coordination requests — the site degrades gracefully without them, with clear inline messages explaining what's pending. Nothing urgent.
+### Server side (you/Gary's other session shipped these — thank you)
+- CORS allowlist includes `https://aydens-page.netlify.app` — verified live
+- `/api/proxy/indot/traffic` alias of `/events`
+- `/api/aydens/sync/{push,pull,list,health}` — backup endpoints, contract `{user, kind, payload}`, max 256 KB
+- All other endpoints from CONNECTION_POINTS.md still in use
 
-1. **CORS allowlist** — please add `https://aydens-page.netlify.app` to `app.db.allowed_origins` so chat / summarize / vision POSTs work cross-origin. Right now GETs work fine.
+### Frontend (this site)
+- 9 tabs: Home / Xbox / PC / Minecraft / Rocket / AI Buddy / Friends / Control / Help
+- Animated neon background (canvas particles + CSS gradient mesh)
+- **Real**: weather (multi-city, `/api/proxy/weather/forecast`), space stats (`/api/world/sitrep`), kids news (`/api/proxy/news/headlines` with strict allowlist filter), AI Buddy + per-game daily AI tips (`/api/public/chat`), Test My PC (browser specs + WebGL + CPU benchmark), Test My Internet (5x ping + multi-fetch download), Server Health, 25 organizer tools (localStorage), JSON backup/restore + cloud sync
+- Firebase Web SDK wired for project `data-44017` — Auth (Email/Password) + Realtime Database. Config in `firebase-config.js` is filled in.
+- Footer: "Created by Gary Amick at TCG"
 
-2. **`/api/proxy/indot/traffic?area=scottsburg`** — INDOT TrafficWise / 511IN proxy, returning `{items:[{title,location,...}]}`. The home page traffic widget auto-activates when this exists.
+## Things you should know about the design
 
-3. **`/api/aydens/sync/push` (POST `{data}`)** and **`/api/aydens/sync/pull` (GET, returns `{data}`)** — simple keyed JSON store for Ayden's localStorage backup. Cloud sync buttons in Control Panel auto-activate when these exist.
+1. **Hard rule from Gary, repeated several times: no mocks, no placeholders, no simulations.** AI-generated content is real. localStorage is real. Firebase config gaps are environment dependencies, not placeholders. If a feature can't be real today, it's left out — not stubbed.
 
-4. **Gaming RSS sources for `/api/proxy/news/headlines`** — currently `category=gaming|tech|entertainment|xbox` all return 0 items. Suggested feeds to add: `news.xbox.com`, `minecraft.net/news`, `rocketleague.com/news`, `blogs.windows.com/devices`. The site already queries the right endpoints; per-game news will populate the moment sources are added.
+2. **Kid-safe filter is allowlist-only for news.** A headline only shows if it explicitly matches a positive topic (gaming/sports/space/animals/kids/etc.) AND survives a topic blocklist + source blocklist + category blocklist. Default deny. Better to show "Nothing kid-safe right now — go play a game!" than leak war/violence/crime. Filter is in `script.js` under `newsHeadlineSafe()`. If something slips through, add the exact word/source to `NEWS_TOPIC_BLOCK` or the source list — don't loosen the allowlist.
 
-## What's already integrated (live and working)
+3. **Two-sided kid-safe filter** runs on AI Buddy + Server Chat: input must pass `kidSafeAllow` before send; output is run through `kidSafeText` before display.
 
-- `/api/public/chat` — used for AI Buddy + per-game daily AI tips + Server Chat (kid-safe wrapper on top)
-- `/api/public/ai-routes` — server health probe
-- `/api/proxy/weather/forecast` — multi-city weather (Scottsburg + 5 nearby)
-- `/api/proxy/news/headlines` (no category) — kids news with client-side kid-safe filter
-- `/api/world/sitrep` — space stats / earthquakes
-- `/api/openapi.json` — used as a real download payload for the internet speed test
+4. **Admin password defaults to `password123`**, sha256-hashed in localStorage at key `aydenhq:adminPwdHash:v2`. The `:v2` suffix exists because v1 had a JSON-stringify mismatch bug that made login impossible — bumping the key forced a clean reset for existing users. There's a "RESET TO DEFAULT" button on the gate as a permanent failsafe.
 
-## Things to know about this build
+5. **Cache strategy**: all asset URLs in `index.html` are cache-busted with `?v=20260427e`. `_headers` enforces `Cache-Control: no-cache, no-store, must-revalidate` for `index.html` and `kids.html`, plus `max-age=0, must-revalidate` for JS/CSS. If you change JS/CSS, **bump the `?v=` query string in index.html** — that's the actual cache invalidator (header-only revalidation isn't reliable across browsers).
 
-- **No mocks anywhere.** Hard requirement from Gary, repeated several times. AI-generated content is real; localStorage is real persistence; everything else is a real network call. If something needs server work to be real, the UI shows a clear "activates when X is added" message rather than fake data.
-- **Kid-safe filter is two-sided.** Both Ayden's input AND server replies pass through `kidSafeAllow` / `kidSafeText` in `script.js` before display.
-- **Firebase config in `firebase-config.js`** is empty by design — Gary will fill it when he sets up the Firebase project. Friends Chat and cross-device user management activate then.
-- **CSP is strict** — declared in `_headers`. If you ever see CSP failures from Ayden's origin, check the `connect-src` and `script-src` directives there.
-- **Default admin password:** `password123` (sha256-hashed). User can change it from Control → Account.
+6. **`measurementId` is in `firebase-config.js` per Gary's explicit request, but Google Analytics is NOT active**: nothing imports `firebase-analytics.js` or calls `getAnalytics(app)`. Don't add either — it's a child-targeted site and GA isn't COPPA-compliant. There's a comment block in firebase-config.js as a guard rail.
 
-## File map
+7. **Firebase RTDB rules are NOT yet applied** — the database may still be in test mode. You recommended namespacing under `aydens-page/`; suggested rules are inline in `firebase-config.js`. The code currently writes to root-level `users/`, `posts/`, `blocked/` — change those paths in `script.js` (search for `'users/'`, `'posts'`, `'blocked'`) when you apply namespaced rules.
 
-- `index.html` — 9 tabs, all panels in one file
-- `styles.css` — full neon theme, per-tab accent vars, animations
-- `background.js` — canvas particle field
-- `firebase-config.js` — empty config object + setup instructions
-- `script.js` — main app (~1100 lines): tabs, API, kid-safe, admin, 25 tools, diagnostics, Firebase chat
-- `netlify.toml`, `_headers` — deploy + security
-- `CONNECTION_POINTS.md`, `HANDOFF_FROM_OTHER_CLAUDE.md` — your handoff docs (preserved)
+## Open items handed to you
+
+### Server-side (your area)
+1. **Kid-safe news endpoint** — you mentioned you were adding this. The frontend already auto-tries `/api/proxy/news/kids`, `/api/proxy/news/headlines?safe=kids`, `/api/kids/news` in order before falling back to the general feed + client filter. Whichever path you ship, it'll just work.
+2. **Gaming RSS sources** for the feeds aggregator (`news.xbox.com`, `minecraft.net/news`, `rocketleague.com/news`, `blogs.windows.com/devices`). Per-game news widgets activate the moment those land.
+3. **Firebase RTDB rules** — apply the namespaced version from `REVIEW_FROM_SERVER_CLAUDE.md` and update the database away from test mode. Then update the script.js paths to match.
+
+### Frontend things I'd do next if I were continuing
+1. Profile editor in the Friends tab (let users edit their own gaming-tag profile from there, not just from Control). The data model is already in place.
+2. Reminders / bedtime tool currently lacks browser notification API hookup — easy add, just needs `Notification.requestPermission()` flow.
+3. Mobile polish on the modal (works but could be better on small phones).
+
+## Files in the repo
+
+- `index.html` — 9 tabs, all panels in one file. Asset references cache-busted.
+- `styles.css` — neon theme, per-tab CSS variable accent, animations.
+- `background.js` — canvas particle field with mouse repulsion.
+- `firebase-config.js` — Web SDK config for project `data-44017`.
+- `script.js` — main app (~1200 lines): tabs, API, kid-safe filter, admin, 25 tools, diagnostics, Firebase chat. Search by section comment headers.
+- `_headers` — strict CSP, HSTS, framing deny, no-cache for HTML, etc. (Note: `_headers` was tightened by Gary or a linter at the very end of the session — keep the no-cache/no-store/must-revalidate values.)
+- `netlify.toml` — static site config + SPA fallback.
+- `.gitignore` — standard.
+- `kids.html`, `quickstart.html` — your earlier work, untouched by me.
+- `CONNECTION_POINTS.md`, `HANDOFF_FROM_OTHER_CLAUDE.md` — your originals, preserved.
+- `SERVER_INTEGRATION_READY.md`, `REVIEW_FROM_SERVER_CLAUDE.md` — your responses, preserved.
+- `NOTES_FROM_AYDENS_SITE_CLAUDE.md` — this file.
+
+## Memory
+
+I saved `project_aydens_page.md` in the shared memory dir at `C:\Users\American Rental\.claude\projects\C--\memory\` and updated it with the final state. Read it for the one-glance summary.
+
+Good luck. Ayden's going to love it.
