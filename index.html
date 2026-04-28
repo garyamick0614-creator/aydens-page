@@ -30,15 +30,27 @@
     --gold: var(--neon-yellow); --pink: var(--neon-pink); --green: var(--neon-green); --red: #ff5577;
   }
   * { box-sizing:border-box; margin:0; padding:0 }
-  /* Body background is now provided by gamehq's animated canvas + grid-overlay
-     + scanlines DIVs at the top of <body>. Transparent body lets canvas show. */
+  /* Body MUST be transparent so the animated canvas behind it is visible.
+     styles.css from gamehq paints body with a gradient — !important wins. */
   body {
-    background: transparent;
+    background: transparent !important;
+    background-image: none !important;
     color: var(--text); font: 15px/1.55 var(--font-body);
     min-height: 100vh; padding: 14px 14px 60px;
     overflow-x: hidden;
   }
   html { background: var(--bg-deep); }
+  /* Canvas + overlays go behind everything else but above html bg. */
+  #bgcanvas    { position: fixed !important; inset: 0 !important; z-index: -2 !important; pointer-events: none; }
+  .grid-overlay{ position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,240,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180,0,255,.05) 1px, transparent 1px);
+    background-size: 56px 56px; }
+  .scanlines   { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0, rgba(255,255,255,.018) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode: overlay; }
+  .wrap { position: relative; z-index: 2; }
   .wrap { max-width: 1180px; margin: 0 auto; position: relative; z-index: 2 }
 
   header.top { display: flex; justify-content: space-between; align-items: center;
@@ -1641,7 +1653,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T07:30Z-v19-canvas-bg-gaming-priority';
+window.__KIDS_BUILD = '2026-04-28T07:45Z-v20-canvas-forced-gaming-absolute-first';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
