@@ -3,120 +3,518 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ayden's Dashboard — Scottsburg edition</title>
-<meta name="description" content="Real weather, space stats, news headlines, and Indiana traffic — kid-friendly. Powered by Gary's home server.">
+<title>🚀 Ayden's Hub — Games, Tools, Weather, Space</title>
+<meta name="description" content="Ayden's interactive dashboard — weather, space, gaming feeds, mini-games, drawing, calculator, jokes, and more. Strict kid-safe content filter.">
+<meta name="theme-color" content="#1a0a3e">
+<meta name="referrer" content="no-referrer-when-downgrade">
 <style>
   :root {
-    --bg:#0c1430; --panel:#162253; --line:rgba(255,255,255,.12);
-    --text:#fffbe6; --dim:#a5b4fc; --pri:#22d3ee; --acc:#fbbf24;
-    --ok:#34d399; --warn:#fbbf24; --err:#f87171; --kid:#a855f7;
+    --bg:#0a0e14; --panel:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+    --text:#fff; --dim:#cbd5e1;
+    --pri:#22d3ee; --acc:#a855f7; --gold:#fbbf24; --pink:#f472b6; --green:#34d399; --red:#f87171;
   }
   * { box-sizing:border-box; margin:0; padding:0 }
-  body { background: linear-gradient(180deg, #1e1b4b 0%, var(--bg) 60%);
-         color: var(--text); font: 16px/1.5 'Comic Sans MS', system-ui, sans-serif;
-         min-height: 100vh; padding: 18px; }
+  body {
+    background:
+      radial-gradient(circle at 10% -10%, #5b21b6 0%, transparent 50%),
+      radial-gradient(circle at 90% 10%, #0e7490 0%, transparent 50%),
+      radial-gradient(circle at 50% 110%, #be185d 0%, transparent 60%),
+      #0a0e14;
+    color: var(--text); font: 16px/1.5 'Comic Sans MS', 'Trebuchet MS', system-ui, sans-serif;
+    min-height: 100vh; padding: 14px 14px 60px;
+  }
   .wrap { max-width: 1180px; margin: 0 auto }
-  h1 { font-size: 32px; background: linear-gradient(90deg, var(--pri), var(--acc), var(--kid));
-       -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 4px }
-  h1 small { display:block; font: 14px system-ui; color: var(--dim); margin-top: 4px }
-  h2 { font-size: 20px; color: var(--acc); margin: 20px 0 10px; display:flex;align-items:center;gap:8px }
-  .grid { display: grid; gap: 14px }
-  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) }
+
+  header.top { display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 14px; margin-bottom: 14px; gap: 14px; flex-wrap: wrap; }
+  .title { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -.01em;
+    background: linear-gradient(90deg, var(--green), var(--pri), var(--acc), var(--pink));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 4px 24px rgba(168,85,247,.3); }
+  .title small { display: block; font: 13px/1.4 system-ui; color: var(--dim);
+    -webkit-text-fill-color: var(--dim); margin-top: 6px; }
+  .home-link { color: var(--gold); text-decoration: none; padding: 8px 16px;
+    border: 2px solid rgba(251,191,36,.4); border-radius: 99px;
+    font-size: 14px; font-weight: 700; background: rgba(251,191,36,.08); }
+  .home-link:hover { background: rgba(251,191,36,.18); border-color: var(--gold); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--line); padding-bottom: 12px; }
+  .tab { background: rgba(255,255,255,.05); color: var(--dim);
+    border: 2px solid var(--line); border-radius: 12px;
+    padding: 10px 18px; font: 700 14px 'Comic Sans MS', sans-serif;
+    cursor: pointer; transition: all .15s; }
+  .tab:hover { background: rgba(168,85,247,.15); color: var(--text); }
+  .tab.active { background: linear-gradient(135deg, var(--acc), var(--pri));
+    color: #fff; border-color: transparent; box-shadow: 0 4px 16px rgba(168,85,247,.4); }
+  .pane { display: none } .pane.active { display: block }
+
+  h2 { font-size: 20px; margin: 18px 0 10px;
+    display: flex; align-items: center; gap: 10px; }
+  h2 .em { font-size: 26px; line-height: 1 }
+  h3 { font-size: 16px; margin: 12px 0 8px; color: var(--gold) }
+
+  .grid { display: grid; gap: 12px; margin-bottom: 14px }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) }
   .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) }
-  .card { background: linear-gradient(180deg, rgba(34,52,128,.6), rgba(22,34,83,.8));
-          border: 2px solid var(--line); border-radius: 16px; padding: 16px;
-          box-shadow: 0 4px 20px rgba(0,0,0,.4) }
-  .card.weather { border-color: rgba(34,211,238,.4) }
-  .card.space { border-color: rgba(168,85,247,.4) }
-  .card.news { border-color: rgba(251,191,36,.4) }
-  .card.traffic { border-color: rgba(248,113,113,.4) }
-  .city { font-size: 18px; font-weight: 700; margin-bottom: 6px }
-  .temp { font-size: 36px; font-weight: 800; font-family: 'Comic Sans MS', sans-serif;
-          color: var(--acc); line-height: 1; margin: 6px 0 }
-  .small { font-size: 13px; color: var(--dim) }
+
+  .card { background: linear-gradient(180deg, rgba(20,26,62,.7), rgba(15,12,45,.85));
+    border: 2px solid var(--line); border-radius: 16px; padding: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .card.weather { border-color: rgba(251,191,36,.3) }
+  .card.space { border-color: rgba(168,85,247,.3) }
+  .card.gaming { border-color: rgba(244,114,182,.3) }
+  .card.news { border-color: rgba(34,211,238,.3) }
+  .card.traffic { border-color: rgba(52,211,153,.3) }
+  .card.tool { border-color: rgba(168,85,247,.4) }
+
+  .city { font-size: 17px; font-weight: 700; margin-bottom: 4px }
+  .big-emoji { font-size: 48px; line-height: 1; text-align: center; margin: 6px 0 }
+  .temp { font-size: 32px; font-weight: 900; color: var(--gold);
+    text-align: center; line-height: 1; font-family: 'Comic Sans MS', sans-serif;
+    text-shadow: 0 2px 12px rgba(251,191,36,.3); }
+  .small { font-size: 12px; color: var(--dim); text-align: center; margin-top: 4px }
+
   .feed { list-style: none; max-height: 320px; overflow-y: auto; padding-right: 6px }
-  .feed li { padding: 9px 0; border-bottom: 1px dashed var(--line); font-size: 14px; line-height: 1.45 }
+  .feed::-webkit-scrollbar { width: 6px } .feed::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px }
+  .feed li { padding: 9px 0; border-bottom: 1px dashed var(--line); font-size: 13px; line-height: 1.5; }
   .feed li:last-child { border-bottom: 0 }
-  .feed li a { color: var(--pri); text-decoration: none }
-  .feed li a:hover { text-decoration: underline }
-  .feed li .meta { display:block; font-size: 11px; color: var(--dim); margin-top: 3px }
-  .stat-row { display: flex; gap: 14px; flex-wrap: wrap }
-  .stat { background: rgba(255,255,255,.05); border-radius: 10px; padding: 10px 14px; flex: 1; min-width: 110px }
-  .stat .v { font-size: 22px; font-weight: 800; color: var(--acc); font-family: monospace }
-  .stat .l { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: .06em }
-  .iss { font-family: monospace; font-size: 13px; color: var(--pri); margin-top: 8px }
-  .err-text { color: var(--err); font-size: 13px }
-  .muted { color: var(--dim) }
-  footer { text-align: center; margin-top: 30px; padding-top: 16px;
-           border-top: 1px solid var(--line); color: var(--dim); font-size: 12px }
-  @media (max-width: 600px) { body { padding: 12px } h1 { font-size: 24px } }
+  .feed li a { color: var(--pri); text-decoration: none; font-weight: 600 }
+  .feed li a:hover { color: var(--text); text-decoration: underline }
+  .feed li .meta { display: block; font-size: 11px; color: var(--dim); margin-top: 4px }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 10px;
+    font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-right: 6px; }
+  .pill.gaming { background: rgba(244,114,182,.18); color: var(--pink) }
+  .pill.tech   { background: rgba(34,211,238,.18); color: var(--pri) }
+  .pill.space  { background: rgba(168,85,247,.18); color: var(--acc) }
+  .pill.world  { background: rgba(251,191,36,.18); color: var(--gold) }
+  .pill.local  { background: rgba(52,211,153,.18); color: var(--green) }
+
+  .iss-box { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 13px;
+    color: var(--pri); padding: 10px 12px; margin: 6px 0 10px;
+    background: rgba(34,211,238,.08); border-radius: 10px; border: 1px solid rgba(34,211,238,.2);
+    text-align: center; font-weight: 700; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px }
+  .stat { background: rgba(255,255,255,.04); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px; text-align: center; }
+  .stat .v { font-size: 22px; font-weight: 900; color: var(--gold); line-height: 1;
+    font-family: 'Comic Sans MS', sans-serif; }
+  .stat .l { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px }
+
+  .err-text { color: #fca5a5 } .muted { color: var(--dim) }
+
+  /* BUTTONS */
+  .btn { background: linear-gradient(135deg, var(--acc), var(--pri));
+    color: #fff; border: 0; border-radius: 10px; padding: 10px 18px;
+    font: 700 14px 'Comic Sans MS', sans-serif; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(168,85,247,.3); transition: transform .1s; }
+  .btn:hover { transform: translateY(-2px) }
+  .btn:active { transform: translateY(0) }
+  .btn.gold { background: linear-gradient(135deg, var(--gold), var(--pink)) }
+  .btn.green { background: linear-gradient(135deg, var(--green), var(--pri)) }
+  .btn.red { background: linear-gradient(135deg, var(--red), var(--pink)) }
+  .btn.small { padding: 6px 12px; font-size: 12px }
+
+  /* GAMES */
+  .ttt-board { display: grid; grid-template-columns: repeat(3, 70px); gap: 6px;
+    margin: 12px auto; width: max-content; }
+  .ttt-cell { width: 70px; height: 70px; background: rgba(255,255,255,.06);
+    border: 2px solid var(--line); border-radius: 10px; display:flex;align-items:center;justify-content:center;
+    font: 900 36px 'Comic Sans MS', sans-serif; cursor: pointer; transition: all .1s; }
+  .ttt-cell:hover { background: rgba(168,85,247,.18) }
+  .ttt-cell.x { color: var(--pri) } .ttt-cell.o { color: var(--pink) }
+
+  .memory-board { display: grid; grid-template-columns: repeat(4, 60px); gap: 6px;
+    margin: 12px auto; width: max-content; }
+  .mem-card { width: 60px; height: 60px; background: linear-gradient(135deg, var(--acc), var(--pri));
+    border-radius: 10px; cursor: pointer; display:flex;align-items:center;justify-content:center;
+    font-size: 28px; transition: all .2s; }
+  .mem-card.flipped { background: rgba(255,255,255,.08); border: 2px solid var(--gold) }
+  .mem-card.matched { background: rgba(52,211,153,.25); cursor: default }
+
+  .snake-canvas { display:block; margin: 12px auto; background: rgba(0,0,0,.5);
+    border: 2px solid var(--line); border-radius: 12px; max-width: 100% }
+  .draw-canvas { display:block; background: #fff; border: 2px solid var(--line);
+    border-radius: 12px; cursor: crosshair; max-width: 100%; touch-action: none; }
+  .color-pick { display:flex; gap:6px; flex-wrap:wrap; margin: 8px 0 }
+  .color-swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff;
+    cursor: pointer; transition: transform .1s; }
+  .color-swatch:hover { transform: scale(1.15) }
+  .color-swatch.active { border-color: var(--gold); transform: scale(1.2) }
+
+  .calc-display { background: #000; color: var(--green); border-radius: 10px;
+    padding: 16px; font: 800 28px 'JetBrains Mono', monospace; text-align:right;
+    margin-bottom: 10px; min-height: 60px; word-break:break-all; }
+  .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px }
+  .calc-btn { padding: 14px; font: 700 18px 'Comic Sans MS', sans-serif;
+    background: rgba(255,255,255,.08); border: 1px solid var(--line);
+    border-radius: 10px; color: var(--text); cursor: pointer; }
+  .calc-btn:hover { background: rgba(255,255,255,.15) }
+  .calc-btn.op { background: rgba(168,85,247,.25); color: var(--acc) }
+  .calc-btn.eq { background: linear-gradient(135deg, var(--green), var(--pri)); color: #000 }
+  .calc-btn.clr { background: rgba(248,113,113,.25); color: var(--red) }
+
+  .timer-display { font: 900 56px 'JetBrains Mono', monospace; text-align:center;
+    color: var(--gold); margin: 10px 0; text-shadow: 0 2px 12px rgba(251,191,36,.3); }
+
+  .joke-box { padding: 16px; font-size: 18px; line-height: 1.5; min-height: 80px;
+    border-radius: 12px; background: rgba(168,85,247,.1); margin: 10px 0;
+    border: 2px dashed rgba(168,85,247,.4); }
+  .joke-q { font-weight: 700; color: var(--pri) }
+  .joke-a { color: var(--gold); margin-top: 10px; font-size: 16px }
+
+  .fact-box { padding: 14px; font-size: 15px; line-height: 1.6; border-radius: 12px;
+    background: rgba(34,211,238,.1); border: 2px dashed rgba(34,211,238,.4);
+    color: var(--pri); margin: 10px 0; }
+
+  .quiz-btn { display:block; width: 100%; padding: 12px; margin: 6px 0;
+    background: rgba(255,255,255,.06); border: 2px solid var(--line);
+    border-radius: 10px; color: var(--text); font: 600 14px 'Comic Sans MS', sans-serif;
+    cursor: pointer; text-align:left; }
+  .quiz-btn:hover { background: rgba(168,85,247,.15) }
+  .quiz-btn.correct { background: rgba(52,211,153,.25); border-color: var(--green) }
+  .quiz-btn.wrong   { background: rgba(248,113,113,.25); border-color: var(--red) }
+
+  .row { display:flex; align-items:center; gap: 10px; flex-wrap: wrap; margin: 6px 0 }
+  .input { background: rgba(255,255,255,.06); border: 2px solid var(--line);
+    border-radius: 10px; color: var(--text); padding: 8px 12px;
+    font: 600 14px 'Comic Sans MS', sans-serif; }
+  .input:focus { outline: 2px solid var(--acc); border-color: var(--acc) }
+
+  .badge { display:inline-block; padding: 4px 10px; border-radius: 99px;
+    font: 700 11px 'Comic Sans MS', sans-serif; background: rgba(168,85,247,.18); color: var(--acc); }
+
+  footer { text-align: center; margin-top: 28px; padding-top: 16px;
+    border-top: 1px dashed var(--line); color: var(--dim); font-size: 12px; }
+  @media (max-width: 600px) {
+    body { padding: 10px 10px 60px } .title { font-size: 24px }
+    .ttt-cell { width: 60px; height: 60px; font-size: 30px }
+    .memory-board { grid-template-columns: repeat(4, 56px) }
+    .mem-card { width: 56px; height: 56px; font-size: 24px }
+    .timer-display { font-size: 44px }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<header>
-  <h1>👋 Ayden's Dashboard
-    <small>Real weather around Scottsburg · Live space stats · Today's news · Indiana traffic</small>
-  </h1>
+<header class="top">
+  <div>
+    <div class="title">🚀 Ayden's Hub
+      <small>Games · Tools · Weather · Space · Gaming feeds — built for Ayden by Gary</small>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <a href="/" class="home-link">🏠 Home</a>
+    <span class="badge" id="buildBadge">v3</span>
+  </div>
 </header>
 
-<h2>☀️ Weather — Austin · Scottsburg · Crothersville</h2>
-<div class="grid grid-3" id="weatherGrid">
-  <div class="card weather"><div class="city">Loading…</div></div>
-</div>
+<!-- TABS -->
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-pane="today">📅 Today</button>
+  <button class="tab" data-pane="play">🎮 Play</button>
+  <button class="tab" data-pane="tools">🛠 Tools</button>
+  <button class="tab" data-pane="fun">🎉 Fun</button>
+  <button class="tab" data-pane="space">🚀 Space</button>
+  <button class="tab" data-pane="news">📰 News</button>
+  <button class="tab" data-pane="cams">📷 Cameras</button>
+  <button class="tab" data-pane="watch">📺 Watch</button>
+</nav>
 
-<h2>🚀 Space right now</h2>
-<div class="card space">
-  <div class="stat-row" id="spaceStats">
-    <div class="stat"><div class="v" id="spLaunches">—</div><div class="l">Launches coming up</div></div>
-    <div class="stat"><div class="v" id="spQuakes">—</div><div class="l">M2.5+ quakes 7d</div></div>
-    <div class="stat"><div class="v" id="spDisasters">—</div><div class="l">Global alerts</div></div>
-    <div class="stat"><div class="v" id="spNews">—</div><div class="l">Space news today</div></div>
+<!-- ============================== TODAY ============================== -->
+<section class="pane active" id="pane-today">
+  <h2><span class="em">☀️</span> Weather — Austin · Scottsburg · Crothersville</h2>
+  <div class="grid grid-3" id="weatherGrid"><div class="card weather"><div class="city">Loading…</div></div></div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <section class="card traffic">
+      <h2 style="margin:0 0 10px"><span class="em">🚗</span> Traffic + weather alerts (Scott Co. area)</h2>
+      <ul class="feed" id="trafficFeed"><li class="muted">Loading alerts…</li></ul>
+    </section>
+    <section class="card news">
+      <h2 style="margin:0 0 10px"><span class="em">📰</span> Headlines (kid-safe)</h2>
+      <ul class="feed" id="newsFeedToday"><li class="muted">Loading headlines…</li></ul>
+    </section>
   </div>
-  <div class="iss" id="issBox">ISS position: loading…</div>
-  <ul class="feed" id="launchFeed" style="margin-top:10px"><li class="muted">Loading upcoming launches…</li></ul>
-</div>
+</section>
 
-<div class="grid grid-2" style="margin-top:14px">
-  <section class="card news" style="border-color:rgba(244,114,182,.5)">
-    <h2 style="margin:0 0 10px">🎮 Kid-safe gaming</h2>
-    <ul class="feed" id="gamingFeed"><li class="muted">Loading gaming posts…</li></ul>
-  </section>
+<!-- ============================== PLAY ============================== -->
+<section class="pane" id="pane-play">
+  <div class="grid grid-2">
+    <!-- Tic Tac Toe -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">⭕</span> Tic-Tac-Toe (vs computer)</h2>
+      <div class="ttt-board" id="tttBoard"></div>
+      <div style="text-align:center;margin-top:10px">
+        <span id="tttStatus">Your turn (X)</span><br>
+        <button class="btn small" onclick="newTTT()" style="margin-top:8px">🔄 New game</button>
+      </div>
+    </section>
 
+    <!-- Memory Match -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🧠</span> Memory match</h2>
+      <div class="memory-board" id="memBoard"></div>
+      <div style="text-align:center;margin-top:10px">
+        <span id="memStatus">Find all the pairs! Moves: 0</span><br>
+        <button class="btn small" onclick="newMemory()" style="margin-top:8px">🔄 Shuffle</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <!-- Snake -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🐍</span> Snake</h2>
+      <canvas id="snakeCanvas" width="300" height="300" class="snake-canvas"></canvas>
+      <div style="text-align:center">
+        <span id="snakeStatus">Score: 0 — press ▶ to play, arrow keys / WASD to move</span><br>
+        <button class="btn small" onclick="startSnake()" style="margin-top:8px">▶ Start / Restart</button>
+      </div>
+    </section>
+
+    <!-- Dice + Coin + Random Picker -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🎲</span> Dice, coin & random</h2>
+      <div class="row">
+        <button class="btn green" onclick="rollDice()">🎲 Roll dice</button>
+        <span id="diceResult" style="font-size:32px">—</span>
+      </div>
+      <div class="row">
+        <button class="btn gold" onclick="flipCoin()">🪙 Flip coin</button>
+        <span id="coinResult" style="font-size:24px">—</span>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="pickNumber()">🔢 Pick 1-100</button>
+        <span id="numResult" style="font-size:24px;color:var(--gold)">—</span>
+      </div>
+      <h3>Pick from a list</h3>
+      <input class="input" id="pickInput" placeholder="apple, banana, cherry" style="width:100%">
+      <div class="row">
+        <button class="btn small" onclick="pickFromList()">🎯 Pick one</button>
+        <span id="pickResult" style="font-weight:700;color:var(--pri)">—</span>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- ============================== TOOLS ============================== -->
+<section class="pane" id="pane-tools">
+  <div class="grid grid-2">
+    <!-- Calculator -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">➗</span> Calculator</h2>
+      <div class="calc-display" id="calcDisplay">0</div>
+      <div class="calc-grid">
+        <button class="calc-btn clr" onclick="calcClear()">C</button>
+        <button class="calc-btn op" onclick="calcOp('(')">(</button>
+        <button class="calc-btn op" onclick="calcOp(')')">)</button>
+        <button class="calc-btn op" onclick="calcOp('/')">÷</button>
+        <button class="calc-btn" onclick="calcDigit('7')">7</button>
+        <button class="calc-btn" onclick="calcDigit('8')">8</button>
+        <button class="calc-btn" onclick="calcDigit('9')">9</button>
+        <button class="calc-btn op" onclick="calcOp('*')">×</button>
+        <button class="calc-btn" onclick="calcDigit('4')">4</button>
+        <button class="calc-btn" onclick="calcDigit('5')">5</button>
+        <button class="calc-btn" onclick="calcDigit('6')">6</button>
+        <button class="calc-btn op" onclick="calcOp('-')">−</button>
+        <button class="calc-btn" onclick="calcDigit('1')">1</button>
+        <button class="calc-btn" onclick="calcDigit('2')">2</button>
+        <button class="calc-btn" onclick="calcDigit('3')">3</button>
+        <button class="calc-btn op" onclick="calcOp('+')">+</button>
+        <button class="calc-btn" onclick="calcDigit('0')">0</button>
+        <button class="calc-btn" onclick="calcDigit('.')">.</button>
+        <button class="calc-btn op" onclick="calcBackspace()">⌫</button>
+        <button class="calc-btn eq" onclick="calcEquals()">=</button>
+      </div>
+    </section>
+
+    <!-- Drawing pad -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🎨</span> Drawing pad</h2>
+      <div class="color-pick" id="colorPick"></div>
+      <canvas id="drawCanvas" width="320" height="240" class="draw-canvas"></canvas>
+      <div class="row" style="margin-top:8px">
+        <button class="btn small green" onclick="drawClear()">🗑 Clear</button>
+        <button class="btn small gold" onclick="drawSave()">💾 Download</button>
+        <span class="muted" style="font-size:11px">Brush: <input type="range" id="brushSize" min="2" max="20" value="6"></span>
+      </div>
+    </section>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <!-- Timer + Stopwatch -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">⏱</span> Timer / Stopwatch</h2>
+      <div class="timer-display" id="timerDisplay">00:00.0</div>
+      <div class="row" style="justify-content:center">
+        <button class="btn green" onclick="timerStart()">▶ Start</button>
+        <button class="btn gold" onclick="timerPause()">⏸ Pause</button>
+        <button class="btn red"  onclick="timerReset()">🔄 Reset</button>
+      </div>
+      <h3>Set a countdown timer</h3>
+      <div class="row">
+        <input class="input" id="timerMinutes" type="number" min="1" max="60" value="5" style="width:80px">
+        <span>minutes</span>
+        <button class="btn small" onclick="countdownStart()">⏰ Start countdown</button>
+      </div>
+    </section>
+
+    <!-- Word + math quiz -->
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🧮</span> Math quiz</h2>
+      <div id="quizArea">
+        <div style="font-size:24px;font-weight:800;color:var(--gold);text-align:center" id="quizQ">Loading…</div>
+        <div id="quizChoices"></div>
+        <div class="row" style="justify-content:space-between;margin-top:10px">
+          <span>Score: <span id="quizScore">0</span> / <span id="quizTotal">0</span></span>
+          <button class="btn small" onclick="newQuiz()">➕ Next</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- ============================== FUN ============================== -->
+<section class="pane" id="pane-fun">
+  <div class="grid grid-2">
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">😂</span> Joke of the moment</h2>
+      <div class="joke-box" id="jokeBox">Click the button for a joke!</div>
+      <button class="btn gold" onclick="newJoke()">🎲 New joke</button>
+    </section>
+
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🐾</span> Random animal fact</h2>
+      <div class="fact-box" id="factBox">Click the button for a fact!</div>
+      <button class="btn">🧠 New fact</button>
+      <span id="factBtnSpacer" style="display:none"></span>
+      <button class="btn green" onclick="newFact()" style="margin-left:6px">🦁 New fact</button>
+    </section>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🍪</span> Fortune cookie</h2>
+      <div class="fact-box" id="fortuneBox" style="background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:var(--gold)">Open a fortune cookie!</div>
+      <button class="btn gold" onclick="newFortune()">🥠 Crack one open</button>
+    </section>
+
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">💬</span> Inspiring quote</h2>
+      <div class="fact-box" id="quoteBox" style="background:rgba(244,114,182,.1);border-color:rgba(244,114,182,.4);color:var(--pink)">Click for a quote!</div>
+      <button class="btn red" onclick="newQuote()">💜 New quote</button>
+    </section>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:12px">
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🎨</span> Color of the day</h2>
+      <div id="colorBox" style="width:100%;height:80px;border-radius:12px;border:2px solid var(--line);margin:10px 0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px"></div>
+      <div class="row">
+        <button class="btn" onclick="newColor()">🎨 New color</button>
+        <span id="colorHex" style="font-family:monospace;font-size:14px">#000000</span>
+      </div>
+    </section>
+
+    <section class="card tool">
+      <h2 style="margin:0 0 10px"><span class="em">🎮</span> Kid-safe gaming feed</h2>
+      <ul class="feed" id="gamingFeedFun"><li class="muted">Loading kid-safe gaming posts…</li></ul>
+    </section>
+  </div>
+</section>
+
+<!-- ============================== SPACE ============================== -->
+<section class="pane" id="pane-space">
+  <div class="card space">
+    <h2 style="margin:0 0 12px"><span class="em">🚀</span> Space right now</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="v" id="spLaunches">—</div><div class="l">Launches coming up</div></div>
+      <div class="stat"><div class="v" id="spQuakes">—</div><div class="l">M2.5+ quakes 7d</div></div>
+      <div class="stat"><div class="v" id="spDisasters">—</div><div class="l">Global alerts</div></div>
+      <div class="stat"><div class="v" id="spNews">—</div><div class="l">Space news today</div></div>
+    </div>
+    <div class="iss-box" id="issBox">🛰  ISS position loading…</div>
+    <h3>Upcoming launches</h3>
+    <ul class="feed" id="launchFeed"><li class="muted">Loading launches…</li></ul>
+  </div>
+
+  <div class="card space" style="margin-top:14px">
+    <h2 style="margin:0 0 12px"><span class="em">🌍</span> Earthquakes (M2.5+ last 7 days)</h2>
+    <ul class="feed" id="quakeFeed"><li class="muted">Loading quakes…</li></ul>
+  </div>
+</section>
+
+<!-- ============================== NEWS ============================== -->
+<section class="pane" id="pane-news">
   <section class="card news">
-    <h2 style="margin:0 0 10px">📰 Kid-safe news</h2>
-    <ul class="feed" id="newsFeed"><li class="muted">Loading headlines…</li></ul>
+    <h2 style="margin:0 0 10px"><span class="em">📰</span> Kid-safe headlines</h2>
+    <ul class="feed" id="newsFeedFull" style="max-height:none"><li class="muted">Loading headlines…</li></ul>
   </section>
-</div>
 
-<div style="margin-top:14px">
-  <section class="card traffic">
-    <h2 style="margin:0 0 10px">🚗 Indiana traffic — Scott County area</h2>
-    <ul class="feed" id="trafficFeed"><li class="muted">Loading traffic events for Scott / Jackson / Clark / Washington / Jefferson…</li></ul>
+  <section class="card gaming" style="margin-top:14px">
+    <h2 style="margin:0 0 10px"><span class="em">🎮</span> Kid-safe gaming community posts</h2>
+    <ul class="feed" id="gamingFeedFull" style="max-height:none"><li class="muted">Loading gaming posts…</li></ul>
   </section>
-</div>
+</section>
+
+<!-- ============================== CAMERAS ============================== -->
+<section class="pane" id="pane-cams">
+  <h2><span class="em">📷</span> Live INDOT cameras around Scott County</h2>
+  <p class="muted" style="margin-bottom:12px">Snapshots refresh every 30 seconds from <code>content.trafficwise.org</code> via the home server. Click any to enlarge.</p>
+  <div class="grid grid-3" id="camGrid"><div class="card"><div class="muted">Loading cameras…</div></div></div>
+
+  <h3 style="margin-top:18px">More cameras nearby</h3>
+  <div class="grid grid-3" id="camGridNearby"><div class="card"><div class="muted">Loading cameras…</div></div></div>
+</section>
+
+<!-- ============================== WATCH ============================== -->
+<section class="pane" id="pane-watch">
+  <h2><span class="em">📺</span> Kid-safe gaming channels</h2>
+  <p class="muted" style="margin-bottom:12px">Hand-picked YouTube channels Ayden can watch. Click any thumbnail to open the channel.</p>
+  <div class="grid grid-2" id="watchGrid"></div>
+
+  <h3 style="margin-top:18px">🎮 Live gameplay clips</h3>
+  <div class="grid grid-2" id="watchClips"></div>
+
+  <h3 style="margin-top:18px">🚀 NASA picture of the day</h3>
+  <div class="card" id="apodCard"><div class="muted">Loading…</div></div>
+</section>
 
 <footer>
-  Powered by Gary's home server at <code>api.thatcomputerguy26.org</code>.
-  Auto-refreshes every few minutes. Made for Ayden 💜
+  Built for Ayden by <a href="/" style="color:var(--gold)">Gary @ TCG Solutions</a> ·
+  Powered by <code>api.thatcomputerguy26.org</code> · Strict kid-safe filter active.
 </footer>
 
 </div>
 
 <script>
-// Build stamp - bumped on every kid-safe filter update so stale tabs detect it.
-window.__KIDS_BUILD = '2026-04-27T22:30Z-strict-filter-v2';
+window.__KIDS_BUILD = '2026-04-27T23:30Z-v5-cameras-watch-apod';
 (function () {
+  'use strict';
   const API = 'https://api.thatcomputerguy26.org';
-  // Auto-reload if the tab is older than 30 minutes (catches stale Ayden tab)
-  setTimeout(function(){
-    if (document.visibilityState === 'hidden') location.reload();
-  }, 30 * 60 * 1000);
-  const $ = (id) => document.getElementById(id);
+  const $  = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  $('buildBadge').textContent = window.__KIDS_BUILD.split('T')[0] + ' v4';
+  // Auto-reload stale tab after 30 min
+  setTimeout(() => { if (document.visibilityState === 'hidden') location.reload(); }, 30*60*1000);
 
-  // === Weather: primary 3 (Gary's request) + nearby fallbacks ===
+  // ===== STRICT KID-SAFE BLOCKLIST =====
+  const UNSAFE = /\b(violence|violent|murder|murderer|killed|killing|kill|shoot|shooting|shooter|gun|guns|firearm|stab|stabbed|knife|sex|sexual|sexy|porn|pornography|nude|nudity|nsfw|hentai|onlyfans|escort|prostitut|abuse|abused|abusive|assault|assaulted|rape|raped|rapist|harass|molest|pedophile|drug|drugs|cocaine|heroin|fentanyl|meth|marijuana|weed|cannabis|alcohol|drunk|war|warfare|bomb|bombing|bomber|terror|terrorism|terrorist|hostage|massacre|genocide|isis|hamas|taliban|hezbollah|cartel|gang|gangster|riot|riots|protest|protests|trump|biden|harris|putin|netanyahu|epstein|hitler|nazi|racism|racist|hate|crime|crimes|criminal|arrest|arrested|prison|jail|convict|hanging|hanged|suicide|suicidal|self-harm|cutting|overdose|dies|died|death|dead|fatal|fatality|tragic|tragedy|horror|horrific|gruesome|brutal|bloody|blood|gore|graphic|disturb|kkk|qanon|opioid|addict|wound|injur|hospital|police|cop|cops|fbi|cia|swat|raid|warrant|investigation|charged|sentence|verdict|guilty|innocent|trial|killer|attacker|victim|victims|stalker|abductor|kidnap|kidnapped|kidnapping|missing-person|amber-alert|silver-alert|deadly|lethal|toxic|poison|poisoning|drown|drowned|drowning|crash|crashed|wreck|wrecked|fire|fires|wildfire|burning|burned|burnt|explosion|exploded|explode|blast|injured|trauma|hospitalized|fatally|deaths|killings|shootings|stabbings|robberies|robbery|burglary|burglar|theft|thief|steal|stolen|carjack|hijack|drone-strike|airstrike|missile|nuclear|warhead|hacker|breached|breach|leaked|exposed|whistleblower|scandal|allegation|alleged|accused|defendant|crackdown|deport|deportation|migrant|asylum|refugee|smuggling|trafficking|slavery|cult|extremist|extremism|radical|radicalized|jihad|civil-war|insurgent|insurgency|coup|dictator|tyrant|oppression|persecution|atrocity|war-crime|holocaust|slaughter|carnage|bloodbath|mass-shooting|serial-killer|cannibal|torture|tortured|hanged|guillotine|execution|executed|stoning|beheaded|beheading|decapitate|dismember|mutilate|disfigure|amputate|acid-attack|adult|mature)\b/i;
+  function isSafe(text) { return !!text && !UNSAFE.test(String(text)); }
+
+  // ===== TABS =====
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const t = e.target.closest('.tab'); if (!t) return;
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('pane-' + t.dataset.pane).classList.add('active');
+  });
+
+  // ===== WEATHER =====
   const CITIES = [
     { name: 'Austin',       lat: 38.7561, lon: -85.8089 },
     { name: 'Scottsburg',   lat: 38.6856, lon: -85.7705 },
@@ -127,33 +525,26 @@ window.__KIDS_BUILD = '2026-04-27T22:30Z-strict-filter-v2';
   ];
   function emoji(code) {
     if (code == null) return '🌤';
-    if (code === 0) return '☀️';
-    if (code <= 3) return '⛅';
-    if (code <= 48) return '🌫';
-    if (code <= 67) return '🌧';
-    if (code <= 77) return '🌨';
-    if (code <= 82) return '🌧';
-    if (code <= 86) return '🌨';
-    if (code >= 95) return '⛈';
+    if (code === 0) return '☀️'; if (code <= 3) return '⛅';
+    if (code <= 48) return '🌫'; if (code <= 67) return '🌧';
+    if (code <= 77) return '❄️'; if (code <= 82) return '🌧';
+    if (code <= 86) return '🌨'; if (code >= 95) return '⛈';
     return '🌤';
   }
   async function loadWeather() {
     const cells = await Promise.all(CITIES.map(async (c) => {
       try {
-        const r = await fetch(`${API}/api/proxy/weather/forecast?lat=${c.lat}&lon=${c.lon}&days=1`, { cache: 'no-store' });
+        const r = await fetch(`${API}/api/proxy/weather/forecast?lat=${c.lat}&lon=${c.lon}&days=1&_=${Date.now()}`, { cache:'no-store' });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
-        // Open-Meteo proxy returns daily only (already °F per daily_units)
         const daily = d.daily || {};
         const tmax = (daily.temperature_2m_max || [])[0];
         const tmin = (daily.temperature_2m_min || [])[0];
         const code = (daily.weathercode || [])[0];
-        return `<div class="card weather">
-          <div class="city">${esc(c.name)}</div>
-          <div style="font-size:32px">${emoji(code)}</div>
+        return `<div class="card weather"><div class="city">${esc(c.name)}</div>
+          <div class="big-emoji">${emoji(code)}</div>
           <div class="temp">${tmax != null ? Math.round(tmax) + '°F' : '—'}</div>
-          <div class="small">Low ${tmin != null ? Math.round(tmin) + '°F' : '—'}</div>
-        </div>`;
+          <div class="small">Low ${tmin != null ? Math.round(tmin) + '°F' : '—'}</div></div>`;
       } catch (e) {
         return `<div class="card weather"><div class="city">${esc(c.name)}</div><div class="err-text">No data</div></div>`;
       }
@@ -161,81 +552,634 @@ window.__KIDS_BUILD = '2026-04-27T22:30Z-strict-filter-v2';
     $('weatherGrid').innerHTML = cells.join('');
   }
 
-  // === Space stats ===
-  async function loadSpace() {
-    try {
-      const r = await fetch(`${API}/api/world/sitrep`, { cache: 'no-store' });
-      if (r.ok) {
-        const s = await r.json();
-        $('spLaunches').textContent = (s.launches || []).length;
-        $('spQuakes').textContent = (s.quakes || []).length;
-        $('spDisasters').textContent = (s.disasters || []).length;
-        $('spNews').textContent = (s.world_news || []).filter(n => /space|nasa|launch|astronaut|iss|orbit/i.test(n.title || '')).length;
-        const launches = (s.launches || []).slice(0, 5);
-        $('launchFeed').innerHTML = launches.length
-          ? launches.map(l => `<li><strong>${esc(l.name || 'Mission')}</strong>
-              <span class="meta">${esc((l.provider && l.provider.name) || '')} · ${esc(l.net || '')}</span></li>`).join('')
-          : '<li class="muted">No upcoming launches in cache.</li>';
-      }
-    } catch (e) { $('launchFeed').innerHTML = `<li class="err-text">Space data unavailable: ${esc(e.message)}</li>`; }
-    // ISS position
-    try {
-      const r = await fetch(`${API}/api/proxy/iss`, { cache: 'no-store' });
-      if (r.ok) {
-        const d = await r.json();
-        $('issBox').textContent = `🛰  ISS: ${d.latitude?.toFixed(2)}°, ${d.longitude?.toFixed(2)}° · ${d.altitude?.toFixed(0)} km · ${d.velocity?.toFixed(0)} km/h`;
-      }
-    } catch (_) { $('issBox').textContent = 'ISS position unavailable'; }
-  }
-
-  // STRONG kid-safe blocklist — defense in depth.
-  // Backend /api/proxy/news/kids-safe already strips the worst stuff;
-  // this is a second client-side pass against title + summary + source.
-  const UNSAFE = /\b(violence|violent|murder|murderer|killed|killing|kill|shoot|shooting|shooter|gun|guns|firearm|stab|stabbed|knife|sex|sexual|sexy|porn|pornography|nude|nudity|nsfw|hentai|onlyfans|escort|prostitut|abuse|abused|abusive|assault|assaulted|rape|raped|rapist|harass|molest|pedophile|drug|drugs|cocaine|heroin|fentanyl|meth|marijuana|weed|cannabis|alcohol|drunk|war|warfare|bomb|bombing|bomber|terror|terrorism|terrorist|hostage|massacre|genocide|isis|hamas|taliban|hezbollah|cartel|gang|gangster|riot|riots|protest|protests|trump|biden|harris|putin|netanyahu|epstein|hitler|nazi|racism|racist|hate|crime|crimes|criminal|arrest|arrested|prison|jail|convict|hanging|hanged|suicide|suicidal|self-harm|cutting|overdose|dies|died|death|dead|fatal|fatality|tragic|tragedy|horror|horrific|gruesome|brutal|bloody|blood|gore|graphic|disturb|kkk|qanon|opioid|addict|wound|injur|hospital|police|cop|cops|fbi|cia|swat|raid|warrant|investigation|charged|sentence|verdict|guilty|innocent|trial|killer|attacker|victim|victims|stalker|abductor|kidnap|kidnapped|kidnapping|missing-person|amber-alert|silver-alert|deadly|lethal|toxic|poison|poisoning|drown|drowned|drowning|crash|crashed|wreck|wrecked|fire|fires|wildfire|burning|burned|burnt|explosion|exploded|explode|blast|injured|trauma|hospitalized|fatally|deaths|killings|shootings|stabbings|robberies|robbery|burglary|burglar|theft|thief|steal|stolen|carjack|hijack|drone-strike|airstrike|missile|nuclear|warhead|hacker|breached|breach|leaked|exposed|whistleblower|scandal|allegation|alleged|accused|defendant|crackdown|deport|deportation|migrant|asylum|refugee|smuggling|trafficking|slavery|cult|extremist|extremism|radical|radicalized|jihad|civil-war|insurgent|insurgency|coup|dictator|tyrant|oppression|persecution|atrocity|war-crime|holocaust|slaughter|carnage|bloodbath|mass-shooting|serial-killer|cannibal|torture|tortured|hanged|guillotine|execution|executed|stoning|beheaded|beheading|decapitate|dismember|mutilate|disfigure|amputate|acid-attack)\b/i;
-  async function loadNews() {
-    // Server-side kid-safe filter (pre-filtered: violence/crime/adult/drugs/political-violence stripped)
-    try {
-      const cacheBust = '&_=' + Date.now();
-      const r = await fetch(`${API}/api/proxy/news/kids-safe?limit=30${cacheBust}`, { cache: 'no-store' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const d = await r.json();
-      const all = d.items || [];
-      const safe = all
-        .filter(n => {
-          if (!n || !n.title) return false;
-          const blob = String(n.title) + ' ' + String(n.summary || '') + ' ' + String(n.source_name || '');
-          return !UNSAFE.test(blob);
-        })
-        .slice(0, 12);
-      $('newsFeed').innerHTML = safe.length
-        ? safe.map(n => `<li><a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
-            <span class="meta">${esc(n.source_name || '')} · ${esc(n.category || '')}</span></li>`).join('')
-        : '<li class="muted">No kid-safe items in feed cache right now.</li>';
-    } catch (e) { $('newsFeed').innerHTML = `<li class="err-text">Feeds unavailable: ${esc(e.message)}</li>`; }
-  }
-
-  // === Indiana traffic via INDOT proxy ===
+  // ===== TRAFFIC + WEATHER ALERTS (Scott + nearby) =====
   async function loadTraffic() {
+    const COUNTIES = ['scott','jackson','clark','washington','jefferson'];
     try {
-      const r = await fetch(`${API}/api/proxy/indot/events`, { cache: 'no-store' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const d = await r.json();
-      const items = (d.items || []).slice(0, 10);
-      $('trafficFeed').innerHTML = items.length
-        ? items.map(t => `<li><strong>${esc(t.title || 'Event')}</strong>
-            <span class="meta">${esc(t.county || '')} · ${esc(t.road || '')} · ${esc(t.severity || '')}</span></li>`).join('')
-        : '<li class="muted">No active traffic events.</li>';
+      const buckets = await Promise.all(COUNTIES.map(async (c) => {
+        try {
+          const r = await fetch(`${API}/api/proxy/indot/events?county=${c}&_=${Date.now()}`, { cache:'no-store' });
+          if (!r.ok) return [];
+          const d = await r.json();
+          return (d.items || []).map(it => Object.assign({}, it, { _county: c }));
+        } catch (_) { return []; }
+      }));
+      const seen = new Set(); const items = [];
+      buckets.flat().forEach(it => {
+        const k = it.id || (it.title + '|' + it.county);
+        if (!seen.has(k)) { seen.add(k); items.push(it); }
+      });
+      items.sort((a,b) => COUNTIES.indexOf(a._county) - COUNTIES.indexOf(b._county));
+      const top = items.slice(0, 18);
+      $('trafficFeed').innerHTML = top.length
+        ? top.map(t => {
+            const cap = (t._county || '').charAt(0).toUpperCase() + (t._county || '').slice(1);
+            const sev = (t.severity || 'info').toLowerCase();
+            const icon = sev.includes('extreme') ? '🚨' : sev.includes('severe') ? '⚠️' : sev.includes('moderate') ? '🟡' : 'ℹ️';
+            return `<li>${icon} <strong>${esc(t.title || 'Event')}</strong>
+              <span class="meta">📍 ${esc(cap)} · ${esc(t.road || '—')} · severity: ${esc(sev)}</span></li>`;
+          }).join('')
+        : '<li class="muted">All quiet in Scott County area right now ✨</li>';
     } catch (e) { $('trafficFeed').innerHTML = `<li class="err-text">Traffic unavailable: ${esc(e.message)}</li>`; }
   }
 
-  loadWeather();
-  loadSpace();
-  loadNews();
-  loadTraffic();
-  setInterval(loadWeather, 600000);  // 10 min
-  setInterval(loadSpace,   300000);  // 5 min
-  setInterval(loadNews,    600000);  // 10 min
-  setInterval(loadTraffic, 180000);  // 3 min
+  // ===== NEWS =====
+  async function loadNews() {
+    try {
+      const r = await fetch(`${API}/api/proxy/news/kids-safe?limit=30&_=${Date.now()}`, { cache:'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const all = d.items || [];
+      const safe = all.filter(n => {
+        if (!n || !n.title) return false;
+        return isSafe(`${n.title} ${n.summary || ''} ${n.source_name || ''}`);
+      });
+      const renderItem = (n) => {
+        const pillClass = (n.region === 'local' || n.category === 'local') ? 'local'
+                        : n.category === 'tech' ? 'tech'
+                        : n.category === 'space' ? 'space' : 'world';
+        return `<li><span class="pill ${pillClass}">${esc((n.category || 'NEWS').toUpperCase())}</span>
+          <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
+          <span class="meta">${esc(n.source_name || '')}</span></li>`;
+      };
+      const top = safe.slice(0, 10).map(renderItem).join('') || '<li class="muted">No headlines right now.</li>';
+      const full = safe.slice(0, 30).map(renderItem).join('') || '<li class="muted">No headlines right now.</li>';
+      $('newsFeedToday').innerHTML = top;
+      $('newsFeedFull').innerHTML = full;
+    } catch (e) {
+      $('newsFeedToday').innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
+      $('newsFeedFull').innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
+    }
+  }
+
+  // ===== GAMING =====
+  async function loadGaming() {
+    try {
+      const r = await fetch(`${API}/api/feeds/social/reddit/gaming?limit=40&_=${Date.now()}`, { cache:'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const raw = d.posts || d.items || [];
+      const items = raw.filter(p => p && p.title && !p.over_18 && !p.nsfw && isSafe(`${p.title} ${p.selftext || ''}`));
+      const render = (p) => `<li><a href="${esc(p.permalink || p.url || '#')}" target="_blank" rel="noopener">${esc(p.title)}</a>
+        <span class="meta">r/${esc(p.subreddit || 'gaming')} · ⭐ ${p.score || 0} · 💬 ${p.num_comments || 0}</span></li>`;
+      const fun = items.slice(0, 10).map(render).join('') || '<li class="muted">No fresh gaming posts.</li>';
+      const full = items.slice(0, 30).map(render).join('') || '<li class="muted">No fresh gaming posts.</li>';
+      $('gamingFeedFun').innerHTML = fun;
+      $('gamingFeedFull').innerHTML = full;
+    } catch (e) {
+      $('gamingFeedFun').innerHTML = `<li class="err-text">Gaming unavailable: ${esc(e.message)}</li>`;
+      $('gamingFeedFull').innerHTML = `<li class="err-text">Gaming unavailable: ${esc(e.message)}</li>`;
+    }
+  }
+
+  // ===== SPACE =====
+  async function loadSpace() {
+    try {
+      const r = await fetch(`${API}/api/world/sitrep?_=${Date.now()}`, { cache:'no-store' });
+      if (r.ok) {
+        const s = await r.json();
+        $('spLaunches').textContent = (s.launches || []).length;
+        $('spQuakes').textContent   = (s.quakes || []).length;
+        $('spDisasters').textContent= (s.disasters || []).length;
+        $('spNews').textContent     = (s.world_news || []).filter(n => /space|nasa|launch|astronaut|iss|orbit/i.test(n.title || '')).length;
+
+        const launches = (s.launches || []).slice(0, 8);
+        $('launchFeed').innerHTML = launches.length
+          ? launches.map(l => `<li><span class="pill space">SPACE</span><strong>${esc(l.name || 'Mission')}</strong>
+              <span class="meta">${esc((l.provider && l.provider.name) || '')} · ${esc(l.net || '')}</span></li>`).join('')
+          : '<li class="muted">No upcoming launches in cache.</li>';
+
+        const quakes = (s.quakes || []).slice(0, 12);
+        $('quakeFeed').innerHTML = quakes.length
+          ? quakes.map(q => {
+              const m = q.magnitude || q.mag;
+              const place = q.place || q.location || 'Unknown';
+              return `<li>🌍 <strong>M${m != null ? Number(m).toFixed(1) : '?'}</strong>
+                <span class="meta">${esc(place)}</span></li>`;
+            }).join('')
+          : '<li class="muted">No recent quakes in cache.</li>';
+      }
+    } catch (e) { $('launchFeed').innerHTML = `<li class="err-text">Space unavailable.</li>`; }
+
+    try {
+      const r = await fetch(`${API}/api/proxy/iss?_=${Date.now()}`, { cache:'no-store' });
+      if (r.ok) {
+        const d = await r.json();
+        $('issBox').textContent = `🛰  ISS at ${d.latitude?.toFixed(2)}°, ${d.longitude?.toFixed(2)}° · alt ${Math.round(d.altitude)} km · ${Math.round(d.velocity).toLocaleString()} km/h`;
+      }
+    } catch (_) { $('issBox').textContent = '🛰  ISS position unavailable'; }
+  }
+
+  // ===== TIC-TAC-TOE (vs simple AI) =====
+  let tttBoard = Array(9).fill('');
+  let tttDone = false;
+  function newTTT() {
+    tttBoard = Array(9).fill('');
+    tttDone = false;
+    $('tttStatus').textContent = 'Your turn (X)';
+    renderTTT();
+  }
+  function renderTTT() {
+    const b = $('tttBoard');
+    b.innerHTML = tttBoard.map((c, i) =>
+      `<div class="ttt-cell ${c.toLowerCase()}" onclick="tttClick(${i})">${esc(c)}</div>`).join('');
+  }
+  window.tttClick = (i) => {
+    if (tttDone || tttBoard[i]) return;
+    tttBoard[i] = 'X';
+    if (checkTTT('X')) { $('tttStatus').textContent = '🎉 You won!'; tttDone = true; renderTTT(); return; }
+    if (tttBoard.every(c => c)) { $('tttStatus').textContent = '🤝 Tie game.'; tttDone = true; renderTTT(); return; }
+    // Computer move: pick winning, blocking, then random
+    const empty = tttBoard.map((c,i)=>c?-1:i).filter(i=>i>=0);
+    let move = -1;
+    for (const i of empty) { tttBoard[i]='O'; if (checkTTT('O')) { move=i; tttBoard[i]=''; break; } tttBoard[i]=''; }
+    if (move<0) for (const i of empty) { tttBoard[i]='X'; if (checkTTT('X')) { move=i; tttBoard[i]=''; break; } tttBoard[i]=''; }
+    if (move<0) move = empty[Math.floor(Math.random()*empty.length)];
+    tttBoard[move] = 'O';
+    if (checkTTT('O')) { $('tttStatus').textContent = '🤖 Computer won!'; tttDone = true; }
+    else if (tttBoard.every(c => c)) { $('tttStatus').textContent = '🤝 Tie game.'; tttDone = true; }
+    else $('tttStatus').textContent = 'Your turn (X)';
+    renderTTT();
+  };
+  function checkTTT(p) {
+    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    return wins.some(([a,b,c]) => tttBoard[a]===p && tttBoard[b]===p && tttBoard[c]===p);
+  }
+  window.newTTT = newTTT;
+
+  // ===== MEMORY MATCH =====
+  const MEM_EMOJIS = ['🐶','🐱','🦊','🐼','🐸','🐙','🦄','🐢'];
+  let memCards = []; let memFlipped = []; let memMatched = []; let memMoves = 0;
+  function newMemory() {
+    memCards = [...MEM_EMOJIS, ...MEM_EMOJIS].sort(() => Math.random() - .5);
+    memFlipped = []; memMatched = []; memMoves = 0;
+    $('memStatus').textContent = 'Find all the pairs! Moves: 0';
+    renderMem();
+  }
+  function renderMem() {
+    $('memBoard').innerHTML = memCards.map((c, i) => {
+      const flipped = memFlipped.includes(i) || memMatched.includes(i);
+      const matched = memMatched.includes(i);
+      return `<div class="mem-card ${flipped?'flipped':''} ${matched?'matched':''}" onclick="memClick(${i})">${flipped?esc(c):'?'}</div>`;
+    }).join('');
+  }
+  window.memClick = (i) => {
+    if (memFlipped.includes(i) || memMatched.includes(i) || memFlipped.length >= 2) return;
+    memFlipped.push(i);
+    renderMem();
+    if (memFlipped.length === 2) {
+      memMoves++;
+      const [a,b] = memFlipped;
+      if (memCards[a] === memCards[b]) {
+        memMatched.push(a, b); memFlipped = [];
+        if (memMatched.length === memCards.length) {
+          $('memStatus').textContent = `🎉 You won in ${memMoves} moves!`;
+        } else {
+          $('memStatus').textContent = `Find all the pairs! Moves: ${memMoves}`;
+        }
+        renderMem();
+      } else {
+        $('memStatus').textContent = `Find all the pairs! Moves: ${memMoves}`;
+        setTimeout(() => { memFlipped = []; renderMem(); }, 800);
+      }
+    }
+  };
+  window.newMemory = newMemory;
+
+  // ===== SNAKE =====
+  let snakeRunning = false; let snakeInt = null;
+  let snake, dir, food, score, GRID = 15, CELL = 20;
+  function startSnake() {
+    if (snakeInt) clearInterval(snakeInt);
+    snake = [{x:7,y:7}]; dir = {x:1,y:0}; score = 0;
+    placeFood(); snakeRunning = true;
+    $('snakeStatus').textContent = 'Score: 0 — arrow keys / WASD to move';
+    snakeInt = setInterval(snakeStep, 130);
+  }
+  function placeFood() {
+    while (true) {
+      food = { x: Math.floor(Math.random()*GRID), y: Math.floor(Math.random()*GRID) };
+      if (!snake.some(s => s.x===food.x && s.y===food.y)) break;
+    }
+  }
+  function snakeStep() {
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    if (head.x<0||head.x>=GRID||head.y<0||head.y>=GRID || snake.some(s=>s.x===head.x&&s.y===head.y)) {
+      snakeRunning = false; clearInterval(snakeInt);
+      $('snakeStatus').textContent = `💥 Game over! Score: ${score} — press Start to play again`;
+      return;
+    }
+    snake.unshift(head);
+    if (head.x===food.x && head.y===food.y) { score++; placeFood();
+      $('snakeStatus').textContent = `Score: ${score}`;
+    } else { snake.pop(); }
+    drawSnake();
+  }
+  function drawSnake() {
+    const c = $('snakeCanvas'); const ctx = c.getContext('2d');
+    ctx.fillStyle = '#000018'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle = '#34d399'; snake.forEach(s => ctx.fillRect(s.x*CELL+1, s.y*CELL+1, CELL-2, CELL-2));
+    ctx.fillStyle = '#fbbf24'; ctx.fillRect(food.x*CELL+1, food.y*CELL+1, CELL-2, CELL-2);
+  }
+  document.addEventListener('keydown', (e) => {
+    if (!snakeRunning) return;
+    const k = e.key.toLowerCase();
+    if ((k==='arrowup'   ||k==='w') && dir.y!==1)  { dir = {x:0,y:-1}; e.preventDefault(); }
+    if ((k==='arrowdown' ||k==='s') && dir.y!==-1) { dir = {x:0,y:1};  e.preventDefault(); }
+    if ((k==='arrowleft' ||k==='a') && dir.x!==1)  { dir = {x:-1,y:0}; e.preventDefault(); }
+    if ((k==='arrowright'||k==='d') && dir.x!==-1) { dir = {x:1,y:0};  e.preventDefault(); }
+  });
+  window.startSnake = startSnake;
+
+  // ===== DICE / COIN / RANDOM =====
+  window.rollDice = () => {
+    const dice = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    let i = 0;
+    const roll = setInterval(() => { $('diceResult').textContent = dice[i++ % 6]; }, 60);
+    setTimeout(() => { clearInterval(roll); $('diceResult').textContent = dice[Math.floor(Math.random()*6)]; }, 500);
+  };
+  window.flipCoin = () => {
+    $('coinResult').textContent = '...';
+    setTimeout(() => { $('coinResult').textContent = Math.random() < .5 ? '🪙 Heads' : '🪙 Tails'; }, 400);
+  };
+  window.pickNumber = () => {
+    $('numResult').textContent = Math.floor(Math.random()*100) + 1;
+  };
+  window.pickFromList = () => {
+    const items = $('pickInput').value.split(',').map(s=>s.trim()).filter(Boolean);
+    if (!items.length) { $('pickResult').textContent = 'add a list first!'; return; }
+    $('pickResult').textContent = '🎯 ' + items[Math.floor(Math.random()*items.length)];
+  };
+
+  // ===== CALCULATOR =====
+  let calcExpr = '';
+  function calcRender() { $('calcDisplay').textContent = calcExpr || '0'; }
+  window.calcDigit  = (d) => { calcExpr += d; calcRender(); };
+  window.calcOp     = (op) => { calcExpr += op; calcRender(); };
+  window.calcClear  = () => { calcExpr = ''; calcRender(); };
+  window.calcBackspace = () => { calcExpr = calcExpr.slice(0, -1); calcRender(); };
+  window.calcEquals = () => {
+    try {
+      // Strict allowlist: digits, operators, parens, dot, spaces only
+      if (!/^[\d+\-*/().\s]+$/.test(calcExpr)) { calcExpr = 'Error'; calcRender(); return; }
+      const v = Function('"use strict"; return (' + calcExpr + ')')();
+      calcExpr = String(Math.round(v * 1e10) / 1e10);
+    } catch (_) { calcExpr = 'Error'; }
+    calcRender();
+  };
+
+  // ===== DRAWING PAD =====
+  const COLORS = ['#000','#fff','#ef4444','#f97316','#fbbf24','#22c55e','#22d3ee','#3b82f6','#a855f7','#ec4899'];
+  let drawColor = '#000'; let drawing = false;
+  function setupDraw() {
+    const cp = $('colorPick');
+    cp.innerHTML = COLORS.map((c, i) =>
+      `<div class="color-swatch ${i===0?'active':''}" data-color="${c}" style="background:${c}"></div>`).join('');
+    cp.addEventListener('click', (e) => {
+      const sw = e.target.closest('.color-swatch'); if (!sw) return;
+      drawColor = sw.dataset.color;
+      cp.querySelectorAll('.color-swatch').forEach(x => x.classList.remove('active'));
+      sw.classList.add('active');
+    });
+    const c = $('drawCanvas'); const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    function pt(e) {
+      const r = c.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+      return { x: x * (c.width / r.width), y: y * (c.height / r.height) };
+    }
+    function start(e) { drawing = true; const p = pt(e); ctx.strokeStyle = drawColor;
+      ctx.lineWidth = parseInt($('brushSize').value, 10); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+    function move(e)  { if (!drawing) return; const p = pt(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
+    function end()    { drawing = false; }
+    c.addEventListener('mousedown', start); c.addEventListener('mousemove', move);
+    c.addEventListener('mouseup', end); c.addEventListener('mouseleave', end);
+    c.addEventListener('touchstart', start); c.addEventListener('touchmove', move); c.addEventListener('touchend', end);
+  }
+  window.drawClear = () => { const c = $('drawCanvas'); const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height); };
+  window.drawSave  = () => { const c = $('drawCanvas');
+    const a = document.createElement('a'); a.download = 'aydens-drawing.png'; a.href = c.toDataURL('image/png'); a.click(); };
+
+  // ===== TIMER / STOPWATCH =====
+  let timerStartTime = 0; let timerElapsed = 0; let timerInterval = null; let countdownTarget = 0;
+  function timerRender(ms) {
+    const total = Math.max(0, Math.floor(ms / 100));
+    const m = String(Math.floor(total / 600)).padStart(2,'0');
+    const s = String(Math.floor((total % 600) / 10)).padStart(2,'0');
+    const t = total % 10;
+    $('timerDisplay').textContent = `${m}:${s}.${t}`;
+  }
+  window.timerStart = () => {
+    if (timerInterval) clearInterval(timerInterval);
+    countdownTarget = 0;
+    timerStartTime = Date.now() - timerElapsed;
+    timerInterval = setInterval(() => { timerElapsed = Date.now() - timerStartTime; timerRender(timerElapsed); }, 100);
+  };
+  window.timerPause = () => { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } };
+  window.timerReset = () => { if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null; timerElapsed = 0; countdownTarget = 0; timerRender(0); };
+  window.countdownStart = () => {
+    if (timerInterval) clearInterval(timerInterval);
+    const min = Math.max(1, Math.min(60, parseInt($('timerMinutes').value, 10) || 5));
+    countdownTarget = Date.now() + min * 60000;
+    timerInterval = setInterval(() => {
+      const left = countdownTarget - Date.now();
+      if (left <= 0) { clearInterval(timerInterval); timerInterval = null;
+        $('timerDisplay').textContent = '⏰ TIME!'; alert('⏰ Countdown done!'); return; }
+      timerRender(left);
+    }, 100);
+  };
+
+  // ===== MATH QUIZ =====
+  let quizScore = 0; let quizTotal = 0; let quizAnswer = 0;
+  function newQuiz() {
+    const op = ['+','-','×','÷'][Math.floor(Math.random()*4)];
+    let a, b, ans;
+    if (op==='+') { a=rand(1,30); b=rand(1,30); ans=a+b; }
+    else if (op==='-') { a=rand(10,40); b=rand(1,a); ans=a-b; }
+    else if (op==='×') { a=rand(2,12); b=rand(2,12); ans=a*b; }
+    else { ans=rand(2,12); b=rand(2,12); a=ans*b; }
+    quizAnswer = ans;
+    $('quizQ').textContent = `${a} ${op} ${b} = ?`;
+    const choices = new Set([ans]);
+    while (choices.size < 4) choices.add(ans + rand(-10, 10));
+    const arr = [...choices].sort(() => Math.random() - .5);
+    $('quizChoices').innerHTML = arr.map(c =>
+      `<button class="quiz-btn" onclick="quizPick(this, ${c})">${c}</button>`).join('');
+  }
+  function rand(min, max) { return Math.floor(Math.random()*(max-min+1)) + min; }
+  window.quizPick = (btn, val) => {
+    quizTotal++;
+    $('quizTotal').textContent = quizTotal;
+    if (val === quizAnswer) { btn.classList.add('correct'); quizScore++; $('quizScore').textContent = quizScore; }
+    else {
+      btn.classList.add('wrong');
+      $('quizChoices').querySelectorAll('.quiz-btn').forEach(b => {
+        if (parseInt(b.textContent, 10) === quizAnswer) b.classList.add('correct');
+      });
+    }
+    setTimeout(newQuiz, 1200);
+  };
+  window.newQuiz = newQuiz;
+
+  // ===== JOKES (curated kid-safe) =====
+  const JOKES = [
+    {q:"Why don't skeletons fight each other?", a:"They don't have the guts!"},
+    {q:"What did the ocean say to the shore?", a:"Nothing, it just waved."},
+    {q:"Why did the math book look sad?", a:"Because it had too many problems."},
+    {q:"What do you call cheese that isn't yours?", a:"Nacho cheese!"},
+    {q:"Why don't eggs tell jokes?", a:"They'd crack each other up."},
+    {q:"What's a computer's favorite snack?", a:"Microchips."},
+    {q:"Why was the broom late?", a:"It over-swept!"},
+    {q:"How do you organize a space party?", a:"You planet."},
+    {q:"What did one wall say to the other?", a:"I'll meet you at the corner."},
+    {q:"Why did the bicycle fall over?", a:"It was two-tired."},
+    {q:"What do you call a fish wearing a crown?", a:"Your royal high-ness."},
+    {q:"Why don't scientists trust atoms?", a:"Because they make up everything!"},
+    {q:"What's a cat's favorite color?", a:"Purr-ple."},
+    {q:"Why did the cookie cry?", a:"Because its mom was a wafer too long."},
+    {q:"What do you call a bear with no teeth?", a:"A gummy bear!"},
+    {q:"Why did the golfer wear two pants?", a:"In case he got a hole in one."},
+    {q:"What did zero say to eight?", a:"Nice belt!"},
+    {q:"Why don't elephants use computers?", a:"They're afraid of the mouse."},
+    {q:"What's brown and sticky?", a:"A stick."},
+    {q:"Why did the picture go to jail?", a:"Because it was framed."},
+    {q:"What do you call a sleeping bull?", a:"A bulldozer."},
+    {q:"What did the grape do when it got stepped on?", a:"It let out a little wine."},
+    {q:"Why did the kid bring a ladder to school?", a:"To go to high school!"},
+    {q:"How do you make an octopus laugh?", a:"With ten-tickles."},
+    {q:"What's a pirate's favorite letter?", a:"You'd think it's R, but their first love is the C."},
+  ];
+  window.newJoke = () => {
+    const j = JOKES[Math.floor(Math.random()*JOKES.length)];
+    $('jokeBox').innerHTML = `<div class="joke-q">${esc(j.q)}</div><div class="joke-a">${esc(j.a)}</div>`;
+  };
+
+  // ===== ANIMAL FACTS =====
+  const FACTS = [
+    "🐙 Octopuses have three hearts and blue blood.",
+    "🐧 Penguins propose to their mates with a pebble.",
+    "🦒 A giraffe's tongue is dark blue and 18-20 inches long.",
+    "🐨 Koala fingerprints are nearly identical to human ones.",
+    "🦈 Sharks existed before trees did.",
+    "🐢 Some turtles can breathe through their butts.",
+    "🦘 Kangaroos can't walk backwards.",
+    "🐜 Ants don't have lungs — they breathe through tiny holes in their bodies.",
+    "🦉 Owls can rotate their heads up to 270 degrees.",
+    "🐝 Honey never spoils — 3000-year-old honey is still edible.",
+    "🐬 Dolphins have names for each other.",
+    "🐋 A blue whale's heart is the size of a small car.",
+    "🦎 Geckos can climb walls because of millions of tiny hairs on their feet.",
+    "🐶 A dog's nose print is unique, just like a human fingerprint.",
+    "🐱 Cats have a third eyelid called a haw.",
+    "🦔 A group of hedgehogs is called a prickle.",
+    "🦋 Butterflies taste with their feet.",
+    "🐌 Snails can sleep for up to three years.",
+    "🦀 Crabs have taste sensors on their feet.",
+    "🐘 Elephants can recognize themselves in mirrors.",
+    "🦓 No two zebras have the same stripe pattern.",
+    "🦦 Otters hold hands while sleeping so they don't drift apart.",
+    "🐦 A hummingbird's heart beats up to 1,260 times per minute.",
+    "🦅 Eagles can see 4-8 times better than humans.",
+    "🦥 Sloths only poop once a week.",
+    "🐊 A crocodile cannot stick its tongue out.",
+    "🐳 Whales sing songs that can travel hundreds of miles.",
+    "🦏 A rhinoceros's horn is made of keratin, the same stuff as your hair.",
+  ];
+  window.newFact = () => { $('factBox').textContent = FACTS[Math.floor(Math.random()*FACTS.length)]; };
+
+  // ===== FORTUNES =====
+  const FORTUNES = [
+    "🌟 An adventure is just around the corner.",
+    "🍀 Today is a great day to learn something new.",
+    "🚀 The stars are aligning in your favor.",
+    "🎮 Your high score is just one game away.",
+    "🌈 Something colorful is coming your way.",
+    "🎁 Look for a surprise from someone you love.",
+    "⚡ Your courage will be rewarded.",
+    "🦄 Believe in magic — it's all around you.",
+    "🌊 Big things are coming, like waves on the beach.",
+    "🏆 Practice today, win tomorrow.",
+    "🌱 The seeds you plant now will grow into something big.",
+    "🎯 Stay focused — you're closer than you think.",
+    "💡 Your next great idea is right behind your next nap.",
+    "🎵 Sing today even if no one's listening.",
+    "🐉 Be brave like a dragon, kind like a unicorn.",
+  ];
+  window.newFortune = () => { $('fortuneBox').textContent = FORTUNES[Math.floor(Math.random()*FORTUNES.length)]; };
+
+  // ===== QUOTES =====
+  const QUOTES = [
+    "💜 \"You are braver than you believe.\" — Christopher Robin",
+    "💜 \"Today you are You, that is truer than true.\" — Dr. Seuss",
+    "💜 \"The best way to predict the future is to create it.\"",
+    "💜 \"Mistakes are proof that you are trying.\"",
+    "💜 \"Be a fountain, not a drain.\"",
+    "💜 \"Stars can't shine without darkness.\"",
+    "💜 \"The world is full of magic things.\" — W.B. Yeats",
+    "💜 \"Imagination is more important than knowledge.\" — Albert Einstein",
+    "💜 \"The only way to do great work is to love what you do.\"",
+    "💜 \"Adventure is out there!\" — Up",
+    "💜 \"Hakuna matata — it means no worries.\" — Lion King",
+    "💜 \"To infinity and beyond!\" — Buzz Lightyear",
+    "💜 \"With great power comes great responsibility.\" — Spider-Man",
+    "💜 \"You miss 100% of the shots you don't take.\" — Wayne Gretzky",
+  ];
+  window.newQuote = () => { $('quoteBox').textContent = QUOTES[Math.floor(Math.random()*QUOTES.length)]; };
+
+  // ===== COLOR =====
+  window.newColor = () => {
+    const r = Math.floor(Math.random()*256), g = Math.floor(Math.random()*256), b = Math.floor(Math.random()*256);
+    const hex = '#' + [r,g,b].map(n => n.toString(16).padStart(2,'0')).join('');
+    const fg = (r*0.299 + g*0.587 + b*0.114) > 150 ? '#000' : '#fff';
+    const box = $('colorBox');
+    box.style.background = hex; box.style.color = fg; box.textContent = hex.toUpperCase();
+    $('colorHex').textContent = hex.toUpperCase();
+  };
+
+  // ===== BOOT =====
+  newTTT();
+  newMemory();
+  setupDraw();
+  newQuiz();
+  newJoke();
+  newFact();
+  newFortune();
+  newQuote();
+  newColor();
+  // Pre-render snake idle
+  drawSnake = function() {
+    const c = $('snakeCanvas'); if (!c) return; const ctx = c.getContext('2d');
+    ctx.fillStyle = '#000018'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle = '#94a3b8'; ctx.font = '16px Comic Sans MS';
+    ctx.fillText('Press ▶ Start to play!', 60, c.height/2);
+  };
+  drawSnake();
+
+  // ===== CAMERAS (INDOT JPG snapshots) =====
+  const CAM_COUNTIES_PRIMARY = ['Scott'];
+  const CAM_COUNTIES_NEARBY  = ['Jackson','Clark','Washington','Jefferson'];
+  function camCard(c, bust) {
+    const url = c.image_url || c.snapshot_url || c.stream_url;
+    if (!url) return '';
+    const cacheBust = url + (url.includes('?') ? '&' : '?') + 't=' + bust;
+    const name = c.name || c.location || c.camera_id || 'Camera';
+    const meta = [c.county, c.route, c.direction].filter(Boolean).join(' · ');
+    return `<div class="card" style="padding:8px">
+      <a href="${esc(cacheBust)}" target="_blank" rel="noopener" title="${esc(name)} — open full size">
+        <img src="${esc(cacheBust)}" alt="${esc(name)}" loading="lazy"
+             style="width:100%;height:160px;object-fit:cover;border-radius:8px;background:#000"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <div style="display:none;height:160px;background:rgba(248,113,113,.12);border-radius:8px;color:var(--red);text-align:center;padding-top:65px">📷 offline</div>
+      </a>
+      <div style="margin-top:8px"><strong>${esc(name)}</strong><br>
+        <span class="meta" style="color:var(--dim);font-size:11px">${esc(meta)}</span></div>
+    </div>`;
+  }
+  async function loadCams(counties, mountId) {
+    try {
+      const buckets = await Promise.all(counties.map(async (c) => {
+        try {
+          const r = await fetch(`${API}/api/indot/cameras?county=${encodeURIComponent(c)}&limit=20`, { cache:'no-store' });
+          if (!r.ok) return [];
+          const d = await r.json();
+          return d.items || [];
+        } catch (_) { return []; }
+      }));
+      const all = buckets.flat();
+      const bust = Math.floor(Date.now() / 30000); // 30s cache buckets
+      const html = all.map(c => camCard(c, bust)).filter(Boolean).join('');
+      $(mountId).innerHTML = html || '<div class="card"><div class="muted">No cameras for these counties.</div></div>';
+    } catch (e) {
+      $(mountId).innerHTML = `<div class="card"><div class="err-text">Cameras unavailable: ${esc(e.message)}</div></div>`;
+    }
+  }
+  function loadAllCams() {
+    loadCams(CAM_COUNTIES_PRIMARY, 'camGrid');
+    loadCams(CAM_COUNTIES_NEARBY,  'camGridNearby');
+  }
+
+  // ===== WATCH (kid-safe YouTube channels) =====
+  // Channel IDs are public; embedding only; no API key needed.
+  const KID_CHANNELS = [
+    { name:'Aphmau',           id:'UCXBE_QqWcb4o5q9XhUjQHGg', desc:'Minecraft roleplay & adventures' },
+    { name:'DanTDM',           id:'UCS5Oz6CHmeoF7vSad0qqXfw', desc:'Kid-safe Minecraft & gaming' },
+    { name:'Stampylonghead',   id:'UCj5i58mCkAREDqFWlhaQbOw', desc:'Stampy Cat Minecraft adventures' },
+    { name:'Mark Rober',       id:'UCY1kMZp36IQSyNx_9h4mpCg', desc:'Cool science experiments' },
+    { name:'Crash Course Kids',id:'UCD-kU1HHZqcOhB0-h-VhJaA', desc:'Science lessons for kids' },
+    { name:'NASA',             id:'UCLA_DiR1FfKNvjuUpBHmylQ', desc:'Real space missions & launches' },
+    { name:'Ryan\'s World',    id:'UChGJGhZ9SOOHvBB0Y4DOO_w', desc:'Toys, science & fun' },
+    { name:'Wild Kratts',      id:'UCe1c9Cz3EoKlV5Xf7n4u4Aw', desc:'Animal adventures' },
+  ];
+  function loadWatch() {
+    const grid = $('watchGrid');
+    grid.innerHTML = KID_CHANNELS.map(ch => `
+      <div class="card" style="padding:12px">
+        <h3 style="margin:0 0 8px;color:var(--pink)">📺 ${esc(ch.name)}</h3>
+        <iframe width="100%" height="200" loading="lazy"
+                src="https://www.youtube.com/embed?listType=user_uploads&list=${esc(ch.id)}&modestbranding=1&rel=0"
+                style="border:0;border-radius:10px;background:#000"
+                allow="encrypted-media;picture-in-picture"
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+        <div style="margin-top:8px;color:var(--dim);font-size:13px">${esc(ch.desc)}</div>
+        <a href="https://www.youtube.com/channel/${esc(ch.id)}" target="_blank" rel="noopener"
+           style="color:var(--pri);text-decoration:none;font-size:13px;font-weight:600">→ Open channel</a>
+      </div>`).join('');
+  }
+  // Search-based gameplay clips (curated kid-safe terms)
+  function loadWatchClips() {
+    const CLIPS = [
+      { q:'Minecraft+kid+friendly+gameplay', label:'⛏ Minecraft' },
+      { q:'Roblox+kid+friendly+gameplay',    label:'🎮 Roblox' },
+      { q:'Mario+gameplay+family+friendly',  label:'🍄 Mario' },
+      { q:'Fortnite+no+commentary',          label:'🪂 Fortnite (no commentary)' },
+    ];
+    $('watchClips').innerHTML = CLIPS.map(c => `
+      <div class="card" style="padding:12px">
+        <h3 style="margin:0 0 8px">${esc(c.label)}</h3>
+        <iframe width="100%" height="200" loading="lazy"
+                src="https://www.youtube.com/embed?listType=search&list=${esc(c.q)}&modestbranding=1&rel=0"
+                style="border:0;border-radius:10px;background:#000"
+                allow="encrypted-media;picture-in-picture"
+                referrerpolicy="strict-origin-when-cross-origin"
+                sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+      </div>`).join('');
+  }
+  // NASA APOD via server proxy
+  async function loadAPOD() {
+    try {
+      const r = await fetch(`${API}/api/proxy/nasa/apod?_=${Date.now()}`, { cache:'no-store' });
+      if (r.ok) {
+        const d = await r.json();
+        const img = d.url || d.hdurl || '';
+        const title = d.title || 'NASA Picture of the Day';
+        const expl = (d.explanation || '').slice(0, 400);
+        const isVideo = (d.media_type === 'video');
+        $('apodCard').innerHTML = `
+          <h3 style="margin:0 0 8px">${esc(title)}</h3>
+          ${isVideo
+            ? `<iframe src="${esc(img)}" width="100%" height="320" style="border:0;border-radius:10px;background:#000" allowfullscreen></iframe>`
+            : `<a href="${esc(img)}" target="_blank" rel="noopener"><img src="${esc(img)}" style="max-width:100%;border-radius:10px" alt="${esc(title)}" loading="lazy"></a>`}
+          <p style="margin-top:10px;color:var(--dim);font-size:13px;line-height:1.5">${esc(expl)}…</p>`;
+      } else {
+        $('apodCard').innerHTML = `<div class="muted">NASA picture unavailable right now.</div>`;
+      }
+    } catch (_) { $('apodCard').innerHTML = `<div class="muted">NASA picture unavailable.</div>`; }
+  }
+
+  // Live data
+  loadWeather(); loadTraffic(); loadNews(); loadGaming(); loadSpace();
+  loadAllCams(); loadWatch(); loadWatchClips(); loadAPOD();
+  setInterval(loadWeather, 600000);
+  setInterval(loadTraffic, 180000);
+  setInterval(loadNews,    600000);
+  setInterval(loadGaming,  300000);
+  setInterval(loadSpace,   300000);
+  setInterval(loadAllCams, 30000); // 30s camera refresh
 })();
 </script>
 </body>
