@@ -395,6 +395,8 @@
   <button class="tab" data-pane="pcmastery">⚙ PC Mastery</button>
   <button class="tab" data-pane="study">📚 Study Partner</button>
   <button class="tab" data-pane="schools">🏫 Schools</button>
+  <button class="tab" data-pane="sky">🛰 Sky Tracker</button>
+  <button class="tab" data-pane="lab">🧪 Science Lab</button>
   <a class="tab" href="/" style="text-decoration:none">🏠 Home →</a>
   <a class="tab" href="/playground.html" style="text-decoration:none">🌌 Multiplayer →</a>
 </nav>
@@ -1654,6 +1656,90 @@
   </div>
 </section>
 
+<!-- ============================== SCIENCE LAB (50 tools) ============================== -->
+<section class="pane" id="pane-lab">
+  <h2><span class="em">🧪</span> Science Lab — 50 hands-on tools</h2>
+  <p class="muted" style="margin-bottom:14px">Click any tool below to open it. Most run right in the browser. The ones that need the home server use Gary's local AI for instant answers.</p>
+
+  <div class="grid grid-3" id="labGrid"></div>
+
+  <div class="card tool" style="margin-top:18px;border-color:rgba(57,255,20,.4)">
+    <h3 style="margin:0 0 10px;color:var(--neon-green)">🔬 Got a science question?</h3>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:8px">Use the <strong>Study Partner</strong> tab in Research mode for any topic — it'll give you a multi-perspective writeup with sources you can verify.</p>
+    <button class="btn green" onclick="activateTab('study')">→ OPEN STUDY PARTNER</button>
+  </div>
+</section>
+
+<!-- ============================== SKY TRACKER ============================== -->
+<section class="pane" id="pane-sky">
+  <h2><span class="em">🛰</span> Sky Tracker — ISS, satellites, stars, launches</h2>
+  <p class="muted" style="margin-bottom:14px">Live overhead view from Scottsburg, IN. Live ISS position auto-refreshes every 5 seconds.</p>
+
+  <div class="card tool" style="border-color:rgba(0,240,255,.5);text-align:center;padding:24px">
+    <div style="font:800 11px var(--font-display);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)">International Space Station — RIGHT NOW</div>
+    <div id="iss-position" style="font:900 28px/1.2 var(--font-display);letter-spacing:.04em;color:var(--neon-cyan);margin:12px 0;text-shadow:0 0 16px var(--neon-cyan)">⌛ acquiring signal…</div>
+    <div id="iss-detail" style="color:var(--dim);font-size:13px;font-family:monospace"></div>
+    <div style="display:flex;justify-content:center;gap:18px;margin-top:14px;flex-wrap:wrap;font-size:13px">
+      <span><strong style="color:var(--neon-yellow)" id="iss-vel">—</strong> km/h</span>
+      <span><strong style="color:var(--neon-yellow)" id="iss-alt">—</strong> km up</span>
+      <span><strong style="color:var(--neon-yellow)" id="iss-vis">—</strong> visibility</span>
+      <span><strong style="color:var(--neon-yellow)" id="iss-pass">—</strong> overhead Scottsburg?</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:18px">🚀 Upcoming rocket launches</h3>
+  <ul class="feed" id="sky-launches" style="max-height:none"><li class="muted">Loading launches…</li></ul>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card tool" style="border-color:rgba(168,85,247,.4)">
+      <h3 style="margin:0 0 10px;color:var(--neon-purple)">🛰 Famous satellites to know</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>ISS</strong> — Space station, 400km up, looks like a fast bright star moving steadily across the sky</li>
+        <li><strong>Hubble Space Telescope</strong> — 540km up, tiny dot but you can spot it on dark nights</li>
+        <li><strong>Starlink trains</strong> — Newly-launched batches look like a string of bright dots in a line, only visible the first few weeks after launch</li>
+        <li><strong>Tiangong</strong> — China's space station, about as bright as ISS</li>
+        <li><strong>Iridium flares</strong> — Old comm sats that flash super-bright for ~10 sec when sunlight glints off their antennas</li>
+        <li><strong>NOAA / GOES weather sats</strong> — Always above the horizon, never move (geostationary)</li>
+      </ul>
+    </div>
+
+    <div class="card tool" style="border-color:rgba(255,208,0,.4)">
+      <h3 style="margin:0 0 10px;color:var(--neon-yellow)">⭐ Constellations to find tonight (April 2026)</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>Big Dipper (Ursa Major)</strong> — High in the north, nearly overhead in spring</li>
+        <li><strong>Leo (the Lion)</strong> — Backwards question mark = his head, fading west by midnight</li>
+        <li><strong>Bootes & Arcturus</strong> — Bright orange star + kite-shape, rising in the east</li>
+        <li><strong>Virgo & Spica</strong> — Spica is the bright blue-white star southeast of Leo</li>
+        <li><strong>Corona Borealis</strong> — Tiny semicircle of stars between Bootes and Hercules</li>
+        <li><strong>Polaris (North Star)</strong> — Always due north, end of Little Dipper handle</li>
+      </ul>
+      <p class="muted" style="font-size:11px;margin-top:8px">💡 Find Polaris first: follow the line from the two stars on the Big Dipper's "scoop" outward — it points right at it.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card tool">
+      <h3 style="margin:0 0 10px;color:var(--neon-green)">🔭 Free apps to use outside</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>Stellarium Mobile</strong> — Best free planetarium app; point your phone at the sky</li>
+        <li><strong>Heavens-Above</strong> — Best for upcoming ISS / satellite passes by location</li>
+        <li><strong>Star Walk 2</strong> — Pretty AR overlay, identifies what you're pointing at</li>
+        <li><strong>SkyView Lite</strong> — Free, works offline, no signup</li>
+      </ul>
+    </div>
+    <div class="card tool">
+      <h3 style="margin:0 0 10px;color:var(--neon-pink)">🌐 Live tracking sites</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><a href="https://eyes.nasa.gov/apps/orrery/" target="_blank" rel="noopener" style="color:var(--neon-cyan)">NASA Eyes on the Solar System</a> — real-time 3D solar system</li>
+        <li><a href="https://eyes.nasa.gov/apps/asteroids/" target="_blank" rel="noopener" style="color:var(--neon-cyan)">NASA Eyes on Asteroids</a> — every known near-Earth asteroid</li>
+        <li><a href="https://www.heavens-above.com/PassSummary.aspx?satid=25544" target="_blank" rel="noopener" style="color:var(--neon-cyan)">Heavens-Above ISS passes</a> — set Scottsburg as location</li>
+        <li><a href="https://celestrak.org/satcat/search.php" target="_blank" rel="noopener" style="color:var(--neon-cyan)">Celestrak satellite catalog</a> — every tracked object</li>
+        <li><a href="https://www.n2yo.com/?s=25544" target="_blank" rel="noopener" style="color:var(--neon-cyan)">N2YO live ISS map</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <!-- ============================== SCHOOLS ============================== -->
 <section class="pane" id="pane-schools">
   <h2><span class="em">🏫</span> Scott County school status — delays, closings, e-learning days</h2>
@@ -1750,7 +1836,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T10:45Z-v28-schools-nasa-cors-deeplinks';
+window.__KIDS_BUILD = '2026-04-28T11:00Z-v29-sky-tracker-science-lab-50-tools';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
@@ -2580,6 +2666,141 @@ window.__KIDS_BUILD = '2026-04-28T10:45Z-v28-schools-nasa-cors-deeplinks';
       <img src="${esc(url + (url.includes('?') ? '&' : '?') + 'mt=' + Date.now())}" style="width:100%;max-height:60vh;object-fit:contain;background:#000;border-radius:10px" alt="${esc(name)}">
       <p style="margin-top:10px;color:var(--dim);font-size:12px">Refresh interval: 30s · Source: content.trafficwise.org</p>`);
   });
+
+  // ===== SCIENCE LAB — 50 curated free tools =====
+  const LAB_TOOLS = [
+    // Math (10)
+    { c:'Math', n:'WolframAlpha',          d:'Solve any math problem step-by-step',         u:'https://www.wolframalpha.com/' },
+    { c:'Math', n:'Desmos Graphing',       d:'Plot equations + animate sliders',            u:'https://www.desmos.com/calculator' },
+    { c:'Math', n:'Desmos Geometry',       d:'Build constructions with compass + ruler',    u:'https://www.desmos.com/geometry' },
+    { c:'Math', n:'GeoGebra',              d:'3D geometry, calculus, statistics',           u:'https://www.geogebra.org/calculator' },
+    { c:'Math', n:'Symbolab',              d:'Calculus + algebra step-by-step',             u:'https://www.symbolab.com/' },
+    { c:'Math', n:'Photomath',             d:'Snap a math problem with phone, get steps',   u:'https://photomath.com/' },
+    { c:'Math', n:'Khan Academy Math',     d:'Free K-college math lessons',                 u:'https://www.khanacademy.org/math' },
+    { c:'Math', n:'Mathigon Polypad',      d:'Virtual algebra tiles + fractions + bars',    u:'https://mathigon.org/polypad' },
+    { c:'Math', n:'Numberphile',           d:'YouTube channel — math made fun',             u:'https://www.youtube.com/numberphile' },
+    { c:'Math', n:'Project Euler',         d:'Math + programming puzzles',                  u:'https://projecteuler.net/' },
+    // Physics (8)
+    { c:'Physics', n:'PhET Simulations',   d:'200+ free physics + chem + bio simulations',  u:'https://phet.colorado.edu/' },
+    { c:'Physics', n:'Algodoo',            d:'2D physics sandbox — build machines',         u:'http://www.algodoo.com/' },
+    { c:'Physics', n:'Falstad Circuits',   d:'Build electrical circuits in browser',        u:'https://www.falstad.com/circuit/' },
+    { c:'Physics', n:'NASA Eyes Solar Sys',d:'Real-time 3D solar system explorer',          u:'https://eyes.nasa.gov/apps/orrery/' },
+    { c:'Physics', n:'NASA Eyes Asteroids',d:'Track every known near-Earth asteroid',       u:'https://eyes.nasa.gov/apps/asteroids/' },
+    { c:'Physics', n:'OpenStax Physics',   d:'Free college-level physics textbook',         u:'https://openstax.org/details/books/college-physics-2e' },
+    { c:'Physics', n:'Universe Sandbox',   d:'Build galaxies, smash planets together',      u:'http://universesandbox.com/' },
+    { c:'Physics', n:'Hyperphysics',       d:'Concept maps for every physics topic',        u:'http://hyperphysics.phy-astr.gsu.edu/hbase/index.html' },
+    // Chemistry (6)
+    { c:'Chem', n:'PubChem',               d:'NIH database of every known chemical',        u:'https://pubchem.ncbi.nlm.nih.gov/' },
+    { c:'Chem', n:'Periodic Table (PT)',   d:'Interactive periodic table with everything',  u:'https://ptable.com/' },
+    { c:'Chem', n:'MolView',               d:'Build + view 3D molecules',                   u:'https://molview.org/' },
+    { c:'Chem', n:'PhET Reactions',        d:'Balance + run virtual chemical reactions',    u:'https://phet.colorado.edu/en/simulations/filter?subjects=chemistry' },
+    { c:'Chem', n:'ChemTube3D',            d:'3D animations of organic + inorganic chem',   u:'https://www.chemtube3d.com/' },
+    { c:'Chem', n:'NIST WebBook',          d:'Reference data on 1000s of compounds',        u:'https://webbook.nist.gov/' },
+    // Biology (8)
+    { c:'Bio', n:'BioInteractive',         d:'HHMI interactive lessons + virtual labs',     u:'https://www.biointeractive.org/' },
+    { c:'Bio', n:'NIH Genetics Home Ref',  d:'Disease + genetics encyclopedia',             u:'https://medlineplus.gov/genetics/' },
+    { c:'Bio', n:'Visible Body',           d:'3D anatomy of every body system',             u:'https://www.visiblebody.com/learn' },
+    { c:'Bio', n:'iNaturalist',            d:'ID any plant/animal from a phone photo',      u:'https://www.inaturalist.org/' },
+    { c:'Bio', n:'Cornell Lab Merlin',     d:'Bird ID by song or photo',                    u:'https://merlin.allaboutbirds.org/' },
+    { c:'Bio', n:'eBird',                  d:'Real-time bird sightings worldwide',          u:'https://ebird.org/home' },
+    { c:'Bio', n:'NCBI Genome Browser',    d:'Real DNA sequence data',                      u:'https://www.ncbi.nlm.nih.gov/genome/browse/' },
+    { c:'Bio', n:'Foldit',                 d:'Solve real protein-folding puzzles',          u:'https://fold.it/' },
+    // Earth & Space (8)
+    { c:'Earth', n:'USGS Earthquakes',     d:'Real-time global earthquake map',             u:'https://earthquake.usgs.gov/earthquakes/map/' },
+    { c:'Earth', n:'NWS Weather',          d:'National Weather Service forecasts + radar',  u:'https://www.weather.gov/' },
+    { c:'Earth', n:'Windy.com',            d:'Animated wind, storm, smoke + ozone maps',    u:'https://www.windy.com/' },
+    { c:'Earth', n:'Earth Nullschool',     d:'Live wind/ocean current visualization',       u:'https://earth.nullschool.net/' },
+    { c:'Earth', n:'Stellarium Web',       d:'Free planetarium in browser',                 u:'https://stellarium-web.org/' },
+    { c:'Earth', n:'Heavens-Above',        d:'When/where to see ISS + satellites',          u:'https://www.heavens-above.com/' },
+    { c:'Earth', n:'NOAA Tides',           d:'Tide tables for every US coastal station',    u:'https://tidesandcurrents.noaa.gov/' },
+    { c:'Earth', n:'Volcano Discovery',    d:'Active volcano alerts worldwide',             u:'https://www.volcanodiscovery.com/' },
+    // CS / coding (6)
+    { c:'Code', n:'Scratch',               d:'Block-based coding for games + animation',    u:'https://scratch.mit.edu/' },
+    { c:'Code', n:'Replit',                d:'Code in 50+ languages, runs in browser',      u:'https://replit.com/' },
+    { c:'Code', n:'CodePen',               d:'HTML/CSS/JS sandbox',                         u:'https://codepen.io/' },
+    { c:'Code', n:'Brilliant.org',         d:'Visual courses on math + science + CS',       u:'https://brilliant.org/' },
+    { c:'Code', n:'Code.org',              d:'Free curriculum for kids learning to code',   u:'https://code.org/' },
+    { c:'Code', n:'Hour of Code',          d:'1-hour intro coding activities',              u:'https://hourofcode.com/us/learn' },
+    // General reference (4)
+    { c:'Ref', n:'Khan Academy',           d:'Free lessons on every subject',               u:'https://www.khanacademy.org/' },
+    { c:'Ref', n:'CK-12 FlexBooks',        d:'Free interactive textbooks',                  u:'https://www.ck12.org/student/' },
+    { c:'Ref', n:'OpenStax (free books)',  d:'Free college textbooks for every subject',    u:'https://openstax.org/subjects' },
+    { c:'Ref', n:'NASA for Students',      d:'NASA-produced lessons + activities',          u:'https://www.nasa.gov/learning-resources/for-kids-and-students/' },
+  ];
+  function renderLab() {
+    const grid = $('labGrid'); if (!grid) return;
+    const cats = ['Math','Physics','Chem','Bio','Earth','Code','Ref'];
+    const colors = { Math:'var(--neon-cyan)', Physics:'var(--neon-purple)', Chem:'var(--neon-pink)',
+                     Bio:'var(--neon-green)', Earth:'var(--neon-yellow)', Code:'var(--neon-blue)', Ref:'var(--neon-orange)' };
+    grid.innerHTML = LAB_TOOLS.map(t => `
+      <div class="card tool" style="border-color:${colors[t.c]}">
+        <div style="font:700 10px var(--font-display);letter-spacing:.14em;color:${colors[t.c]};text-transform:uppercase;margin-bottom:6px">${t.c}</div>
+        <h4 style="margin:0 0 6px;color:var(--text);font-size:14px">${esc(t.n)}</h4>
+        <p style="font-size:12px;line-height:1.5;color:var(--dim);margin:6px 0">${esc(t.d)}</p>
+        <a href="${esc(t.u)}" target="_blank" rel="noopener" class="btn small" style="display:inline-block;text-decoration:none;margin-top:6px">▶ OPEN</a>
+      </div>
+    `).join('');
+  }
+  document.querySelector('.tab[data-pane="lab"]')?.addEventListener('click', () => setTimeout(renderLab, 50));
+  setTimeout(renderLab, 1500);   // pre-render so initial click is instant
+
+  // ===== SKY TRACKER (live ISS + launches + sky info) =====
+  function updateISSCard(d) {
+    const lat = (d && typeof d.latitude === 'number') ? d.latitude : null;
+    const lon = (d && typeof d.longitude === 'number') ? d.longitude : null;
+    const vel = d?.velocity || 0;
+    const alt = d?.altitude || 0;
+    const vis = d?.visibility || 'unknown';
+    if (lat == null || lon == null) {
+      $('iss-position').textContent = 'Lost signal — retry…';
+      return;
+    }
+    $('iss-position').textContent = `${lat.toFixed(2)}° ${lat>=0?'N':'S'}, ${Math.abs(lon).toFixed(2)}° ${lon>=0?'E':'W'}`;
+    $('iss-detail').textContent = `over ${reverseGeoQuick(lat, lon)}`;
+    $('iss-vel').textContent = Math.round(vel).toLocaleString();
+    $('iss-alt').textContent = Math.round(alt);
+    $('iss-vis').textContent = vis;
+    // Quick "is overhead Scottsburg" check — within ~500km of (38.69, -85.77)
+    const dLat = lat - 38.69, dLon = lon - (-85.77);
+    const km = Math.sqrt(dLat*dLat + dLon*dLon) * 111;
+    $('iss-pass').textContent = km < 500 ? '✅ YES (look up!)' : `${Math.round(km)} km away`;
+    $('iss-pass').style.color = km < 500 ? 'var(--neon-green)' : 'var(--dim)';
+  }
+  function reverseGeoQuick(lat, lon) {
+    // Lightweight ocean/continent labeling — no API needed.
+    if (lat > 60) return 'Arctic';
+    if (lat < -60) return 'Antarctica';
+    if (lon > -30 && lon < 60 && lat > -10 && lat < 35) return 'Africa';
+    if (lon > 60 && lon < 150 && lat > -10 && lat < 60) return 'Asia';
+    if (lon > -10 && lon < 40 && lat > 35) return 'Europe';
+    if (lon > -170 && lon < -50 && lat > 0 && lat < 60) return 'North America';
+    if (lon > -85 && lon < -35 && lat < 0 && lat > -60) return 'South America';
+    if (lon > 110 && lon < 180 && lat > -50 && lat < 0) return 'Australia / Pacific';
+    return 'Ocean';
+  }
+  async function loadISS() {
+    try {
+      const r = await fetch(`${API}/api/proxy/iss?_=${Date.now()}`, { cache:'no-store' });
+      if (r.ok) updateISSCard(await r.json());
+    } catch (_) {}
+  }
+  async function loadSkyLaunches() {
+    try {
+      const r = await fetch(`${API}/api/world/sitrep?_=${Date.now()}`, { cache:'no-store' });
+      if (!r.ok) return;
+      const s = await r.json();
+      const launches = (s.launches || []).slice(0, 8);
+      $('sky-launches').innerHTML = launches.length ?
+        launches.map(l => `<li><span class="pill space">SPACE</span><strong>${esc(l.name||'Mission')}</strong>
+          <span class="meta">${esc((l.provider&&l.provider.name)||'')} · ${esc(l.net||'')}</span></li>`).join('')
+        : '<li class="muted">No upcoming launches in cache.</li>';
+    } catch (_) {}
+  }
+  document.querySelector('.tab[data-pane="sky"]')?.addEventListener('click', () => {
+    setTimeout(() => { loadISS(); loadSkyLaunches(); }, 50);
+  });
+  setInterval(loadISS, 5000);    // every 5s while page open
+  setInterval(loadSkyLaunches, 600000);  // every 10 min
 
   // ===== SCHOOLS (Scott Co district status checker) =====
   window.loadSchools = async () => {
