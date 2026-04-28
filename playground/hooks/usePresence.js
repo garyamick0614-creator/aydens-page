@@ -27,11 +27,14 @@ export function usePresence() {
   const identityRef = useRef(null);
 
   // Build a stable identity (hue + name) once we know the uid.
+  // Prefer the shared profile from window.AYDEN_ID (if loaded) so the cursor
+  // shows the user's chosen display name across kids.html / playground / index.html.
   if (user && !identityRef.current) {
+    const shared = (window.AYDEN_ID && window.AYDEN_ID.profile) || null;
     identityRef.current = {
       uid:  user.uid,
-      hue:  hueFromUid(user.uid),
-      name: nameFromUid(user.uid),
+      hue:  shared?.hue  ?? hueFromUid(user.uid),
+      name: shared?.displayName ?? nameFromUid(user.uid),
     };
   }
 

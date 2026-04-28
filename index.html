@@ -10,7 +10,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260428a">
+<link rel="stylesheet" href="styles.css?v=20260428b">
+<!-- Firebase config + shared identity layer. Loaded BEFORE script.js so any
+     legacy email/password code can also read window.AYDEN_ID. Same uid + profile
+     across index.html, kids.html, and playground.html. -->
+<script src="firebase-config.js?v=20260428b"></script>
+<script type="module" src="shared/firebase-identity.js?v=20260428b"></script>
 </head>
 <body data-tab="home">
 
@@ -18,11 +23,11 @@
 <div class="grid-overlay" aria-hidden="true"></div>
 <div class="scanlines" aria-hidden="true"></div>
 
-<!-- Discovery banner: routes Ayden + friends to the v13 Hub + multiplayer Playground -->
-<div id="hub-discovery-banner" style="position:relative;z-index:50;padding:12px 16px;background:linear-gradient(90deg,#a855f7,#22d3ee,#fbbf24);color:#000;font:800 14px 'Russo One',system-ui,sans-serif;display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;text-shadow:0 1px 0 rgba(255,255,255,.4)">
-  <span style="font-size:18px">🚀 NEW</span>
-  <a href="/kids.html" style="background:#000;color:#fff;text-decoration:none;padding:8px 18px;border-radius:99px;font-weight:800;letter-spacing:.04em">→ AYDEN'S HUB (24 tabs · games + tools + COD + Fortnite Pro)</a>
-  <a href="/playground.html" style="background:#000;color:#fff;text-decoration:none;padding:8px 18px;border-radius:99px;font-weight:800;letter-spacing:.04em">🌌 SHARED MULTIPLAYER PLAYGROUND</a>
+<!-- Discovery banner: routes Ayden + friends to the Hub + multiplayer Playground -->
+<div id="hub-discovery-banner" style="position:relative;z-index:50;padding:10px 16px;background:linear-gradient(90deg,rgba(0,240,255,.08),rgba(180,0,255,.10),rgba(255,43,214,.08));border-bottom:1px solid rgba(0,240,255,.4);font:700 11px 'Russo One',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#f1f4ff;display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;backdrop-filter:blur(10px)">
+  <span style="color:#00f0ff;text-shadow:0 0 8px #00f0ff">◉ NEW SURFACES</span>
+  <a href="/kids.html" style="color:#00f0ff;text-decoration:none;padding:7px 16px;border:1px solid #00f0ff;border-radius:4px;background:rgba(0,240,255,.10);box-shadow:0 0 12px rgba(0,240,255,.4),inset 0 0 8px rgba(0,240,255,.08)">→ AYDEN'S HUB · 24 TABS</a>
+  <a href="/playground.html" style="color:#ff2bd6;text-decoration:none;padding:7px 16px;border:1px solid #ff2bd6;border-radius:4px;background:rgba(255,43,214,.10);box-shadow:0 0 12px rgba(255,43,214,.4),inset 0 0 8px rgba(255,43,214,.08)">🌌 MULTIPLAYER PLAYGROUND</a>
 </div>
 
 <header class="masthead">
@@ -508,8 +513,8 @@
   <div class="foot-line" style="margin-top:6px;font-size:10.5px;letter-spacing:.2em;opacity:.7;">© 2026 TCG :: stay safe, game smart</div>
 </footer>
 
-<script src="background.js?v=20260428a" defer></script>
-<script src="firebase-config.js?v=20260428a" defer></script>
-<script src="script.js?v=20260428a" defer></script>
+<script src="background.js?v=20260428b" defer></script>
+<script src="firebase-config.js?v=20260428b" defer></script>
+<script src="script.js?v=20260428b" defer></script>
 </body>
 </html>

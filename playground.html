@@ -16,12 +16,11 @@
       radial-gradient(circle at 80% 80%, #0e7490 0%, transparent 55%),
       radial-gradient(circle at 50% 100%, #be185d 0%, transparent 60%),
       #0a0e14;
-    color: #fff;
-    font-family: 'Comic Sans MS', 'Trebuchet MS', system-ui, sans-serif;
-    cursor: none;     /* hide native cursor — we render our own halo */
+    color: #f1f4ff;
+    font-family: 'Russo One', 'Rubik', system-ui, sans-serif;
+    /* Native cursor STAYS visible. The colored halo is decorative — players
+       still need a real pointer for clicking links/buttons. */
   }
-  /* Show native cursor on interactive overlays so the welcome card is usable. */
-  .playground-cursors a, .playground-cursors button, [style*="pointerEvents:auto"] { cursor: pointer }
   body::before {
     content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
     background-image:
@@ -41,7 +40,9 @@
 <noscript>This Playground needs JavaScript. Please enable it and reload.</noscript>
 
 <!-- Firebase config — public values; safe to commit. -->
-<script src="firebase-config.js?v=20260427g"></script>
+<script src="firebase-config.js?v=20260428b"></script>
+<!-- Shared identity layer — gives the playground the same uid + display name + hue as kids.html and index.html -->
+<script type="module" src="shared/firebase-identity.js?v=20260428b"></script>
 
 <!-- React 18 UMD (production). Sets window.React + window.ReactDOM. -->
 <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
@@ -51,6 +52,6 @@
 <div id="playground-root"></div>
 
 <!-- Phase 1 modules. Native ESM — no bundler, no Babel, no unsafe-eval. -->
-<script type="module" src="./playground/main.js?v=20260428a"></script>
+<script type="module" src="./playground/main.js?v=20260428b"></script>
 </body>
 </html>
