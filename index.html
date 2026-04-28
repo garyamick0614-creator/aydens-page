@@ -145,7 +145,12 @@
     color: var(--text);
     text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent);
   }
-  h2 .em { font-size: 22px; line-height: 1 }
+  /* Force native colored emoji rendering — without this, Russo One falls back
+     to a textual emoji glyph that ends up boxed/black on Windows Chrome. */
+  h2 .em, .tab, .title, .badge, .pill {
+    font-family: 'Russo One', system-ui, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  }
+  h2 .em { font-size: 22px; line-height: 1; text-shadow: none; }
   h3 {
     font-family: var(--font-display); font-size: 13px; letter-spacing: .14em;
     text-transform: uppercase; margin: 14px 0 10px;
@@ -365,7 +370,7 @@
   <button class="tab" data-pane="tools">🛠 Tools</button>
   <button class="tab" data-pane="fun">🎉 Fun</button>
   <button class="tab" data-pane="space">🚀 Space</button>
-  <button class="tab" data-pane="news">📰 News</button>
+  <button class="tab" data-pane="news">👥 Community</button>
   <button class="tab" data-pane="cams">📷 Cameras</button>
   <button class="tab" data-pane="watch">📺 Watch</button>
   <button class="tab" data-pane="poke">⚡ Pokémon</button>
@@ -383,7 +388,7 @@
   <button class="tab" data-pane="cod">🎯 COD loadouts</button>
   <button class="tab" data-pane="fnpro">🪂 Fortnite Pro</button>
   <button class="tab" data-pane="pcmastery">⚙ PC Mastery</button>
-  <a class="tab" href="/gamehq.html" style="text-decoration:none">🏠 Game HQ</a>
+  <button class="tab" data-pane="gamehq">🏠 Game HQ</button>
   <a class="tab" href="/playground.html" style="text-decoration:none">🌌 Multiplayer →</a>
 </nav>
 
@@ -620,16 +625,17 @@
   </div>
 </section>
 
-<!-- ============================== NEWS ============================== -->
+<!-- ============================== COMMUNITY ============================== -->
 <section class="pane" id="pane-news">
-  <section class="card news">
-    <h2 style="margin:0 0 10px"><span class="em">📰</span> Kid-safe headlines</h2>
-    <ul class="feed" id="newsFeedFull" style="max-height:none"><li class="muted">Loading headlines…</li></ul>
+  <section class="card gaming">
+    <h2 style="margin:0 0 10px"><span class="em">👥</span> Kid-safe gaming community posts</h2>
+    <p class="muted" style="margin-bottom:10px;font-size:12px">Top posts from r/Gaming, r/Minecraft, r/FortNiteBR, r/roblox, r/pokemon, r/xboxone — all run through the strict kid-safe filter.</p>
+    <ul class="feed" id="gamingFeedFull" style="max-height:none"><li class="muted">Loading gaming posts…</li></ul>
   </section>
 
-  <section class="card gaming" style="margin-top:14px">
-    <h2 style="margin:0 0 10px"><span class="em">🎮</span> Kid-safe gaming community posts</h2>
-    <ul class="feed" id="gamingFeedFull" style="max-height:none"><li class="muted">Loading gaming posts…</li></ul>
+  <section class="card news" style="margin-top:14px">
+    <h2 style="margin:0 0 10px"><span class="em">🎮</span> Kid-safe gaming &amp; space headlines</h2>
+    <ul class="feed" id="newsFeedFull" style="max-height:none"><li class="muted">Loading headlines…</li></ul>
   </section>
 </section>
 
@@ -1577,6 +1583,11 @@
   </div>
 </section>
 
+<!-- ============================== GAME HQ (full embed of original index) ============================== -->
+<section class="pane" id="pane-gamehq" style="padding:0;margin:-14px;height:calc(100vh - 80px);min-height:600px">
+  <iframe src="/gamehq.html" id="gamehqFrame" style="width:100%;height:100%;border:0;border-radius:0;background:transparent" title="Game HQ — original 9-tab Xbox / PC / Minecraft / Rocket League / AI Buddy / Friends / Control / Help"></iframe>
+</section>
+
 <!-- ============================== XP / ACHIEVEMENTS ============================== -->
 <section class="pane" id="pane-xp">
   <h2><span class="em">🏆</span> My XP & achievements</h2>
@@ -1635,7 +1646,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T06:00Z-v15-merged-root-rules-deployed-yt-buttons';
+window.__KIDS_BUILD = '2026-04-28T06:45Z-v17-community-tab-tightened-filter';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
