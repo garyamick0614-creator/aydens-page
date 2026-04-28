@@ -175,23 +175,29 @@
     } catch (_) { $('issBox').textContent = 'ISS position unavailable'; }
   }
 
-  // Default-allow with UNSAFE blocklist (broader than the over-strict
-  // allowlist that was filtering out everything).
-  const UNSAFE = /violence|attack|murder|kill|sex|abuse|drug|war|bomb|shooting|crime|porn|nsfw|hentai/i;
+  // STRONG kid-safe blocklist — defense in depth.
+  // Backend /api/proxy/news/kids-safe already strips the worst stuff;
+  // this is a second client-side pass against title + summary + source.
+  const UNSAFE = /\b(violence|violent|murder|murderer|killed|killing|kill|shoot|shooting|shooter|gun|guns|firearm|stab|stabbed|knife|sex|sexual|sexy|porn|pornography|nude|nudity|nsfw|hentai|onlyfans|escort|prostitut|abuse|abused|abusive|assault|assaulted|rape|raped|rapist|harass|molest|pedophile|drug|drugs|cocaine|heroin|fentanyl|meth|marijuana|weed|cannabis|alcohol|drunk|war|warfare|bomb|bombing|bomber|terror|terrorism|terrorist|hostage|massacre|genocide|isis|hamas|taliban|hezbollah|cartel|gang|gangster|riot|riots|protest|protests|trump|biden|harris|putin|netanyahu|epstein|hitler|nazi|racism|racist|hate|crime|crimes|criminal|arrest|arrested|prison|jail|convict|hanging|hanged|suicide|suicidal|self-harm|cutting|overdose|dies|died|death|dead|fatal|fatality|tragic|tragedy|horror|horrific|gruesome|brutal|bloody|blood|gore|graphic|disturb|kkk|qanon|opioid|addict|wound|injur|hospital|police|cop|cops|fbi|cia|swat|raid|warrant|investigation|charged|sentence|verdict|guilty|innocent|trial|killer|attacker|victim|victims|stalker|abductor|kidnap|kidnapped|kidnapping|missing-person|amber-alert|silver-alert|deadly|lethal|toxic|poison|poisoning|drown|drowned|drowning|crash|crashed|wreck|wrecked|fire|fires|wildfire|burning|burned|burnt|explosion|exploded|explode|blast|injured|trauma|hospitalized|fatally|deaths|killings|shootings|stabbings|robberies|robbery|burglary|burglar|theft|thief|steal|stolen|carjack|hijack|drone-strike|airstrike|missile|nuclear|warhead|hacker|breached|breach|leaked|exposed|whistleblower|scandal|allegation|alleged|accused|defendant|crackdown|deport|deportation|migrant|asylum|refugee|smuggling|trafficking|slavery|cult|extremist|extremism|radical|radicalized|jihad|civil-war|insurgent|insurgency|coup|dictator|tyrant|oppression|persecution|atrocity|war-crime|holocaust|slaughter|carnage|bloodbath|mass-shooting|serial-killer|cannibal|torture|tortured|hanged|guillotine|execution|executed|stoning|beheaded|beheading|decapitate|dismember|mutilate|disfigure|amputate|acid-attack)\b/i;
   async function loadNews() {
-    // Server-aggregated feeds (44 RSS sources, cached on the home server)
+    // Server-side kid-safe filter (pre-filtered: violence/crime/adult/drugs/political-violence stripped)
     try {
-      const r = await fetch(`${API}/api/feeds/items?limit=60`, { cache: 'no-store' });
+      const cacheBust = '&_=' + Date.now();
+      const r = await fetch(`${API}/api/proxy/news/kids-safe?limit=30${cacheBust}`, { cache: 'no-store' });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
       const all = d.items || [];
       const safe = all
-        .filter(n => n.title && !UNSAFE.test(n.title) && !UNSAFE.test(n.summary || ''))
+        .filter(n => {
+          if (!n || !n.title) return false;
+          const blob = String(n.title) + ' ' + String(n.summary || '') + ' ' + String(n.source_name || '');
+          return !UNSAFE.test(blob);
+        })
         .slice(0, 12);
       $('newsFeed').innerHTML = safe.length
         ? safe.map(n => `<li><a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
             <span class="meta">${esc(n.source_name || '')} · ${esc(n.category || '')}</span></li>`).join('')
-        : '<li class="muted">No items in current feed (try again in a bit).</li>';
+        : '<li class="muted">No kid-safe items in feed cache right now.</li>';
     } catch (e) { $('newsFeed').innerHTML = `<li class="err-text">Feeds unavailable: ${esc(e.message)}</li>`; }
   }
 
