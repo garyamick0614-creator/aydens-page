@@ -7,9 +7,10 @@
 const API = 'https://api.thatcomputerguy26.org';
 
 const NEARBY_CITIES = [
-  { name: 'Scottsburg',   lat: 38.6856, lon: -85.7705 },
-  { name: 'Seymour',      lat: 38.9592, lon: -85.8903 },
   { name: 'Austin',       lat: 38.7570, lon: -85.8086 },
+  { name: 'Scottsburg',   lat: 38.6856, lon: -85.7705 },
+  { name: 'Crothersville',lat: 38.8011, lon: -85.8392 },
+  { name: 'Seymour',      lat: 38.9592, lon: -85.8903 },
   { name: 'Salem',        lat: 38.6056, lon: -86.1011 },
   { name: 'Madison',      lat: 38.7359, lon: -85.3800 },
   { name: 'North Vernon', lat: 39.0067, lon: -85.6236 },
@@ -288,14 +289,21 @@ async function loadWeatherCities() {
   for (const r of results) {
     if (r.status !== 'fulfilled') continue;
     const { city, data } = r.value;
-    const cur = (data && (data.current || data.current_weather || (data.daily && data.daily[0]))) || {};
-    const t = cur.temperature_f ?? cur.temperature_2m ?? cur.temperature ?? null;
-    const cond = cur.weather_description || cur.summary || cur.conditions || conditionFromCode(cur.weather_code) || '—';
+    // Open-Meteo proxy returns daily as { temperature_2m_max:[...], temperature_2m_min:[...], weathercode:[...] }
+    const daily = (data && data.daily) || {};
+    const cur = (data && (data.current || data.current_weather)) || {};
+    const tMax = (daily.temperature_2m_max || [])[0];
+    const tMin = (daily.temperature_2m_min || [])[0];
+    const wcode = (daily.weathercode || [])[0];
+    const t = cur.temperature_f ?? cur.temperature_2m ?? cur.temperature ?? tMax ?? null;
+    const cond = cur.weather_description || cur.summary || cur.conditions
+      || conditionFromCode(cur.weather_code != null ? cur.weather_code : wcode) || '—';
+    const lowText = tMin != null ? ` (low ${Math.round(tMin)}°)` : '';
     const row = el('div', { class: 'city-row' }, [
       el('div', { class: 'city-name' }, city),
       el('div', {}, [
-        el('span', { class: 'city-temp' }, t == null ? '—' : Math.round(t) + '°'),
-        el('span', { class: 'city-cond' }, cond),
+        el('span', { class: 'city-temp' }, t == null ? '—' : Math.round(t) + '°F'),
+        el('span', { class: 'city-cond' }, cond + lowText),
       ]),
     ]);
     host.appendChild(row);
@@ -304,9 +312,10 @@ async function loadWeatherCities() {
   if (results[0]?.status === 'fulfilled') {
     const c = results[0].value;
     const cur = (c.data && (c.data.current || c.data.current_weather || {})) || {};
-    const t = cur.temperature_f ?? cur.temperature_2m;
+    const daily = (c.data && c.data.daily) || {};
+    const t = cur.temperature_f ?? cur.temperature_2m ?? (daily.temperature_2m_max || [])[0];
     const m = $('#weather-mini');
-    if (m && t != null) m.textContent = `${c.city.toUpperCase()} ${Math.round(t)}°`;
+    if (m && t != null) m.textContent = `${c.city.toUpperCase()} ${Math.round(t)}°F`;
   }
 }
 function conditionFromCode(c) {

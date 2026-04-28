@@ -221,7 +221,19 @@
   <button class="tab" data-pane="news">📰 News</button>
   <button class="tab" data-pane="cams">📷 Cameras</button>
   <button class="tab" data-pane="watch">📺 Watch</button>
+  <button class="tab" data-pane="poke">⚡ Pokémon</button>
+  <button class="tab" data-pane="sound">🔊 Sounds</button>
+  <button class="tab" data-pane="beats">🎵 Beat maker</button>
+  <button class="tab" data-pane="avatar">🤖 Avatar</button>
+  <button class="tab" data-pane="3d">🌌 3D scene</button>
+  <button class="tab" data-pane="share">📸 Selfie + Share</button>
+  <button class="tab" data-pane="xp">🏆 My XP</button>
 </nav>
+
+<!-- XP HUD -->
+<div id="xpHud" style="position:fixed;top:14px;right:14px;background:rgba(0,0,0,.7);border:2px solid var(--gold);border-radius:99px;padding:8px 14px;font:800 13px 'Comic Sans MS',sans-serif;color:var(--gold);z-index:1000;box-shadow:0 4px 12px rgba(251,191,36,.3)">
+  ⭐ <span id="xpCount">0</span> XP · LVL <span id="xpLevel">1</span>
+</div>
 
 <!-- ============================== TODAY ============================== -->
 <section class="pane active" id="pane-today">
@@ -483,6 +495,239 @@
   <div class="card" id="apodCard"><div class="muted">Loading…</div></div>
 </section>
 
+<!-- ============================== POKÉMON ============================== -->
+<section class="pane" id="pane-poke">
+  <h2><span class="em">⚡</span> Pokémon explorer</h2>
+  <p class="muted" style="margin-bottom:12px">Type a Pokémon name or ID (1-1010) — or roll a random one. Powered by PokéAPI.</p>
+  <div class="card tool">
+    <div class="row">
+      <input class="input" id="pokeInput" placeholder="pikachu, charizard, 25..." style="width:200px">
+      <button class="btn" onclick="lookupPokemon()">🔍 Look up</button>
+      <button class="btn gold" onclick="randomPokemon()">🎲 Random</button>
+      <button class="btn green" onclick="lookupPokemon('pikachu')">⚡ Pikachu</button>
+      <button class="btn red" onclick="lookupPokemon('charizard')">🔥 Charizard</button>
+    </div>
+    <div id="pokeResult" style="margin-top:14px;text-align:center"></div>
+  </div>
+
+  <div class="card tool" style="margin-top:14px">
+    <h3 style="margin:0 0 8px">📖 Pokédex (your favorites)</h3>
+    <p class="muted" style="font-size:12px">Click ⭐ on any Pokémon above to add to your Pokédex (saves on this device).</p>
+    <div id="pokeDex" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+  </div>
+</section>
+
+<!-- ============================== SOUNDS ============================== -->
+<section class="pane" id="pane-sound">
+  <h2><span class="em">🔊</span> Soundboard</h2>
+  <p class="muted" style="margin-bottom:12px">Tap to hear sounds. Made with the Web Audio API — no downloads, works offline.</p>
+  <div class="grid grid-3" id="soundGrid"></div>
+
+  <div class="card tool" style="margin-top:14px">
+    <h3 style="margin:0 0 10px">🎹 Mini piano</h3>
+    <p class="muted" style="font-size:12px;margin-bottom:8px">Click the keys (or use your keyboard: A S D F G H J)</p>
+    <div id="piano" style="display:flex;gap:2px;justify-content:center"></div>
+  </div>
+</section>
+
+<!-- ============================== BEAT MAKER ============================== -->
+<section class="pane" id="pane-beats">
+  <h2><span class="em">🎵</span> Beat maker</h2>
+  <p class="muted" style="margin-bottom:12px">Tap squares to make beats. Press ▶ to play your loop. Use sliders to change tempo.</p>
+  <div class="card tool">
+    <div id="beatGrid" style="display:grid;gap:4px;margin:8px 0"></div>
+    <div class="row" style="margin-top:14px;flex-wrap:wrap">
+      <button class="btn green" onclick="beatPlay()">▶ Play</button>
+      <button class="btn red"   onclick="beatStop()">⏹ Stop</button>
+      <button class="btn"       onclick="beatClear()">🗑 Clear</button>
+      <button class="btn gold"  onclick="beatRandom()">🎲 Random beat</button>
+      <span style="display:flex;align-items:center;gap:6px;color:var(--dim);font-size:13px">
+        Tempo: <input type="range" id="beatTempo" min="60" max="200" value="120" style="width:100px"> <span id="beatTempoVal">120 BPM</span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== AVATAR ============================== -->
+<section class="pane" id="pane-avatar">
+  <h2><span class="em">🤖</span> Avatar builder</h2>
+  <p class="muted" style="margin-bottom:12px">Build your character — tap each part to swap. Save it to your profile, or use it as your selfie!</p>
+  <div class="grid grid-2">
+    <div class="card tool" style="text-align:center">
+      <div id="avatarDisplay" style="font-size:120px;line-height:1.1;background:rgba(0,0,0,.3);border-radius:16px;padding:20px;min-height:200px;cursor:pointer" onclick="randomAvatar()">
+        🤖
+      </div>
+      <div style="margin-top:8px;font-size:14px;color:var(--gold)" id="avatarName">My Avatar</div>
+      <div class="row" style="margin-top:10px;justify-content:center">
+        <button class="btn green" onclick="randomAvatar()">🎲 Random</button>
+        <button class="btn gold" onclick="saveAvatar()">💾 Save</button>
+        <button class="btn" onclick="downloadAvatar()">📥 Download</button>
+      </div>
+    </div>
+
+    <div class="card tool">
+      <h3 style="margin:0 0 8px">Pick your parts</h3>
+      <div style="margin:8px 0">
+        <strong>Face:</strong>
+        <div id="avatarFaces" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+      </div>
+      <div style="margin:8px 0">
+        <strong>Hat:</strong>
+        <div id="avatarHats" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+      </div>
+      <div style="margin:8px 0">
+        <strong>Sidekick:</strong>
+        <div id="avatarPets" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+      </div>
+      <input class="input" id="avatarNameInput" placeholder="Give your avatar a name" style="width:100%;margin-top:10px" oninput="setAvatarName(this.value)">
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 3D SCENE ============================== -->
+<section class="pane" id="pane-3d">
+  <h2><span class="em">🌌</span> 3D scene — drag to rotate</h2>
+  <p class="muted" style="margin-bottom:12px">Real-time 3D in the browser. Drag with mouse/finger to rotate. Tap a button to change what's spinning.</p>
+  <div class="card tool">
+    <div id="threeMount" style="width:100%;height:380px;background:#000;border-radius:14px;cursor:grab;touch-action:none"></div>
+    <div class="row" style="margin-top:12px;flex-wrap:wrap;justify-content:center">
+      <button class="btn green" onclick="threeShape('cube')">🟦 Cube</button>
+      <button class="btn gold" onclick="threeShape('sphere')">🌍 Sphere</button>
+      <button class="btn red" onclick="threeShape('torus')">🍩 Donut</button>
+      <button class="btn" onclick="threeShape('icosa')">💎 Crystal</button>
+      <button class="btn" onclick="threeShape('cone')">🎉 Cone</button>
+      <button class="btn" onclick="threeShape('mc')">⛏ Minecraft</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SELFIE + SHARE ============================== -->
+<section class="pane" id="pane-share">
+  <h2><span class="em">📸</span> Selfie booth</h2>
+  <p class="muted" style="margin-bottom:12px">Click <strong>Allow</strong> when your browser asks for camera permission. Your photos stay on your device — they're never sent anywhere unless you click "Share".</p>
+
+  <div class="grid grid-2">
+    <section class="card tool">
+      <h3 style="margin:0 0 10px">📷 Camera</h3>
+      <video id="selfieVideo" width="100%" height="240" autoplay playsinline muted style="background:#000;border-radius:10px;display:none"></video>
+      <div id="selfieIdle" style="background:rgba(0,0,0,.4);height:240px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px">Press 🎬 Start camera to begin</div>
+      <canvas id="selfieCanvas" width="640" height="480" style="display:none"></canvas>
+      <div class="row" style="margin-top:10px">
+        <button class="btn green" onclick="startCamera()">🎬 Start camera</button>
+        <button class="btn gold" onclick="snapPhoto()">📸 Take photo</button>
+        <button class="btn red" onclick="stopCamera()">⏹ Stop</button>
+        <button class="btn" onclick="flipCamera()">🔄 Flip</button>
+      </div>
+      <div id="selfieGallery" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"></div>
+    </section>
+
+    <section class="card tool">
+      <h3 style="margin:0 0 10px">🎤 Voice memo</h3>
+      <div id="micIdle" style="background:rgba(0,0,0,.4);height:80px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px">Press 🎙 Start to record</div>
+      <div id="micRecording" style="display:none;background:rgba(248,113,113,.18);height:80px;border-radius:10px;align-items:center;justify-content:center;color:var(--red);font:800 16px sans-serif;text-align:center;padding-top:30px">
+        🔴 Recording… <span id="micTime">0:00</span>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn green" onclick="startMic()">🎙 Start recording</button>
+        <button class="btn red" onclick="stopMic()">⏹ Stop</button>
+      </div>
+      <div id="micGallery" style="margin-top:12px"></div>
+    </section>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <section class="card tool">
+      <h3 style="margin:0 0 10px">💌 Send to friends</h3>
+      <p class="muted" style="font-size:13px;margin-bottom:10px">Type a message — Ayden can text it, share via system share menu, or copy to clipboard.</p>
+      <textarea id="shareMsg" rows="4" placeholder="Hey! Check this out…" style="width:100%;background:rgba(255,255,255,.06);border:2px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font:600 14px 'Comic Sans MS',sans-serif"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn green" onclick="shareMessage()">📤 Share</button>
+        <button class="btn gold" onclick="copyMessage()">📋 Copy</button>
+        <button class="btn" onclick="textMessage()">📱 Text it</button>
+        <button class="btn red" onclick="emailMessage()">✉ Email</button>
+      </div>
+      <div id="shareStatus" class="muted" style="margin-top:8px;font-size:12px"></div>
+    </section>
+
+    <section class="card tool">
+      <h3 style="margin:0 0 10px">🖼 Share my drawing</h3>
+      <p class="muted" style="font-size:13px;margin-bottom:10px">Draw something on the Tools tab, then come here to share it.</p>
+      <div id="drawShare" style="text-align:center"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn green" onclick="loadDrawing()">📸 Grab my drawing</button>
+        <button class="btn gold" onclick="shareDrawing()">📤 Share drawing</button>
+        <button class="btn" onclick="downloadDrawing()">💾 Download</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="card tool" style="margin-top:14px">
+    <h3 style="margin:0 0 10px">🖥 Screenshot helper</h3>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">On Windows: press <strong>Win + Shift + S</strong> to take a screenshot. On Mac: <strong>Cmd + Shift + 4</strong>. Then paste it into a message to share!</p>
+    <button class="btn green" onclick="captureTab()">🎬 Capture this tab (works in Chrome/Edge)</button>
+    <div id="captureResult" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card tool" style="margin-top:14px">
+    <h3 style="margin:0 0 10px">🎭 Live camera filters (must Start camera above)</h3>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Apply fun effects to your selfie video. Each filter snap takes a still you can save.</p>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn" onclick="setCamFilter('none')">🚫 None</button>
+      <button class="btn" onclick="setCamFilter('grayscale(1)')">⚫ B/W</button>
+      <button class="btn" onclick="setCamFilter('sepia(1)')">🟫 Sepia</button>
+      <button class="btn" onclick="setCamFilter('hue-rotate(90deg) saturate(2)')">🌈 Neon</button>
+      <button class="btn" onclick="setCamFilter('invert(1)')">🔃 Invert</button>
+      <button class="btn" onclick="setCamFilter('blur(4px)')">😶‍🌫 Blur</button>
+      <button class="btn" onclick="setCamFilter('contrast(2) brightness(1.2)')">⚡ Punch</button>
+      <button class="btn" onclick="setCamFilter('hue-rotate(180deg)')">👾 Alien</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== XP / ACHIEVEMENTS ============================== -->
+<section class="pane" id="pane-xp">
+  <h2><span class="em">🏆</span> My XP & achievements</h2>
+  <p class="muted" style="margin-bottom:12px">Earn XP by playing games, learning facts, and using tools. Level up to unlock new badges!</p>
+  <div class="grid grid-2">
+    <div class="card tool" style="text-align:center">
+      <div style="font-size:80px;line-height:1">🏅</div>
+      <div style="font-size:36px;font-weight:900;color:var(--gold);margin:8px 0">Level <span id="xpLevelBig">1</span></div>
+      <div style="background:rgba(255,255,255,.08);border-radius:99px;height:14px;overflow:hidden;margin:10px 0">
+        <div id="xpBar" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--pink));width:0%;transition:width .5s"></div>
+      </div>
+      <div style="color:var(--dim);font-size:13px"><span id="xpToNext">100</span> XP to next level</div>
+      <div style="margin-top:10px;font-size:14px"><strong style="color:var(--gold)" id="xpTotalBig">0</strong> total XP earned</div>
+    </div>
+
+    <div class="card tool">
+      <h3 style="margin:0 0 8px">🎯 Today's quests</h3>
+      <ul id="questList" style="list-style:none;padding:0">
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-poke">⚡ Look up a Pokémon (+10 XP)</li>
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-ttt">⭕ Win a Tic-Tac-Toe game (+15 XP)</li>
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-snake">🐍 Score 5+ in Snake (+20 XP)</li>
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-mem">🧠 Win Memory Match (+15 XP)</li>
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-quiz">🧮 Get 5 quiz answers right (+20 XP)</li>
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-draw">🎨 Draw something (+10 XP)</li>
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-beat">🎵 Make a beat (+15 XP)</li>
+        <li style="padding:6px 0;border-bottom:1px dashed var(--line)" id="quest-avatar">🤖 Save an avatar (+10 XP)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card tool" style="margin-top:14px">
+    <h3 style="margin:0 0 10px">🏆 Badges earned</h3>
+    <div id="badgeGrid" style="display:flex;gap:10px;flex-wrap:wrap;min-height:80px"></div>
+  </div>
+</section>
+
+<!-- ============================== MODAL ============================== -->
+<div id="modalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;padding:20px" onclick="closeModal(event)">
+  <div id="modalContent" style="max-width:900px;max-height:90vh;overflow:auto;background:#0a0e14;border-radius:16px;padding:20px;border:2px solid var(--acc);position:relative" onclick="event.stopPropagation()">
+    <button onclick="closeModal()" style="position:absolute;top:10px;right:14px;background:transparent;border:0;color:#fff;font-size:24px;cursor:pointer">×</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
 <footer>
   Built for Ayden by <a href="/" style="color:var(--gold)">Gary @ TCG Solutions</a> ·
   Powered by <code>api.thatcomputerguy26.org</code> · Strict kid-safe filter active.
@@ -490,8 +735,9 @@
 
 </div>
 
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-27T23:30Z-v5-cameras-watch-apod';
+window.__KIDS_BUILD = '2026-04-28T00:30Z-v7-WOW-beats-avatar-3d-xp-selfie';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
@@ -1170,6 +1416,584 @@ window.__KIDS_BUILD = '2026-04-27T23:30Z-v5-cameras-watch-apod';
       }
     } catch (_) { $('apodCard').innerHTML = `<div class="muted">NASA picture unavailable.</div>`; }
   }
+
+  // ===== MODAL =====
+  window.openModal = (html) => {
+    $('modalBody').innerHTML = html;
+    $('modalBg').style.display = 'flex';
+  };
+  window.closeModal = (e) => { if (!e || e.target === $('modalBg') || e.target.tagName === 'BUTTON') $('modalBg').style.display = 'none'; };
+
+  // ===== POKÉMON =====
+  let pokeDex = JSON.parse(localStorage.getItem('aydenPokeDex') || '[]');
+  function renderDex() {
+    $('pokeDex').innerHTML = pokeDex.length
+      ? pokeDex.map(p => `<div style="text-align:center;cursor:pointer" onclick="lookupPokemon('${esc(p.name)}')">
+          <img src="${esc(p.sprite)}" style="width:64px;height:64px;background:rgba(255,255,255,.05);border-radius:8px" alt="${esc(p.name)}">
+          <div style="font-size:11px;color:var(--gold)">${esc(p.name)}</div>
+        </div>`).join('')
+      : '<div class="muted">No favorites yet — add some with ⭐!</div>';
+  }
+  window.addToDex = (name, sprite) => {
+    if (pokeDex.some(p => p.name === name)) return;
+    pokeDex.push({ name, sprite });
+    localStorage.setItem('aydenPokeDex', JSON.stringify(pokeDex));
+    renderDex();
+  };
+  window.removeFromDex = (name) => {
+    pokeDex = pokeDex.filter(p => p.name !== name);
+    localStorage.setItem('aydenPokeDex', JSON.stringify(pokeDex));
+    renderDex();
+  };
+  window.lookupPokemon = async (name) => {
+    if (!name) name = $('pokeInput').value.trim().toLowerCase();
+    if (!name) return;
+    $('pokeResult').innerHTML = '<div class="muted">Loading…</div>';
+    try {
+      const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(name)}`);
+      if (!r.ok) throw new Error('Not found: ' + name);
+      const d = await r.json();
+      const sprite = d.sprites?.other?.['official-artwork']?.front_default
+        || d.sprites?.front_default
+        || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${d.id}.png`;
+      const types = (d.types || []).map(t => t.type.name).join(' · ');
+      const stats = (d.stats || []).map(s => `<span class="badge" style="margin:2px">${esc(s.stat.name)}: ${s.base_stat}</span>`).join('');
+      const abilities = (d.abilities || []).map(a => esc(a.ability.name)).join(', ');
+      const inDex = pokeDex.some(p => p.name === d.name);
+      $('pokeResult').innerHTML = `
+        <img src="${esc(sprite)}" style="max-width:240px;background:rgba(255,255,255,.05);border-radius:12px" alt="${esc(d.name)}">
+        <h3 style="font-size:24px;margin:10px 0;color:var(--gold);text-transform:capitalize">#${d.id} ${esc(d.name)}</h3>
+        <div style="margin-bottom:8px"><span class="badge" style="background:rgba(244,114,182,.2);color:var(--pink)">${esc(types)}</span></div>
+        <div style="margin-bottom:8px;color:var(--dim)">Height: ${d.height/10} m · Weight: ${d.weight/10} kg</div>
+        <div style="margin-bottom:8px"><strong>Abilities:</strong> ${esc(abilities)}</div>
+        <div style="margin:10px 0">${stats}</div>
+        <button class="btn ${inDex ? 'red' : 'gold'}" onclick="${inDex ? `removeFromDex('${esc(d.name)}')` : `addToDex('${esc(d.name)}','${esc(sprite)}')`}">
+          ${inDex ? '❌ Remove from Pokédex' : '⭐ Add to my Pokédex'}
+        </button>`;
+    } catch (e) {
+      $('pokeResult').innerHTML = `<div class="err-text">${esc(e.message)} — try a different name or ID.</div>`;
+    }
+  };
+  window.randomPokemon = () => {
+    lookupPokemon(String(Math.floor(Math.random() * 1010) + 1));
+  };
+
+  // ===== SOUNDBOARD =====
+  let audioCtx = null;
+  function getCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+  function tone(freq, dur, type, vol) {
+    const ctx = getCtx();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.value = (vol || 0.2);
+    g.gain.setValueAtTime(g.gain.value, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + dur);
+  }
+  function noiseBurst(dur, freq) {
+    const ctx = getCtx();
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-3 * i / data.length);
+    const src = ctx.createBufferSource(); const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = freq || 1000;
+    src.buffer = buf; src.connect(filter); filter.connect(ctx.destination); src.start();
+  }
+  const SOUNDS = [
+    { label: '🔔 Bell',     fn: () => { tone(880, 0.5, 'sine', 0.3); setTimeout(() => tone(660, 0.4, 'sine', 0.2), 120); } },
+    { label: '🥁 Drum',     fn: () => noiseBurst(0.15, 200) },
+    { label: '👏 Clap',     fn: () => noiseBurst(0.08, 4000) },
+    { label: '🎺 Trumpet',  fn: () => { [262, 330, 392, 523].forEach((f, i) => setTimeout(() => tone(f, 0.2, 'sawtooth', 0.2), i * 150)); } },
+    { label: '🚀 Rocket',   fn: () => { for (let i = 0; i < 8; i++) setTimeout(() => tone(100 + i * 80, 0.1, 'sawtooth', 0.15), i * 60); } },
+    { label: '⚡ Zap',      fn: () => { tone(1200, 0.05, 'square', 0.2); setTimeout(() => tone(400, 0.15, 'sawtooth', 0.2), 50); } },
+    { label: '🐶 Woof',     fn: () => { tone(150, 0.15, 'square', 0.3); setTimeout(() => tone(120, 0.2, 'square', 0.3), 80); } },
+    { label: '🐱 Meow',     fn: () => { tone(660, 0.25, 'triangle', 0.2); setTimeout(() => tone(880, 0.2, 'triangle', 0.2), 200); } },
+    { label: '🎉 Win!',     fn: () => { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, 0.15, 'square', 0.2), i * 100)); } },
+    { label: '😢 Lose',     fn: () => { [400, 350, 300, 250].forEach((f, i) => setTimeout(() => tone(f, 0.2, 'sawtooth', 0.2), i * 150)); } },
+    { label: '💥 Boom',     fn: () => noiseBurst(0.4, 80) },
+    { label: '🚗 Car horn', fn: () => { tone(440, 0.5, 'square', 0.3); } },
+  ];
+  function setupSounds() {
+    $('soundGrid').innerHTML = SOUNDS.map((s, i) =>
+      `<button class="card tool" style="cursor:pointer;border:none;color:var(--text);font:700 16px 'Comic Sans MS',sans-serif;padding:18px"
+        onclick="window.SOUNDS[${i}].fn()">${esc(s.label)}</button>`).join('');
+    window.SOUNDS = SOUNDS;
+    // Piano
+    const NOTES = [
+      { key: 'A', label: 'C', freq: 261.63 },
+      { key: 'S', label: 'D', freq: 293.66 },
+      { key: 'D', label: 'E', freq: 329.63 },
+      { key: 'F', label: 'F', freq: 349.23 },
+      { key: 'G', label: 'G', freq: 392.00 },
+      { key: 'H', label: 'A', freq: 440.00 },
+      { key: 'J', label: 'B', freq: 493.88 },
+      { key: 'K', label: 'C', freq: 523.25 },
+    ];
+    $('piano').innerHTML = NOTES.map(n => `<button class="piano-key"
+      style="width:50px;height:140px;background:#fff;color:#000;border:1px solid #444;border-radius:0 0 6px 6px;font:700 16px sans-serif;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;padding:6px;align-items:center"
+      data-freq="${n.freq}" data-key="${n.key}">${esc(n.label)}<br><span style="font-size:11px;color:#666">${n.key}</span></button>`).join('');
+    document.querySelectorAll('.piano-key').forEach(k => {
+      k.addEventListener('mousedown', () => { tone(parseFloat(k.dataset.freq), 0.4, 'triangle', 0.2); k.style.background = '#fbbf24'; });
+      k.addEventListener('mouseup',   () => { k.style.background = '#fff'; });
+      k.addEventListener('mouseleave',() => { k.style.background = '#fff'; });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+      const k = document.querySelector(`.piano-key[data-key="${e.key.toUpperCase()}"]`);
+      if (k && !e.repeat) { tone(parseFloat(k.dataset.freq), 0.4, 'triangle', 0.2); k.style.background = '#fbbf24';
+        setTimeout(() => k.style.background = '#fff', 200); }
+    });
+  }
+
+  // ===== CAMERA CLICK MODAL =====
+  // Updated camCard generator to use modal opener
+  // Override is in the camera load — we'll bind clicks via event delegation
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('.camera-link'); if (!a) return;
+    e.preventDefault();
+    const url = a.dataset.url; const name = a.dataset.name; const meta = a.dataset.meta;
+    openModal(`<h2 style="margin:0 0 10px;color:var(--gold)">📷 ${esc(name)}</h2>
+      <div style="color:var(--dim);font-size:13px;margin-bottom:10px">${esc(meta)}</div>
+      <img src="${esc(url + (url.includes('?') ? '&' : '?') + 'mt=' + Date.now())}" style="width:100%;max-height:60vh;object-fit:contain;background:#000;border-radius:10px" alt="${esc(name)}">
+      <p style="margin-top:10px;color:var(--dim);font-size:12px">Refresh interval: 30s · Source: content.trafficwise.org</p>`);
+  });
+
+  // ===== XP / ACHIEVEMENT SYSTEM =====
+  let xp = parseInt(localStorage.getItem('aydenXP') || '0', 10);
+  let badges = JSON.parse(localStorage.getItem('aydenBadges') || '[]');
+  let questsDone = JSON.parse(localStorage.getItem('aydenQuestsDone') || '{}');
+  const QUEST_RESET = parseInt(localStorage.getItem('aydenQuestDate') || '0', 10);
+  const TODAY = new Date().toDateString();
+  if (localStorage.getItem('aydenQuestDate') !== TODAY) {
+    questsDone = {}; localStorage.setItem('aydenQuestDate', TODAY); localStorage.setItem('aydenQuestsDone', '{}');
+  }
+  const QUESTS = {
+    poke:   { xp: 10, label: '⚡ Look up a Pokémon' },
+    ttt:    { xp: 15, label: '⭕ Win Tic-Tac-Toe' },
+    snake:  { xp: 20, label: '🐍 Score 5+ in Snake' },
+    mem:    { xp: 15, label: '🧠 Win Memory Match' },
+    quiz:   { xp: 20, label: '🧮 Get 5 quiz answers right' },
+    draw:   { xp: 10, label: '🎨 Draw something' },
+    beat:   { xp: 15, label: '🎵 Make a beat' },
+    avatar: { xp: 10, label: '🤖 Save an avatar' },
+  };
+  const BADGES = [
+    { id:'first-step', name:'First Step', icon:'👣', need: x => x >= 1 },
+    { id:'novice',     name:'Novice',     icon:'🥉', need: x => x >= 50 },
+    { id:'apprentice', name:'Apprentice', icon:'🥈', need: x => x >= 200 },
+    { id:'pro',        name:'Pro',        icon:'🥇', need: x => x >= 500 },
+    { id:'master',     name:'Master',     icon:'🏆', need: x => x >= 1000 },
+    { id:'legend',     name:'Legend',     icon:'👑', need: x => x >= 2500 },
+  ];
+  function xpToNextLevel(x) {
+    const lvl = Math.floor(Math.sqrt(x / 50)) + 1;
+    const next = (lvl) * (lvl) * 50;
+    return { lvl, next, prev: (lvl-1)*(lvl-1)*50, pct: Math.min(100, ((x - (lvl-1)*(lvl-1)*50) / ((next - (lvl-1)*(lvl-1)*50)))*100) };
+  }
+  function renderXP() {
+    const { lvl, next, pct } = xpToNextLevel(xp);
+    $('xpCount').textContent = xp; $('xpLevel').textContent = lvl;
+    if ($('xpLevelBig')) { $('xpLevelBig').textContent = lvl;
+      $('xpToNext').textContent = next - xp; $('xpTotalBig').textContent = xp;
+      $('xpBar').style.width = pct + '%'; }
+    if ($('badgeGrid')) {
+      const earned = BADGES.filter(b => b.need(xp));
+      $('badgeGrid').innerHTML = earned.length
+        ? earned.map(b => `<div style="text-align:center;background:rgba(168,85,247,.15);border:2px solid var(--acc);border-radius:12px;padding:10px;min-width:80px"><div style="font-size:36px">${b.icon}</div><div style="font-size:12px;color:var(--gold);font-weight:700;margin-top:4px">${esc(b.name)}</div></div>`).join('')
+        : '<div class="muted">Keep playing to earn badges!</div>';
+    }
+    // Quest list strikethrough
+    if (document.getElementById('questList')) {
+      Object.keys(QUESTS).forEach(k => {
+        const el = document.getElementById('quest-' + k);
+        if (el) el.style.textDecoration = questsDone[k] ? 'line-through' : 'none';
+        if (el) el.style.opacity = questsDone[k] ? '0.5' : '1';
+      });
+    }
+  }
+  function awardXP(questKey, amount) {
+    if (questKey && questsDone[questKey]) return; // one per day
+    const add = amount || (QUESTS[questKey] && QUESTS[questKey].xp) || 5;
+    xp += add;
+    if (questKey) { questsDone[questKey] = true; localStorage.setItem('aydenQuestsDone', JSON.stringify(questsDone)); }
+    localStorage.setItem('aydenXP', String(xp));
+    renderXP();
+    // Float toast
+    const t = document.createElement('div');
+    t.textContent = `+${add} XP!`;
+    t.style.cssText = 'position:fixed;top:60px;right:20px;background:var(--gold);color:#000;font:800 16px Comic Sans MS;padding:10px 20px;border-radius:99px;z-index:9999;box-shadow:0 4px 20px rgba(251,191,36,.5);animation:fadeUp 1.5s forwards';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1500);
+  }
+  // Floating toast animation
+  const styleEl = document.createElement('style');
+  styleEl.textContent = '@keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}20%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}';
+  document.head.appendChild(styleEl);
+  renderXP();
+
+  // ===== Hook XP into existing functions =====
+  const _origLookupPokemon = window.lookupPokemon;
+  window.lookupPokemon = async (...args) => { await _origLookupPokemon(...args); awardXP('poke'); };
+  const _origNewQuiz = window.newQuiz;
+  let quizCorrectStreak = 0;
+  const _origQuizPick = window.quizPick;
+  window.quizPick = (btn, val) => {
+    _origQuizPick(btn, val);
+    if (val === quizAnswer && quizCorrectStreak !== undefined) {
+      quizCorrectStreak++;
+      if (quizCorrectStreak >= 5) { awardXP('quiz'); quizCorrectStreak = -999; }
+    }
+  };
+  // Override TTT win check
+  const _origTTTClick = window.tttClick;
+  window.tttClick = (i) => {
+    _origTTTClick(i);
+    if ($('tttStatus').textContent.includes('You won')) awardXP('ttt');
+  };
+  // Snake score hook (poll status text)
+  const _origStartSnake = window.startSnake;
+  window.startSnake = () => { _origStartSnake(); };
+  const snakeWatcher = setInterval(() => {
+    const t = $('snakeStatus') ? $('snakeStatus').textContent : '';
+    const m = t.match(/Score:\s*(\d+)/);
+    if (m && parseInt(m[1], 10) >= 5 && !questsDone.snake) awardXP('snake');
+  }, 2000);
+  // Memory win hook
+  const _origMemClick = window.memClick;
+  window.memClick = (i) => {
+    _origMemClick(i);
+    if ($('memStatus').textContent.includes('You won')) awardXP('mem');
+  };
+  // Drawing hook (one-shot first stroke)
+  let drawAwarded = false;
+  document.getElementById('drawCanvas').addEventListener('mousedown', () => { if (!drawAwarded) { drawAwarded = true; awardXP('draw'); } });
+  document.getElementById('drawCanvas').addEventListener('touchstart', () => { if (!drawAwarded) { drawAwarded = true; awardXP('draw'); } });
+
+  // ===== BEAT MAKER =====
+  const BEAT_ROWS = [
+    { name: '🥁 Kick',  fn: () => noiseBurst(0.1, 150) },
+    { name: '👏 Clap',  fn: () => noiseBurst(0.06, 4000) },
+    { name: '🎺 Hi',    fn: () => tone(880, 0.1, 'square', 0.15) },
+    { name: '🎶 Mid',   fn: () => tone(440, 0.15, 'triangle', 0.15) },
+  ];
+  const BEAT_STEPS = 16;
+  let beatGrid = BEAT_ROWS.map(() => Array(BEAT_STEPS).fill(false));
+  let beatPlayingInterval = null;
+  let beatStep = 0;
+  function renderBeats() {
+    const g = $('beatGrid');
+    g.style.gridTemplateColumns = `120px repeat(${BEAT_STEPS}, 1fr)`;
+    g.innerHTML = '';
+    BEAT_ROWS.forEach((row, r) => {
+      const lbl = document.createElement('div');
+      lbl.textContent = row.name;
+      lbl.style.cssText = 'padding:6px;font-weight:700;font-size:13px;color:var(--gold)';
+      g.appendChild(lbl);
+      for (let s = 0; s < BEAT_STEPS; s++) {
+        const cell = document.createElement('button');
+        cell.dataset.r = r; cell.dataset.s = s;
+        const hot = beatGrid[r][s];
+        cell.style.cssText = `min-width:24px;height:34px;background:${hot?'linear-gradient(135deg,var(--pink),var(--acc))':'rgba(255,255,255,.05)'};border:1px solid ${(s%4===0)?'var(--gold)':'var(--line)'};border-radius:6px;cursor:pointer`;
+        cell.onclick = () => { beatGrid[r][s] = !beatGrid[r][s]; renderBeats(); };
+        g.appendChild(cell);
+      }
+    });
+  }
+  window.beatPlay = () => {
+    if (beatPlayingInterval) clearInterval(beatPlayingInterval);
+    beatStep = 0;
+    const tempo = parseInt($('beatTempo').value, 10);
+    const ms = 60000 / tempo / 4; // 16th notes
+    beatPlayingInterval = setInterval(() => {
+      BEAT_ROWS.forEach((row, r) => { if (beatGrid[r][beatStep]) row.fn(); });
+      // highlight current step
+      document.querySelectorAll('#beatGrid button').forEach(b => {
+        if (parseInt(b.dataset.s, 10) === beatStep) b.style.boxShadow = '0 0 0 2px var(--gold)';
+        else b.style.boxShadow = '';
+      });
+      beatStep = (beatStep + 1) % BEAT_STEPS;
+    }, ms);
+    awardXP('beat');
+  };
+  window.beatStop = () => { if (beatPlayingInterval) { clearInterval(beatPlayingInterval); beatPlayingInterval = null; }
+    document.querySelectorAll('#beatGrid button').forEach(b => b.style.boxShadow = ''); };
+  window.beatClear = () => { beatGrid = BEAT_ROWS.map(() => Array(BEAT_STEPS).fill(false)); renderBeats(); };
+  window.beatRandom = () => {
+    beatGrid = BEAT_ROWS.map((_, r) => Array(BEAT_STEPS).fill(false).map((_,s) => Math.random() < (r === 0 ? 0.4 : 0.2)));
+    renderBeats();
+  };
+  $('beatTempo').addEventListener('input', () => { $('beatTempoVal').textContent = $('beatTempo').value + ' BPM';
+    if (beatPlayingInterval) { window.beatStop(); window.beatPlay(); } });
+  renderBeats();
+
+  // ===== AVATAR BUILDER =====
+  const FACES = ['🤖','😀','😎','🦊','🐶','🐱','🦁','🐯','🐸','🐼','🐨','🦄','👽','👾','🤠','🧙','🧛','🧞','🧜','🦸','🦹','🧚','🧝','🥷','🧑‍🚀','👻'];
+  const HATS  = ['🎩','👑','🧢','🎓','🪖','⛑','🎃','🎄','🦔','✨','🔥','⚡','💎','🌟','—'];
+  const PETS  = ['🐶','🐱','🐰','🐹','🦔','🐢','🐍','🦎','🐉','🐲','🐦','🦜','🦢','🦋','🐝','🐢','🦄','—'];
+  let avatar = JSON.parse(localStorage.getItem('aydenAvatar') || '{"face":"🤖","hat":"👑","pet":"🐶","name":"Hero"}');
+  function renderAvatar() {
+    const hatStr = avatar.hat === '—' ? '' : avatar.hat;
+    const petStr = avatar.pet === '—' ? '' : avatar.pet;
+    $('avatarDisplay').innerHTML = `<div style="font-size:36px;height:50px">${esc(hatStr)}</div>
+      <div style="font-size:120px;line-height:1">${esc(avatar.face)}</div>
+      <div style="font-size:48px;margin-top:6px">${esc(petStr)}</div>`;
+    $('avatarName').textContent = avatar.name || 'Hero';
+    if ($('avatarNameInput')) $('avatarNameInput').value = avatar.name;
+    const renderPicker = (host, list, key) => {
+      $(host).innerHTML = list.map(item => {
+        const active = avatar[key] === item;
+        return `<button onclick="pickAvatar('${key}','${esc(item)}')" style="background:${active?'rgba(168,85,247,.4)':'rgba(255,255,255,.05)'};border:2px solid ${active?'var(--gold)':'var(--line)'};border-radius:8px;font-size:24px;padding:6px 8px;cursor:pointer;color:#fff">${esc(item)}</button>`;
+      }).join('');
+    };
+    renderPicker('avatarFaces', FACES, 'face');
+    renderPicker('avatarHats',  HATS,  'hat');
+    renderPicker('avatarPets',  PETS,  'pet');
+  }
+  window.pickAvatar = (key, val) => { avatar[key] = val; renderAvatar(); };
+  window.setAvatarName = (v) => { avatar.name = v.slice(0, 24); $('avatarName').textContent = avatar.name; };
+  window.randomAvatar = () => {
+    avatar.face = FACES[Math.floor(Math.random()*FACES.length)];
+    avatar.hat  = HATS[Math.floor(Math.random()*HATS.length)];
+    avatar.pet  = PETS[Math.floor(Math.random()*PETS.length)];
+    renderAvatar();
+  };
+  window.saveAvatar = () => { localStorage.setItem('aydenAvatar', JSON.stringify(avatar));
+    $('avatarName').textContent = avatar.name + ' (saved!)';
+    setTimeout(() => $('avatarName').textContent = avatar.name, 1500);
+    awardXP('avatar');
+  };
+  window.downloadAvatar = () => {
+    const c = document.createElement('canvas'); c.width = 400; c.height = 400;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#0a0e14'; ctx.fillRect(0,0,400,400);
+    ctx.font = '120px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (avatar.hat !== '—') ctx.fillText(avatar.hat, 200, 80);
+    ctx.font = '180px serif'; ctx.fillText(avatar.face, 200, 220);
+    if (avatar.pet !== '—') { ctx.font = '60px serif'; ctx.fillText(avatar.pet, 200, 350); }
+    ctx.font = 'bold 24px sans-serif'; ctx.fillStyle = '#fbbf24';
+    ctx.fillText(avatar.name, 200, 390);
+    const a = document.createElement('a'); a.download = 'my-avatar.png'; a.href = c.toDataURL('image/png'); a.click();
+  };
+  renderAvatar();
+
+  // ===== THREE.JS 3D SCENE =====
+  let three = null;
+  function initThree() {
+    if (three || !window.THREE) return;
+    const mount = $('threeMount'); if (!mount) return;
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000018);
+    const cam = new THREE.PerspectiveCamera(60, mount.clientWidth / 380, 0.1, 100);
+    cam.position.set(0, 0, 5);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(mount.clientWidth, 380);
+    mount.appendChild(renderer.domElement);
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    const light = new THREE.PointLight(0xffffff, 1.2);
+    light.position.set(5, 5, 5); scene.add(light);
+    const light2 = new THREE.PointLight(0xa855f7, 0.6);
+    light2.position.set(-5, -5, 5); scene.add(light2);
+    // Stars
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = []; for (let i = 0; i < 1000; i++) { starPos.push((Math.random()-.5)*40, (Math.random()-.5)*40, (Math.random()-.5)*40); }
+    starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+    const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.05 }));
+    scene.add(stars);
+
+    let mesh = makeMesh('sphere');
+    scene.add(mesh);
+
+    function makeMesh(shape) {
+      let geo;
+      if (shape === 'cube')  geo = new THREE.BoxGeometry(2, 2, 2);
+      else if (shape === 'sphere') geo = new THREE.SphereGeometry(1.4, 48, 48);
+      else if (shape === 'torus')  geo = new THREE.TorusGeometry(1.2, 0.5, 24, 80);
+      else if (shape === 'icosa')  geo = new THREE.IcosahedronGeometry(1.5, 0);
+      else if (shape === 'cone')   geo = new THREE.ConeGeometry(1.2, 2.4, 32);
+      else if (shape === 'mc')     geo = new THREE.BoxGeometry(2, 2, 2); // styled differently
+      else                          geo = new THREE.SphereGeometry(1.4, 48, 48);
+      const mat = new THREE.MeshStandardMaterial({
+        color: shape === 'mc' ? 0x7cb342 : 0xa855f7,
+        metalness: 0.4, roughness: 0.3,
+        emissive: shape === 'mc' ? 0x000000 : 0x4a148c, emissiveIntensity: 0.3,
+        flatShading: shape === 'mc',
+        wireframe: false,
+      });
+      return new THREE.Mesh(geo, mat);
+    }
+
+    let rotX = 0, rotY = 0, dragging = false, lastX = 0, lastY = 0;
+    mount.addEventListener('mousedown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; mount.style.cursor = 'grabbing'; });
+    mount.addEventListener('mousemove', (e) => { if (!dragging) return;
+      rotY += (e.clientX - lastX) * 0.01; rotX += (e.clientY - lastY) * 0.01;
+      lastX = e.clientX; lastY = e.clientY; });
+    document.addEventListener('mouseup',   () => { dragging = false; mount.style.cursor = 'grab'; });
+    mount.addEventListener('touchstart', (e) => { dragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; });
+    mount.addEventListener('touchmove',  (e) => { if (!dragging) return;
+      rotY += (e.touches[0].clientX - lastX) * 0.01; rotX += (e.touches[0].clientY - lastY) * 0.01;
+      lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; e.preventDefault(); });
+    document.addEventListener('touchend', () => { dragging = false; });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      mesh.rotation.x = rotX + (dragging ? 0 : performance.now() * 0.0003);
+      mesh.rotation.y = rotY + (dragging ? 0 : performance.now() * 0.0005);
+      stars.rotation.y += 0.0003;
+      renderer.render(scene, cam);
+    }
+    animate();
+
+    three = { scene, cam, renderer, mesh, mount, makeMesh };
+    window.addEventListener('resize', () => {
+      cam.aspect = mount.clientWidth / 380;
+      cam.updateProjectionMatrix();
+      renderer.setSize(mount.clientWidth, 380);
+    });
+  }
+  window.threeShape = (shape) => {
+    if (!three) return;
+    three.scene.remove(three.mesh);
+    three.mesh = three.makeMesh(shape);
+    three.scene.add(three.mesh);
+  };
+  // Lazy-init when 3D tab clicked
+  document.querySelector('.tab[data-pane="3d"]').addEventListener('click', () => setTimeout(initThree, 50));
+
+  // ===== SELFIE BOOTH =====
+  let selfieStream = null; let selfieFacing = 'user'; let selfieFilter = 'none';
+  let selfieGallery = [];
+  window.startCamera = async () => {
+    try {
+      selfieStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: selfieFacing, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+      const v = $('selfieVideo'); v.srcObject = selfieStream; v.style.display = 'block';
+      v.style.filter = selfieFilter; $('selfieIdle').style.display = 'none';
+    } catch (e) { alert('Camera permission denied or no camera available: ' + e.message); }
+  };
+  window.stopCamera = () => {
+    if (selfieStream) selfieStream.getTracks().forEach(t => t.stop());
+    selfieStream = null; $('selfieVideo').style.display = 'none'; $('selfieIdle').style.display = 'flex';
+  };
+  window.flipCamera = () => { selfieFacing = (selfieFacing === 'user' ? 'environment' : 'user');
+    if (selfieStream) { stopCamera(); startCamera(); } };
+  window.setCamFilter = (f) => { selfieFilter = f; if ($('selfieVideo').style.display === 'block') $('selfieVideo').style.filter = f; };
+  window.snapPhoto = () => {
+    if (!selfieStream) { alert('Start the camera first!'); return; }
+    const v = $('selfieVideo'); const c = $('selfieCanvas');
+    c.width = v.videoWidth; c.height = v.videoHeight;
+    const ctx = c.getContext('2d');
+    ctx.filter = selfieFilter; ctx.drawImage(v, 0, 0, c.width, c.height); ctx.filter = 'none';
+    const url = c.toDataURL('image/png');
+    selfieGallery.unshift(url);
+    if (selfieGallery.length > 6) selfieGallery.pop();
+    renderSelfieGallery();
+  };
+  function renderSelfieGallery() {
+    $('selfieGallery').innerHTML = selfieGallery.map((url, i) =>
+      `<div style="position:relative">
+        <img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--line)" alt="selfie">
+        <a href="${url}" download="selfie-${i}.png" style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;text-decoration:none">💾</a>
+      </div>`).join('');
+  }
+  window.captureTab = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const v = document.createElement('video'); v.srcObject = stream;
+      await v.play();
+      const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+      c.getContext('2d').drawImage(v, 0, 0);
+      stream.getTracks().forEach(t => t.stop());
+      const url = c.toDataURL('image/png');
+      $('captureResult').innerHTML = `<img src="${url}" style="max-width:100%;border-radius:10px;border:2px solid var(--gold)">
+        <br><a href="${url}" download="screenshot.png" class="btn green" style="display:inline-block;margin-top:8px;text-decoration:none">💾 Download</a>`;
+    } catch (e) { $('captureResult').innerHTML = `<div class="err-text">Capture cancelled or failed: ${esc(e.message)}</div>`; }
+  };
+
+  // ===== VOICE MEMO =====
+  let micStream = null; let micRecorder = null; let micChunks = []; let micStartTime = 0; let micTimer = null;
+  let micGallery = [];
+  window.startMic = async () => {
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micRecorder = new MediaRecorder(micStream); micChunks = [];
+      micRecorder.ondataavailable = (e) => { if (e.data.size > 0) micChunks.push(e.data); };
+      micRecorder.onstop = () => {
+        const blob = new Blob(micChunks, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        micGallery.unshift(url);
+        if (micGallery.length > 5) { URL.revokeObjectURL(micGallery.pop()); }
+        renderMicGallery();
+      };
+      micRecorder.start();
+      micStartTime = Date.now();
+      $('micIdle').style.display = 'none'; $('micRecording').style.display = 'flex';
+      micTimer = setInterval(() => {
+        const s = Math.floor((Date.now() - micStartTime) / 1000);
+        $('micTime').textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+      }, 250);
+    } catch (e) { alert('Mic permission denied: ' + e.message); }
+  };
+  window.stopMic = () => {
+    if (micRecorder && micRecorder.state !== 'inactive') micRecorder.stop();
+    if (micStream) micStream.getTracks().forEach(t => t.stop());
+    micStream = null;
+    if (micTimer) { clearInterval(micTimer); micTimer = null; }
+    $('micIdle').style.display = 'flex'; $('micRecording').style.display = 'none';
+  };
+  function renderMicGallery() {
+    $('micGallery').innerHTML = micGallery.map((url, i) =>
+      `<div style="margin:6px 0;display:flex;align-items:center;gap:8px">
+        <audio controls src="${url}" style="flex:1;height:36px"></audio>
+        <a href="${url}" download="memo-${i}.webm" class="btn small">💾</a>
+      </div>`).join('');
+  }
+
+  // ===== SHARE =====
+  window.shareMessage = async () => {
+    const msg = $('shareMsg').value.trim() || 'Check out my dashboard!';
+    const url = location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: "Ayden's Hub", text: msg, url }); $('shareStatus').textContent = '📤 Shared!'; }
+      catch (_) { $('shareStatus').textContent = 'Share cancelled.'; }
+    } else { $('shareStatus').textContent = 'Share API not supported. Use Copy or Text/Email instead.'; }
+  };
+  window.copyMessage = async () => {
+    const msg = $('shareMsg').value.trim() || 'Check out my dashboard!';
+    const text = `${msg} ${location.href}`;
+    try { await navigator.clipboard.writeText(text); $('shareStatus').textContent = '📋 Copied to clipboard!'; }
+    catch (_) { $('shareStatus').textContent = 'Copy failed — try selecting the text manually.'; }
+  };
+  window.textMessage = () => {
+    const msg = $('shareMsg').value.trim() || "Check out Ayden's Hub!";
+    location.href = `sms:?body=${encodeURIComponent(msg + ' ' + location.href)}`;
+  };
+  window.emailMessage = () => {
+    const msg = $('shareMsg').value.trim() || 'Check out my dashboard!';
+    location.href = `mailto:?subject=${encodeURIComponent("Ayden's Hub")}&body=${encodeURIComponent(msg + '\n\n' + location.href)}`;
+  };
+  window.loadDrawing = () => {
+    const c = $('drawCanvas'); if (!c) return;
+    $('drawShare').innerHTML = `<img src="${c.toDataURL('image/png')}" style="max-width:100%;border-radius:10px;border:2px solid var(--gold)">`;
+  };
+  window.shareDrawing = async () => {
+    const c = $('drawCanvas'); if (!c) return;
+    c.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'drawing.png', { type:'image/png' })] })) {
+        try { await navigator.share({ files: [new File([blob], 'drawing.png', { type:'image/png' })], title: 'My drawing' }); }
+        catch (_) {}
+      } else { alert('Share not supported — use Download instead.'); }
+    });
+  };
+  window.downloadDrawing = () => {
+    const c = $('drawCanvas'); if (!c) return;
+    const a = document.createElement('a'); a.download = 'my-drawing.png'; a.href = c.toDataURL('image/png'); a.click();
+  };
+
+  setupSounds();
+  renderDex();
 
   // Live data
   loadWeather(); loadTraffic(); loadNews(); loadGaming(); loadSpace();
