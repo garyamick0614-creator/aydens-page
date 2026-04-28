@@ -18,8 +18,10 @@ window.AYDEN_FIREBASE_CONFIG = {
   projectId:         "data-44017",
   storageBucket:     "data-44017.firebasestorage.app",
   messagingSenderId: "582095031655",
-  appId:             "1:582095031655:web:1d793237a9d6bb00f8b3c2",
-  measurementId:     "G-MYVW06F02Q"
+  appId:             "1:582095031655:web:1d793237a9d6bb00f8b3c2"
+  // measurementId intentionally omitted — Google Analytics for Firebase is NOT
+  // COPPA-compliant for a child-targeted site (under-13). Do not add it back
+  // and do not call getAnalytics() anywhere in this codebase.
 };
 
 window.AYDEN_ADMIN_USERNAME = "ayden";

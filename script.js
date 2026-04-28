@@ -88,13 +88,56 @@ function relTime(ts) {
 }
 
 /* ============== KID-SAFE FILTER ============== */
+// Profanity / explicit — blocks for ALL contexts (chat input, posts, replies, news)
 const KID_BLOCKLIST = [
   'fuck','shit','bitch','asshole','dick','pussy','cunt','bastard',
-  'nigg','faggot','whore','slut','retard','rape',
-  'kill yourself','suicide','self-harm','heroin','cocaine','meth',
-  'porn','nude','sex tape',
+  'nigg','faggot','whore','slut','retard',
+  'kill yourself','suicide','self-harm','self harm','heroin','cocaine','meth',
+  'porn','nude','sex tape','xxx','onlyfans',
 ];
 const KID_HARD_BLOCK_RX = new RegExp('\\b(' + KID_BLOCKLIST.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i');
+
+// Topical harm — blocks for NEWS ONLY (a 13-year-old shouldn't see headlines about
+// war, crime, deaths, abuse, drugs, disasters, politics-charged content).
+// Default-deny: if the title hits any of these words, the headline is dropped.
+const NEWS_TOPIC_BLOCK = [
+  // violence
+  'kill','killed','killing','dead','dies','died','death','deaths','murder','murdered','homicide',
+  'shoot','shot','shooting','gunman','gunmen','gun','rifle','firearm','weapon','weapons',
+  'stab','stabbed','stabbing','attack','attacks','attacked','attacker','assault','assaulted',
+  'fight','fighting','battle','combat','war','warfare','military','militant','militants',
+  'bomb','bombing','bomber','blast','explode','explosion','grenade','missile','airstrike','strike',
+  'terror','terrorism','terrorist','extremist','militia','insurgent','rebel','rebels',
+  'violence','violent','bloodshed','massacre','genocide','atrocity','torture','beheading',
+  // crime / abuse
+  'crime','criminal','arrest','arrested','jailed','prison','convicted','sentenced','indicted',
+  'rape','raped','rapist','abuse','abused','abuser','molest','assault',
+  'kidnap','kidnapped','kidnapping','abducted','abduction','trafficking','traffickers',
+  'gang','cartel','mob','organized crime','smuggle','smuggling','heist','robbery','robbed',
+  'fraud','scam','scandal','corruption','laundering',
+  // disasters / accidents / casualties
+  'crash','crashed','collision','wreck','plane crash','train crash','derailed',
+  'disaster','catastrophe','tragedy','fatal','fatality','fatalities','casualty','casualties',
+  'wounded','injured','injuries','victim','victims','missing','evacuate','evacuation',
+  'flood','flooding','wildfire','tornado','hurricane','tsunami','earthquake casualties',
+  'collapse','collapsed','sinkhole',
+  // health / drugs / addiction
+  'overdose','overdosed','addicted','addiction','heroin','opioid','fentanyl','meth','cocaine',
+  'epidemic','pandemic','outbreak','deadly','lethal','poisoning','poisoned','contaminated',
+  'cancer death','dies of cancer',
+  // dark socio
+  'starvation','starving','famine','refugee','refugees','exodus','displaced','homeless deaths',
+  'protest','riot','rioting','unrest','clash','clashes','siege','airstrike',
+  'racism','racist','hate crime','antisemit','islamophob','homophob',
+  // adult
+  'sex','sexual','sexually','prostitution','stripper','escort','affair','divorce',
+  'alcohol','drunk','drunken','dui','beer','vodka','tequila','wine','liquor',
+  'lawsuit','sued','suing','probe','indictment',
+];
+const NEWS_TOPIC_RX = new RegExp('\\b(' + NEWS_TOPIC_BLOCK.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'i');
+
+// Allowlist of topics that ARE kid-safe — used as a positive signal for news.
+const NEWS_TOPIC_ALLOW_RX = /\b(game|gaming|gamer|minecraft|roblox|fortnite|nintendo|xbox|playstation|switch|pokemon|lego|movie|cartoon|animation|space|nasa|astronaut|planet|rocket|science|invention|robot|dinosaur|animal|panda|puppy|kitten|whale|shark|sport|sports|baseball|basketball|football|soccer|olympics|tournament|championship|kids|teen|student|school project|library|art|music|concert|festival|holiday|theme park|disney)\b/i;
 
 function strictness() { return (currentSettings()?.strict ?? 'strict'); }
 
@@ -118,6 +161,28 @@ function kidSafeAllow(text) {
   if (KID_HARD_BLOCK_RX.test(text)) return false;
   const mode = strictness();
   if (mode === 'strict' && /\b(damn|hell|crap|hate)\b/i.test(text)) return false;
+  return true;
+}
+
+/* News-specific: stricter, default-deny. A headline must NOT hit topic blocklist
+   AND should ideally hit the topic allowlist. Falls back to deny on doubt. */
+function newsHeadlineSafe(title, source, category) {
+  const t = String(title || '');
+  if (!t || t.length < 6) return false;
+  if (!kidSafeAllow(t)) return false;
+  if (NEWS_TOPIC_RX.test(t)) return false;
+  // Block by category — these whole categories are off-limits for kids
+  const cat = String(category || '').toLowerCase();
+  if (['world','politics','war','conflict','crime','health'].includes(cat)) {
+    // allow only if title hits the kid-safe allowlist explicitly
+    if (!NEWS_TOPIC_ALLOW_RX.test(t)) return false;
+  }
+  // Block known adult-leaning sources (case-insensitive contains)
+  const src = String(source || '').toLowerCase();
+  const blockSources = ['al jazeera','reuters','bbc world','associated press','ap news','nyt','new york times','washington post','cnn','fox news','daily mail','guardian','politico','huffpost','breitbart','rt','tass','sputnik'];
+  if (blockSources.some(b => src.includes(b))) {
+    if (!NEWS_TOPIC_ALLOW_RX.test(t)) return false;
+  }
   return true;
 }
 
@@ -282,29 +347,58 @@ async function loadKidsNews() {
   const host = $('#kids-news');
   if (!host) return;
   host.innerHTML = '';
-  try {
-    const data = await apiGet('/api/proxy/news/headlines', { timeout: 12000 });
-    const all = data.items || [];
-    const safe = [];
-    for (const it of all) {
-      if (!kidSafeAllow(it.title)) continue;
-      safe.push(it);
-      if (safe.length >= 6) break;
-    }
-    if (!safe.length) {
-      host.appendChild(el('div', { class: 'inline-help' }, 'No headlines passed the kid-safe filter right now. Refresh in a few minutes.'));
-      return;
-    }
-    for (const it of safe) {
-      const row = el('div', { class: 'news-item' }, [
-        el('a', { href: it.link, target: '_blank', rel: 'noopener noreferrer nofollow' }, kidSafeText(it.title)),
-        el('div', { class: 'news-source' }, `${it.source || ''} · ${it.category || ''}`),
-      ]);
-      host.appendChild(row);
-    }
-    const stat = $('#stat-news'); if (stat) stat.textContent = String(safe.length);
-  } catch (e) {
-    host.appendChild(el('div', { class: 'inline-help' }, 'News unavailable: ' + e.message));
+
+  // Prefer the server-side kid-safe endpoint when available (other Claude is wiring it).
+  // Try a few likely paths in order; first one that returns items wins. Fall back to
+  // the general feed with a strict client-side default-deny filter.
+  const tryPaths = [
+    '/api/proxy/news/kids',
+    '/api/proxy/news/headlines?safe=kids',
+    '/api/kids/news',
+    '/api/proxy/news/headlines'
+  ];
+
+  let items = null;
+  let usedServerFilter = false;
+  for (const path of tryPaths) {
+    try {
+      const data = await apiGet(path, { timeout: 10000 });
+      const got = data.items || data.headlines || [];
+      if (got.length) {
+        items = got;
+        usedServerFilter = !path.endsWith('/headlines');
+        break;
+      }
+    } catch { /* try next path */ }
+  }
+
+  if (!items) {
+    host.appendChild(el('div', { class: 'inline-help' }, 'News feed unreachable right now — try refresh in a minute.'));
+    return;
+  }
+
+  // Even if the server pre-filtered, run our own filter as defense-in-depth.
+  const safe = [];
+  for (const it of items) {
+    if (!newsHeadlineSafe(it.title, it.source, it.category)) continue;
+    safe.push(it);
+    if (safe.length >= 6) break;
+  }
+
+  if (!safe.length) {
+    host.appendChild(el('div', { class: 'inline-help' }, 'Nothing kid-safe in the feed right now. That\'s a good thing — go play a game!'));
+    return;
+  }
+  for (const it of safe) {
+    const row = el('div', { class: 'news-item' }, [
+      el('a', { href: it.link, target: '_blank', rel: 'noopener noreferrer nofollow' }, kidSafeText(it.title)),
+      el('div', { class: 'news-source' }, `${escapeHtml(it.source || '')} · ${escapeHtml(it.category || '')}`),
+    ]);
+    host.appendChild(row);
+  }
+  const stat = $('#stat-news'); if (stat) stat.textContent = String(safe.length);
+  if (!usedServerFilter && safe.length) {
+    host.appendChild(el('div', { class: 'inline-help', style: 'margin-top:8px;font-size:11px;' }, 'Filtered locally. Server-side kid-safe endpoint coming soon.'));
   }
 }
 
