@@ -55,6 +55,10 @@ export function PlaygroundProvider({ children, fallback }) {
     return () => { if (unsub) unsub(); };
   }, [auth]);
 
+  // Hook-rules fix: useMemo MUST be called every render in the same order.
+  // Previously this was below conditional returns → React #310 on production builds.
+  const value = useMemo(() => ({ app, auth, db, user, ready }), [app, auth, db, user, ready]);
+
   if (error) {
     return h('div', {
       style: {
@@ -74,7 +78,5 @@ export function PlaygroundProvider({ children, fallback }) {
     style: { padding: 40, textAlign: 'center', color: '#cbd5e1', font: '600 14px sans-serif' },
   }, 'Connecting to playground…');
 
-  // Stable context value — shape only changes on auth event, never per frame.
-  const value = useMemo(() => ({ app, auth, db, user, ready: true }), [app, auth, db, user]);
   return h(PlaygroundContext.Provider, { value }, children);
 }

@@ -8,7 +8,17 @@
   Cross-Origin-Resource-Policy: same-site
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.youtube.com https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://api.thatcomputerguy26.org https://content.trafficwise.org https://*.nasa.gov https://apod.nasa.gov https://i.ytimg.com https://*.googleusercontent.com https://raw.githubusercontent.com https://*.pokeapi.co; media-src 'self' blob:; connect-src 'self' https://api.thatcomputerguy26.org https://www.gstatic.com https://*.firebaseio.com https://*.firebasedatabase.app https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://pokeapi.co https://unpkg.com wss://*.firebaseio.com wss://*.firebasedatabase.app; frame-src https://www.youtube.com https://www.youtube-nocookie.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
 /index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/gamehq.html
   Cache-Control: no-cache, no-store, must-revalidate
   Pragma: no-cache
   Expires: 0

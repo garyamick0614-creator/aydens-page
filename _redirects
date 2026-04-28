@@ -1,0 +1,6 @@
+# Old `/kids.html` URLs continue to work (silently serve the new root).
+/kids.html              /                200
+/kids                   /                200
+/hub                    /                200
+/gamehq                 /gamehq.html     200
+/play                   /playground.html 200
