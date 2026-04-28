@@ -30,30 +30,15 @@
     --gold: var(--neon-yellow); --pink: var(--neon-pink); --green: var(--neon-green); --red: #ff5577;
   }
   * { box-sizing:border-box; margin:0; padding:0 }
+  /* Body background is now provided by gamehq's animated canvas + grid-overlay
+     + scanlines DIVs at the top of <body>. Transparent body lets canvas show. */
   body {
-    background: var(--bg-deep);
-    background-image:
-      radial-gradient(ellipse at 20% 0%,  color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 100%,color-mix(in srgb, var(--accent-2) 18%, transparent) 0%, transparent 60%),
-      linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 100%);
-    background-attachment: fixed;
+    background: transparent;
     color: var(--text); font: 15px/1.55 var(--font-body);
     min-height: 100vh; padding: 14px 14px 60px;
     overflow-x: hidden;
   }
-  /* Scanline + grid overlays — same as index */
-  body::before {
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-    background-image:
-      linear-gradient(rgba(0,240,255,.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(180,0,255,.05) 1px, transparent 1px);
-    background-size: 56px 56px;
-  }
-  body::after {
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:1;
-    background: repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0, rgba(255,255,255,.018) 1px, transparent 1px, transparent 3px);
-    mix-blend-mode: overlay;
-  }
+  html { background: var(--bg-deep); }
   .wrap { max-width: 1180px; margin: 0 auto; position: relative; z-index: 2 }
 
   header.top { display: flex; justify-content: space-between; align-items: center;
@@ -350,7 +335,13 @@
   }
 </style>
 </head>
-<body>
+<body data-tab="home">
+
+<!-- Game HQ visual layer — animated canvas + scanlines + grid (same as gamehq.html) -->
+<canvas id="bgcanvas" aria-hidden="true" style="position:fixed;inset:0;z-index:-2;pointer-events:none"></canvas>
+<div class="grid-overlay" aria-hidden="true" style="position:fixed;inset:0;z-index:-1;pointer-events:none"></div>
+<div class="scanlines" aria-hidden="true" style="position:fixed;inset:0;z-index:0;pointer-events:none"></div>
+
 <div class="wrap">
 
 <header class="top">
@@ -1641,6 +1632,8 @@
 
 </div>
 
+<!-- Animated canvas background (Game HQ visual system, ported site-wide) -->
+<script src="background.js?v=20260428c" defer></script>
 <!-- Firebase config — public Web SDK values, safe to commit -->
 <script src="firebase-config.js?v=20260428b"></script>
 <!-- Shared identity layer (Anonymous Auth + profile + XP/Pokédex sync) -->
@@ -1648,7 +1641,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T07:00Z-v18-styles-css-loosened-17plus-filter';
+window.__KIDS_BUILD = '2026-04-28T07:30Z-v19-canvas-bg-gaming-priority';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
