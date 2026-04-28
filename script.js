@@ -1391,7 +1391,9 @@ function bindFriendsAuth() {
       save(KEYS.friendSession, { username: u });
     } catch (e) {
       msg.className = 'gate-msg err';
-      msg.textContent = e.message.replace(/\(auth\/[^)]+\)/, '').trim() || 'Sign-in failed.';
+      // Firebase auth errors sometimes throw with no .message — guard.
+      const raw = (e && e.message) ? String(e.message) : '';
+      msg.textContent = raw.replace(/\(auth\/[^)]+\)/, '').trim() || 'Sign-in failed.';
     }
   };
   login.addEventListener('click', () => attempt('login'));
@@ -1550,3 +1552,169 @@ async function boot() {
 }
 
 document.addEventListener('DOMContentLoaded', boot);
+
+// ===========================================================================
+// Reviews tab (Ayden's game reviews — synced via Firebase RTDB at /reviews/*)
+// + Profile customizer in Control panel (writes to /users/{uid}/profile via
+// the shared firebase-identity layer).
+// Both attach AFTER boot so DOM exists; both wait for window.AYDEN_ID.ready.
+// ===========================================================================
+(function initReviewsAndProfile() {
+  function whenIdReady(cb) {
+    if (window.AYDEN_ID && window.AYDEN_ID.ready) {
+      window.AYDEN_ID.ready.then(cb).catch(e => console.warn('[id]', e.message));
+    } else {
+      let n = 0;
+      const i = setInterval(() => {
+        if (window.AYDEN_ID && window.AYDEN_ID.ready) {
+          clearInterval(i);
+          window.AYDEN_ID.ready.then(cb).catch(e => console.warn('[id]', e.message));
+        } else if (++n > 40) clearInterval(i);
+      }, 250);
+    }
+  }
+  function $$(s){return document.querySelector(s);}
+  function escH(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+  // ===== REVIEWS =====
+  let revRating = 0;
+  function bindReviewStars() {
+    const stars = document.querySelectorAll('#rev-stars span');
+    stars.forEach((s, i) => {
+      s.addEventListener('click', () => {
+        revRating = i + 1;
+        stars.forEach((x, j) => x.textContent = j < revRating ? '★' : '☆');
+        const n = $$('#rev-rating-num'); if (n) n.textContent = revRating + '/5';
+      });
+    });
+  }
+  async function loadReviews() {
+    const feed = $$('#rev-feed'); if (!feed) return;
+    if (!window.AYDEN_ID || !window.AYDEN_ID.db) {
+      feed.innerHTML = '<div class="inline-help">Connecting…</div>'; return;
+    }
+    try {
+      const { ref, get } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js');
+      const snap = await get(ref(window.AYDEN_ID.db, 'reviews'));
+      const items = [];
+      if (snap.exists()) snap.forEach(child => items.push(Object.assign({ id: child.key }, child.val())));
+      items.sort((a,b) => (b.ts||0) - (a.ts||0));
+      if (!items.length) { feed.innerHTML = '<div class="inline-help">No reviews yet — be the first!</div>'; return; }
+      feed.innerHTML = items.slice(0, 30).map(r => {
+        const stars = '★'.repeat(r.rating||0) + '☆'.repeat(5-(r.rating||0));
+        const when  = r.ts ? new Date(r.ts).toLocaleDateString() : '';
+        const author= r.author || 'Ayden';
+        return `<div style="background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:14px;margin:10px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="color:var(--neon-cyan);font-size:15px">${escH(r.game||'Game')}</strong>
+            <span style="color:var(--neon-yellow);font-size:14px">${stars} <span style="color:var(--text-dim);font-size:11px">${escH(when)}</span></span>
+          </div>
+          <p style="margin:6px 0;color:var(--text);line-height:1.6;font-size:14px;white-space:pre-wrap">${escH(r.text||'')}</p>
+          <div style="font-size:11px;color:var(--text-mute);font-family:var(--font-display);letter-spacing:.1em;text-transform:uppercase">— ${escH(author)}</div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      feed.innerHTML = '<div class="inline-help" style="color:#ff6b6b">Reviews unavailable: '+escH(e.message)+'</div>';
+    }
+  }
+  async function postReview() {
+    const game = ($$('#rev-game')||{}).value || '';
+    const text = ($$('#rev-text')||{}).value || '';
+    const status = $$('#rev-status');
+    if (!game.trim()) { if (status) status.textContent = '✗ Game title required.'; return; }
+    if (!text.trim() || text.length < 10) { if (status) status.textContent = '✗ Review must be at least 10 chars.'; return; }
+    if (!revRating) { if (status) status.textContent = '✗ Pick a star rating.'; return; }
+    if (!window.AYDEN_ID || !window.AYDEN_ID.db) { if (status) status.textContent = '✗ Not signed in.'; return; }
+    try {
+      const { ref, push, set, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js');
+      const newRef = push(ref(window.AYDEN_ID.db, 'reviews'));
+      await set(newRef, {
+        game: game.slice(0, 80), text: text.slice(0, 1500), rating: revRating,
+        author: (window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName) || 'Ayden',
+        uid: window.AYDEN_ID.uid, ts: Date.now(),
+      });
+      if (status) status.textContent = '✓ Posted!';
+      $$('#rev-game').value = ''; $$('#rev-text').value = '';
+      revRating = 0; document.querySelectorAll('#rev-stars span').forEach(s => s.textContent = '☆');
+      $$('#rev-rating-num').textContent = '0/5';
+      loadReviews();
+    } catch (e) {
+      if (status) status.textContent = '✗ ' + (e.message || 'Failed');
+    }
+  }
+
+  // ===== PROFILE CUSTOMIZER =====
+  const PROF_AVATARS = ['🤖','😀','😎','🦊','🐶','🐱','🦁','🐯','🐸','🐼','🐨','🦄','👽','👾','🤠','🧙','🧛','🧞','🦸','🦹','🥷','🧑‍🚀','👻','🐲'];
+  const PROF_HUES = [
+    { name:'Cyan',    hue:185, color:'#00f0ff' },
+    { name:'Pink',    hue:320, color:'#ff2bd6' },
+    { name:'Green',   hue:120, color:'#39ff14' },
+    { name:'Purple',  hue:280, color:'#b400ff' },
+    { name:'Orange',  hue:25,  color:'#ff7a00' },
+    { name:'Yellow',  hue:55,  color:'#ffd000' },
+    { name:'Red',     hue:0,   color:'#ff3b3b' },
+    { name:'Blue',    hue:200, color:'#2be6ff' },
+  ];
+  function renderAvatarGrid(selected) {
+    const g = $$('#prof-avatar-grid'); if (!g) return;
+    g.innerHTML = PROF_AVATARS.map(a => `<button type="button" data-av="${a}"
+      style="width:40px;height:40px;background:${a===selected?'rgba(0,240,255,.25)':'rgba(255,255,255,.04)'};border:1px solid ${a===selected?'var(--accent)':'rgba(255,255,255,.12)'};border-radius:6px;font-size:22px;cursor:pointer;color:#fff;font-family:'Russo One', \"Apple Color Emoji\", \"Segoe UI Emoji\", sans-serif">${a}</button>`).join('');
+    g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      const v = b.dataset.av;
+      $$('#prof-avatar-val').value = v;
+      renderAvatarGrid(v);
+    }));
+  }
+  function renderHueGrid(selected) {
+    const g = $$('#prof-theme-grid'); if (!g) return;
+    g.innerHTML = PROF_HUES.map(h => `<button type="button" data-hue="${h.hue}"
+      style="width:80px;height:34px;background:${h.color}22;border:2px solid ${h.hue===selected?h.color:'rgba(255,255,255,.15)'};box-shadow:${h.hue===selected?'0 0 14px '+h.color:''};border-radius:6px;cursor:pointer;color:${h.color};font:700 11px 'Russo One',sans-serif;letter-spacing:.1em;text-transform:uppercase">${h.name}</button>`).join('');
+    g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      const v = parseInt(b.dataset.hue, 10);
+      $$('#prof-hue-val').value = v;
+      renderHueGrid(v);
+    }));
+  }
+  function loadProfileForm() {
+    const id = window.AYDEN_ID;
+    if (!id || !id.profile) return;
+    if ($$('#prof-name')) $$('#prof-name').value = id.profile.displayName || '';
+    const av = (id.profile.avatar && id.profile.avatar.face) || '🤖';
+    if ($$('#prof-avatar-val')) $$('#prof-avatar-val').value = av;
+    renderAvatarGrid(av);
+    const hue = id.profile.hue || 185;
+    if ($$('#prof-hue-val')) $$('#prof-hue-val').value = hue;
+    renderHueGrid(hue);
+    if ($$('#prof-uid')) $$('#prof-uid').textContent = (id.uid || '').slice(0, 12) + '…';
+  }
+  async function saveProfile() {
+    const id = window.AYDEN_ID;
+    const status = $$('#prof-status');
+    if (!id || !id.uid) { if (status) status.textContent = '✗ Not signed in.'; return; }
+    try {
+      const name = ($$('#prof-name')||{}).value || '';
+      const av   = ($$('#prof-avatar-val')||{}).value || '🤖';
+      const hue  = parseInt(($$('#prof-hue-val')||{}).value || '185', 10);
+      await id.updateProfile({
+        displayName: name.slice(0, 32),
+        avatar: Object.assign({}, id.profile.avatar || {}, { face: av }),
+        hue: hue,
+      });
+      if (status) status.textContent = '✓ Saved! Visible across all pages.';
+    } catch (e) {
+      if (status) status.textContent = '✗ ' + (e.message || 'save failed');
+    }
+  }
+
+  // Bindings (run on DOMContentLoaded — boot already fired)
+  function bindAll() {
+    if ($$('#rev-stars')) bindReviewStars();
+    if ($$('#rev-submit')) $$('#rev-submit').addEventListener('click', postReview);
+    if ($$('#rev-refresh')) $$('#rev-refresh').addEventListener('click', loadReviews);
+    if ($$('#prof-save')) $$('#prof-save').addEventListener('click', saveProfile);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindAll);
+  } else { bindAll(); }
+  whenIdReady(() => { loadReviews(); loadProfileForm(); });
+})();
