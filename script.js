@@ -18,7 +18,7 @@ const NEARBY_CITIES = [
 const NS = 'aydenhq:';
 const KEYS = {
   settings: NS + 'settings',
-  adminPwd: NS + 'adminPwdHash',
+  adminPwd: NS + 'adminPwdHash:v2',
   adminAuthed: NS + 'adminAuthed',
   reviews: NS + 'reviews',
   tools: NS + 'tools',
@@ -465,7 +465,7 @@ function bindAdminLogin() {
   if (!btn) return;
   if (btn.dataset.bound) return; btn.dataset.bound = '1';
   const tryLogin = async () => {
-    const stored = localStorage.getItem(KEYS.adminPwd);
+    const stored = load(KEYS.adminPwd, null);
     const tryHash = await sha256Hex(pass.value || '');
     if (stored && tryHash === stored) {
       setAdminAuthed(true);
@@ -505,7 +505,7 @@ function bindAccount() {
     out.className = 'form-msg';
     if (!n || n.length < 8) { out.className = 'form-msg err'; out.textContent = 'New password needs 8+ characters.'; return; }
     if (n !== n2)            { out.className = 'form-msg err'; out.textContent = 'New passwords do not match.'; return; }
-    const stored = localStorage.getItem(KEYS.adminPwd);
+    const stored = load(KEYS.adminPwd, null);
     const ok = (await sha256Hex(o)) === stored;
     if (!ok) { out.className = 'form-msg err'; out.textContent = 'Old password was wrong.'; return; }
     save(KEYS.adminPwd, await sha256Hex(n));
