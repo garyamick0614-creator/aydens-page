@@ -164,25 +164,31 @@ function kidSafeAllow(text) {
   return true;
 }
 
-/* News-specific: stricter, default-deny. A headline must NOT hit topic blocklist
-   AND should ideally hit the topic allowlist. Falls back to deny on doubt. */
+/* News-specific: ALLOWLIST-ONLY. A headline only shows if it explicitly matches a
+   kid-safe topic (game/sport/animal/space/science/etc) AND survives the topic
+   blocklist. Default action is deny. Better to show nothing than show scary stuff. */
 function newsHeadlineSafe(title, source, category) {
   const t = String(title || '');
   if (!t || t.length < 6) return false;
+
+  // Hard reject: profanity / explicit
   if (!kidSafeAllow(t)) return false;
+
+  // Hard reject: any topic blocklist hit (war/violence/crime/disasters/drugs/etc.)
   if (NEWS_TOPIC_RX.test(t)) return false;
-  // Block by category — these whole categories are off-limits for kids
-  const cat = String(category || '').toLowerCase();
-  if (['world','politics','war','conflict','crime','health'].includes(cat)) {
-    // allow only if title hits the kid-safe allowlist explicitly
-    if (!NEWS_TOPIC_ALLOW_RX.test(t)) return false;
-  }
-  // Block known adult-leaning sources (case-insensitive contains)
+
+  // Hard reject: certain adult-news sources entirely (regardless of topic)
   const src = String(source || '').toLowerCase();
-  const blockSources = ['al jazeera','reuters','bbc world','associated press','ap news','nyt','new york times','washington post','cnn','fox news','daily mail','guardian','politico','huffpost','breitbart','rt','tass','sputnik'];
-  if (blockSources.some(b => src.includes(b))) {
-    if (!NEWS_TOPIC_ALLOW_RX.test(t)) return false;
-  }
+  const hardBlockSources = ['al jazeera','reuters','associated press','ap news','politico','breitbart','rt','tass','sputnik','daily mail'];
+  if (hardBlockSources.some(b => src.includes(b))) return false;
+
+  // Hard reject: certain categories entirely
+  const cat = String(category || '').toLowerCase();
+  if (['world','politics','war','conflict','crime','health','business'].includes(cat)) return false;
+
+  // Default deny: only allow if the title explicitly matches a kid-safe topic
+  if (!NEWS_TOPIC_ALLOW_RX.test(t)) return false;
+
   return true;
 }
 
@@ -556,8 +562,19 @@ async function initAdminPanel() {
 
 function bindAdminLogin() {
   const btn = $('#admin-login'), pass = $('#admin-pass'), msg = $('#admin-gate-msg');
+  const resetBtn = $('#admin-reset');
   if (!btn) return;
   if (btn.dataset.bound) return; btn.dataset.bound = '1';
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      if (!confirm('Reset password back to "password123"? This wipes any custom password Ayden set.')) return;
+      rmkey(KEYS.adminPwd);
+      rmkey(KEYS.adminAuthed);
+      save(KEYS.adminPwd, await sha256Hex(DEFAULT_PWD));
+      msg.className = 'gate-msg ok';
+      msg.textContent = 'Password reset. Type password123 and tap UNLOCK.';
+    });
+  }
   const tryLogin = async () => {
     const stored = load(KEYS.adminPwd, null);
     const tryHash = await sha256Hex(pass.value || '');
