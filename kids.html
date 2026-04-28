@@ -98,8 +98,14 @@
 </div>
 
 <script>
+// Build stamp - bumped on every kid-safe filter update so stale tabs detect it.
+window.__KIDS_BUILD = '2026-04-27T22:30Z-strict-filter-v2';
 (function () {
   const API = 'https://api.thatcomputerguy26.org';
+  // Auto-reload if the tab is older than 30 minutes (catches stale Ayden tab)
+  setTimeout(function(){
+    if (document.visibilityState === 'hidden') location.reload();
+  }, 30 * 60 * 1000);
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
