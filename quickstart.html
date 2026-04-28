@@ -69,11 +69,6 @@
     <pre id="seyOut" class="muted">Sitrep will appear here.</pre>
   </div>
 
-  <div class="card">
-    <h2>4. Stocks</h2>
-    <button onclick="stocks()">Load stock watchlist</button>
-    <pre id="stkOut" class="muted">Watchlist will appear here.</pre>
-  </div>
 </div>
 
 <script>
@@ -123,17 +118,6 @@ async function seymour() {
   } catch (e) { show('seyOut', 'Error: ' + e.message, 'err'); }
 }
 
-async function stocks() {
-  show('stkOut', 'Loading…', 'muted');
-  try {
-    const r = await fetch(API + '/api/public/stocks/watchlist');
-    const d = await r.json();
-    const top5 = (d.items || []).slice(0, 5).map(i => ({
-      symbol: i.symbol, price: i.price, change_pct: i.change_pct, signal: (i.signal||{}).label
-    }));
-    show('stkOut', top5, 'ok');
-  } catch (e) { show('stkOut', 'Error: ' + e.message, 'err'); }
-}
 </script>
 </body>
 </html>
