@@ -964,26 +964,30 @@ function bindSync() {
       setMsg('#sync-msg', 'Restored — reload the page to see all your stuff.', 'ok');
     } catch (e) { setMsg('#sync-msg', 'Could not read that file: ' + e.message, 'err'); }
   });
+  const SYNC_USER = (window.AYDEN_ADMIN_USERNAME || 'ayden');
+  const SYNC_KIND = 'all';
   push.addEventListener('click', async () => {
     setMsg('#sync-msg', 'Pushing to home server…');
     try {
       const dump = {};
       for (const k of Object.values(KEYS)) { try { const v = localStorage.getItem(k); if (v != null) dump[k] = JSON.parse(v); } catch {} }
-      await apiPost('/api/aydens/sync/push', { data: dump });
-      setMsg('#sync-msg', 'Pushed.', 'ok');
+      const r = await apiPost('/api/aydens/sync/push', { user: SYNC_USER, kind: SYNC_KIND, payload: dump });
+      const bytes = r && (r.bytes || r.size);
+      setMsg('#sync-msg', 'Pushed' + (bytes ? ` (${formatBytes(bytes)})` : '') + '.', 'ok');
     } catch (e) {
-      setMsg('#sync-msg', 'Cloud sync activates when Dad adds /api/aydens/sync on the home server. (' + e.message + ')', 'err');
+      setMsg('#sync-msg', 'Push failed: ' + e.message, 'err');
     }
   });
   pull.addEventListener('click', async () => {
     setMsg('#sync-msg', 'Pulling from home server…');
     try {
-      const data = await apiGet('/api/aydens/sync/pull');
-      if (!data || !data.data) throw new Error('no data');
-      for (const [k, v] of Object.entries(data.data)) localStorage.setItem(k, JSON.stringify(v));
-      setMsg('#sync-msg', 'Pulled — reload the page.', 'ok');
+      const data = await apiGet(`/api/aydens/sync/pull?user=${encodeURIComponent(SYNC_USER)}&kind=${encodeURIComponent(SYNC_KIND)}`);
+      const payload = data && (data.payload || data.data);
+      if (!payload) throw new Error('no data on server yet — push first');
+      for (const [k, v] of Object.entries(payload)) localStorage.setItem(k, JSON.stringify(v));
+      setMsg('#sync-msg', 'Pulled. Reload the page to see your stuff.', 'ok');
     } catch (e) {
-      setMsg('#sync-msg', 'Cloud pull activates when Dad adds /api/aydens/sync on the home server. (' + e.message + ')', 'err');
+      setMsg('#sync-msg', 'Pull failed: ' + e.message, 'err');
     }
   });
 }

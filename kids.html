@@ -130,14 +130,16 @@
         const r = await fetch(`${API}/api/proxy/weather/forecast?lat=${c.lat}&lon=${c.lon}&days=1`, { cache: 'no-store' });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
-        const cur = d.current || d.current_weather || {};
-        const t = cur.temperature ?? cur.temp ?? cur.temperature_2m;
-        const code = cur.weathercode ?? cur.weather_code;
+        // Open-Meteo proxy returns daily only (already °F per daily_units)
+        const daily = d.daily || {};
+        const tmax = (daily.temperature_2m_max || [])[0];
+        const tmin = (daily.temperature_2m_min || [])[0];
+        const code = (daily.weathercode || [])[0];
         return `<div class="card weather">
           <div class="city">${esc(c.name)}</div>
           <div style="font-size:32px">${emoji(code)}</div>
-          <div class="temp">${t != null ? Math.round(t * 9/5 + 32) + '°F' : '—'}</div>
-          <div class="small">Wind ${cur.windspeed != null ? Math.round(cur.windspeed) + ' km/h' : '—'}</div>
+          <div class="temp">${tmax != null ? Math.round(tmax) + '°F' : '—'}</div>
+          <div class="small">Low ${tmin != null ? Math.round(tmin) + '°F' : '—'}</div>
         </div>`;
       } catch (e) {
         return `<div class="card weather"><div class="city">${esc(c.name)}</div><div class="err-text">No data</div></div>`;
@@ -173,9 +175,9 @@
     } catch (_) { $('issBox').textContent = 'ISS position unavailable'; }
   }
 
-  // === Kid-safe news (filter by safe keyword allowlist) ===
-  const SAFE_TOPICS = /space|nasa|astronaut|launch|iss|mars|moon|robot|game|video game|gaming|nintendo|playstation|xbox|minecraft|fortnite|roblox|science|dinosaur|animal|panda|whale|invent|discover|kids?|school|sport|baseball|football|basketball|race/i;
-  const UNSAFE = /violence|attack|murder|kill|sex|abuse|drug|war|bomb|shooting|crime|porn/i;
+  // Default-allow with UNSAFE blocklist (broader than the over-strict
+  // allowlist that was filtering out everything).
+  const UNSAFE = /violence|attack|murder|kill|sex|abuse|drug|war|bomb|shooting|crime|porn|nsfw|hentai/i;
   async function loadNews() {
     // Server-aggregated feeds (44 RSS sources, cached on the home server)
     try {
@@ -183,11 +185,13 @@
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
       const all = d.items || [];
-      const safe = all.filter(n => SAFE_TOPICS.test(n.title || '') && !UNSAFE.test(n.title || '')).slice(0, 12);
+      const safe = all
+        .filter(n => n.title && !UNSAFE.test(n.title) && !UNSAFE.test(n.summary || ''))
+        .slice(0, 12);
       $('newsFeed').innerHTML = safe.length
         ? safe.map(n => `<li><a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
             <span class="meta">${esc(n.source_name || '')} · ${esc(n.category || '')}</span></li>`).join('')
-        : '<li class="muted">No kid-safe news right now (try again in a bit).</li>';
+        : '<li class="muted">No items in current feed (try again in a bit).</li>';
     } catch (e) { $('newsFeed').innerHTML = `<li class="err-text">Feeds unavailable: ${esc(e.message)}</li>`; }
   }
 
