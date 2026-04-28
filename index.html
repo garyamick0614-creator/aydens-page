@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260428f">
+<link rel="stylesheet" href="styles.css?v=20260428g">
 <!-- Firebase config + shared identity layer. Loaded BEFORE script.js so any
      legacy email/password code can also read window.AYDEN_ID. Same uid + profile
      across index.html, kids.html, and playground.html. -->
@@ -216,6 +216,23 @@
         <div class="widget-body" id="kids-news"><div class="skeleton"></div></div>
         <p class="inline-help">Real headlines. Bad words and scary stuff get auto-filtered.</p>
       </div>
+      <!-- Friends Chat widget — surfaces /posts/* live so kids see it on home -->
+      <div class="widget" id="widget-chat" style="border-color:rgba(255,43,214,.4)">
+        <div class="widget-head"><span class="section-tag" style="background:rgba(255,43,214,.2);color:#ff2bd6;border-color:#ff2bd6">LIVE CHAT</span><h3>Friends Chat Room</h3><button class="refresh-mini" type="button" id="chat-jump" aria-label="Open full chat">→</button></div>
+        <div class="widget-body">
+          <div id="chat-mini-feed" style="max-height:160px;overflow-y:auto;font-size:12px;line-height:1.5">
+            <div class="skeleton"></div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:10px">
+            <input type="text" id="chat-mini-input" placeholder="Type a message…" maxlength="240"
+              style="flex:1;background:rgba(255,43,214,.08);border:1px solid #ff2bd6;border-radius:6px;color:#f1f4ff;padding:7px 10px;font:600 13px var(--font-body)">
+            <button class="btn btn-p" type="button" id="chat-mini-send" style="padding:7px 14px;background:#ff2bd6;border-color:#ff2bd6;color:#000">SEND</button>
+          </div>
+          <div id="chat-mini-status" style="font-size:11px;color:var(--text-mute);margin-top:4px;min-height:14px"></div>
+        </div>
+        <p class="inline-help">Anyone with a display name can chat. Set yours in Control or the Friends tab.</p>
+      </div>
+
       <div class="widget" id="widget-traffic">
         <div class="widget-head"><span class="section-tag">LOCAL</span><h3>INDOT Traffic</h3><button class="refresh-mini" data-action="refresh-traffic" aria-label="Refresh traffic">↻</button></div>
         <div class="widget-body" id="traffic-state"><div class="skeleton"></div></div>
@@ -711,8 +728,8 @@
   <div class="foot-line" style="margin-top:6px;font-size:10.5px;letter-spacing:.2em;opacity:.7;">© 2026 TCG :: stay safe, game smart</div>
 </footer>
 
-<script src="background.js?v=20260428f" defer></script>
-<script src="firebase-config.js?v=20260428f" defer></script>
-<script src="script.js?v=20260428f" defer></script>
+<script src="background.js?v=20260428g" defer></script>
+<script src="firebase-config.js?v=20260428g" defer></script>
+<script src="script.js?v=20260428g" defer></script>
 </body>
 </html>

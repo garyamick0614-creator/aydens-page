@@ -1368,77 +1368,187 @@ function emailFor(username) {
 }
 
 function bindFriendsAuth() {
+  // OPTION B FLOW (2026-04-28): no email/password gate. Anonymous Auth runs
+  // automatically via shared/firebase-identity.js — kid just picks a display
+  // name. We don't TOUCH window.__FB.signIn* — it triggers OPERATION_NOT_ALLOWED
+  // because Email/Password is disabled in the Firebase console.
   const userInp = $('#friend-user'), passInp = $('#friend-pass');
-  const login = $('#friend-login-btn'), register = $('#friend-register-btn');
+  const loginBtn = $('#friend-login-btn'), registerBtn = $('#friend-register-btn');
   const msg = $('#friend-gate-msg'), shell = $('#friends-shell'), gate = $('#friends-gate');
-  const send = $('#friend-send'), msgInp = $('#friend-msg'), feed = $('#friends-feed');
+  const send = $('#friend-send'), msgInp = $('#friend-msg');
   const logoutBtn = $('#friend-logout-btn'), nameLbl = $('#friend-current-user');
-  if (!login || login.dataset.bound) return; login.dataset.bound = '1';
+  if (!loginBtn || loginBtn.dataset.bound) return; loginBtn.dataset.bound = '1';
 
-  const attempt = async (op) => {
-    const u = (userInp.value || '').trim().toLowerCase();
-    const p = passInp.value;
+  // Hide password input, repurpose buttons.
+  if (passInp) passInp.style.display = 'none';
+  if (loginBtn) loginBtn.textContent = '✓ Use this name';
+  if (registerBtn) registerBtn.style.display = 'none';
+  if (userInp) userInp.placeholder = 'Pick a display name (3-20 chars)';
+  const help = $('#friends-gate-help');
+  if (help) help.innerHTML = '<strong>No password needed.</strong> Just pick a display name your friends will see — you\'re already signed in anonymously.';
+
+  const setName = async () => {
+    const u = (userInp.value || '').trim();
     msg.className = 'gate-msg';
-    if (!/^[a-z0-9_]{3,20}$/i.test(u)) { msg.className='gate-msg err'; msg.textContent='Username: 3-20 letters/numbers/underscore.'; return; }
-    if (!p || p.length < 6)             { msg.className='gate-msg err'; msg.textContent='Password: 6+ characters.'; return; }
+    if (!/^[A-Za-z0-9_-]{3,20}$/.test(u)) {
+      msg.className='gate-msg err';
+      msg.textContent='Display name: 3-20 chars, letters/numbers/underscore/dash.';
+      return;
+    }
+    if (!window.AYDEN_ID || !window.AYDEN_ID.uid) {
+      msg.className='gate-msg err'; msg.textContent='Still connecting — try again in a sec.'; return;
+    }
     try {
-      if (op === 'register') {
-        await window.__FB.createUserWithEmailAndPassword(fbAuth, emailFor(u), p);
-        await window.__FB.set(window.__FB.ref(fbDB, 'users/' + u), { username: u, createdAt: nowISO(), profile: {} });
-      } else {
-        await window.__FB.signInWithEmailAndPassword(fbAuth, emailFor(u), p);
-      }
+      await window.AYDEN_ID.updateProfile({ displayName: u });
+      // Also write a /display-name-index/{name} → uid mapping so friends can find
+      // each other by name without scanning every user.
+      const { ref, set } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js');
+      try { await set(ref(fbDB, 'displayNameIndex/' + u), window.AYDEN_ID.uid); } catch(_){}
       save(KEYS.friendSession, { username: u });
+      msg.className='gate-msg ok'; msg.textContent='✓ Set! Welcome, ' + u + '.';
+      // Trigger UI refresh
+      if (gate) gate.classList.add('hidden');
+      if (shell) shell.classList.remove('hidden');
+      if (nameLbl) nameLbl.textContent = u;
+      bindFriendsFeed(u);
+      bindFriendsBlocklist();
+      bindFriendsUsers();
+      bindFriendsList();   // NEW: my friends list
     } catch (e) {
-      msg.className = 'gate-msg err';
-      // Firebase auth errors sometimes throw with no .message — guard.
-      const raw = (e && e.message) ? String(e.message) : '';
-      msg.textContent = raw.replace(/\(auth\/[^)]+\)/, '').trim() || 'Sign-in failed.';
+      msg.className='gate-msg err';
+      msg.textContent = (e && e.message) ? e.message : 'Could not save name.';
     }
   };
-  login.addEventListener('click', () => attempt('login'));
-  register.addEventListener('click', () => attempt('register'));
-  passInp.addEventListener('keydown', e => { if (e.key === 'Enter') attempt('login'); });
+  loginBtn.addEventListener('click', setName);
+  if (userInp) userInp.addEventListener('keydown', e => { if (e.key === 'Enter') setName(); });
 
-  window.__FB.onAuthStateChanged(fbAuth, async (user) => {
-    if (!user) {
-      gate.classList.remove('hidden'); shell.classList.add('hidden'); return;
-    }
+  // Auto-skip the gate when shared identity already has a displayName.
+  const skipIfReady = () => {
+    if (!window.AYDEN_ID || !window.AYDEN_ID.uid) return;
     const sess = load(KEYS.friendSession, {});
-    // Anonymous users have no email — fall back to shared identity displayName, then uid prefix.
-    const fallback = (window.AYDEN_ID && window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName)
-                  || (user.uid || 'guest').slice(0, 10);
-    const username = sess.username || (user.email ? user.email.split('@')[0] : fallback);
-    nameLbl.textContent = username;
-    gate.classList.add('hidden'); shell.classList.remove('hidden');
-    bindFriendsFeed(username);
-    bindFriendsBlocklist();
-    bindFriendsUsers();
+    const have = sess.username
+      || (window.AYDEN_ID.profile && !/^(Brave|Cosmic|Mighty|Sneaky|Zappy|Glowing|Speedy|Pixel|Lucky|Wild|Star|Funky|Stormy|Sparkly|Atomic|Turbo|Mega|Ultra|Neon|Crystal)/.test(window.AYDEN_ID.profile.displayName)
+          ? window.AYDEN_ID.profile.displayName : null);
+    if (have) {
+      if (gate) gate.classList.add('hidden');
+      if (shell) shell.classList.remove('hidden');
+      if (nameLbl) nameLbl.textContent = have;
+      bindFriendsFeed(have);
+      bindFriendsBlocklist();
+      bindFriendsUsers();
+      bindFriendsList();
+    } else {
+      if (userInp && window.AYDEN_ID.profile) userInp.value = window.AYDEN_ID.profile.displayName || '';
+    }
+  };
+  if (window.AYDEN_ID && window.AYDEN_ID.ready) {
+    window.AYDEN_ID.ready.then(skipIfReady).catch(()=>{});
+  }
+
+  if (logoutBtn) logoutBtn.addEventListener('click', () => {
+    save(KEYS.friendSession, {});
+    if (gate) gate.classList.remove('hidden');
+    if (shell) shell.classList.add('hidden');
   });
 
-  logoutBtn.addEventListener('click', () => window.__FB.signOut(fbAuth));
-
-  send.addEventListener('click', () => sendFriendPost());
-  msgInp.addEventListener('keydown', e => { if (e.key === 'Enter') sendFriendPost(); });
+  if (send) send.addEventListener('click', () => sendFriendPost());
+  if (msgInp) msgInp.addEventListener('keydown', e => { if (e.key === 'Enter') sendFriendPost(); });
 
   async function sendFriendPost() {
+    if (!msgInp) return;
     const text = msgInp.value.trim(); if (!text) return;
     if (!kidSafeAllow(text)) { msg.className='gate-msg err'; msg.textContent='Try clean wording.'; return; }
-    const u = fbAuth.currentUser; if (!u) return;
+    if (!window.AYDEN_ID || !window.AYDEN_ID.uid) { msg.className='gate-msg err'; msg.textContent='Not signed in yet.'; return; }
     const sess = load(KEYS.friendSession, {});
-    const fallback2 = (window.AYDEN_ID && window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName)
-                   || (u.uid || 'guest').slice(0, 10);
-    const username = sess.username || (u.email ? u.email.split('@')[0] : fallback2);
+    const username = sess.username || (window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName) || 'guest';
     if (getBlocked().includes(username)) { msg.className='gate-msg err'; msg.textContent='You\'re blocked from posting. Talk to Ayden.'; return; }
     try {
       await window.__FB.push(window.__FB.ref(fbDB, 'posts'), {
-        username, text: kidSafeText(text), at: Date.now()
+        username, uid: window.AYDEN_ID.uid, text: kidSafeText(text), at: Date.now()
       });
       msgInp.value = '';
     } catch (e) {
-      msg.className = 'gate-msg err'; msg.textContent = 'Could not post: ' + e.message;
+      msg.className = 'gate-msg err'; msg.textContent = 'Could not post: ' + ((e && e.message) || 'unknown');
     }
   }
+}
+
+// ===== My Friends list (Option B 2026-04-28) =====
+// Schema: /users/{myUid}/friends/{friendUid} = { name, addedAt, lastSeen? }
+//         /displayNameIndex/{name} = uid           (for finding friends by name)
+let _friendsListBound = false;
+async function bindFriendsList() {
+  if (_friendsListBound) return; _friendsListBound = true;
+  if (!window.AYDEN_ID || !window.AYDEN_ID.uid) return;
+  const myUid = window.AYDEN_ID.uid;
+  const host = $('#friends-users');     // re-use the existing users panel container
+  if (!host) return;
+
+  const { ref, get, set, remove, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js');
+
+  function render(friends) {
+    if (!friends || !Object.keys(friends).length) {
+      host.innerHTML = '<div class="inline-help" style="color:var(--text-dim)">No friends yet — add one by display name below.</div>'
+        + buildAddBox();
+    } else {
+      const list = Object.entries(friends).map(([uid, info]) => `
+        <div class="friend-row" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid rgba(0,240,255,.2);border-radius:6px;margin:6px 0;background:rgba(0,240,255,.04)">
+          <div><strong style="color:var(--neon-cyan)">${escH(info.name||'?')}</strong>
+            <div style="font-size:11px;color:var(--text-mute)">added ${info.addedAt ? new Date(info.addedAt).toLocaleDateString() : '?'}</div></div>
+          <button class="btn btn-o" type="button" data-rm="${uid}" style="font-size:11px;padding:4px 10px">REMOVE</button>
+        </div>`).join('');
+      host.innerHTML = list + buildAddBox();
+      host.querySelectorAll('button[data-rm]').forEach(b => b.addEventListener('click', async () => {
+        const fuid = b.dataset.rm;
+        if (!confirm('Remove this friend?')) return;
+        try { await remove(ref(window.AYDEN_ID.db, `users/${myUid}/friends/${fuid}`)); }
+        catch(e){ alert('Failed: ' + (e.message||'')); }
+      }));
+    }
+    bindAddFriend();
+  }
+
+  function buildAddBox() {
+    return `<div style="margin-top:14px;padding:12px;background:rgba(180,0,255,.08);border:1px solid rgba(180,0,255,.3);border-radius:8px">
+      <strong style="color:var(--neon-purple);font-size:12px;font-family:var(--font-display);letter-spacing:.12em;text-transform:uppercase">Add a friend</strong>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <input type="text" id="add-friend-name" placeholder="Their display name"
+          style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--neon-purple);border-radius:4px;color:var(--text);padding:7px 10px;font:600 13px var(--font-body)">
+        <button type="button" class="btn btn-p" id="add-friend-btn" style="padding:7px 14px">+ ADD</button>
+      </div>
+      <div id="add-friend-msg" style="margin-top:6px;font-size:12px;color:var(--text-mute);min-height:16px"></div>
+    </div>`;
+  }
+  function bindAddFriend() {
+    const btn = document.getElementById('add-friend-btn');
+    const inp = document.getElementById('add-friend-name');
+    const m   = document.getElementById('add-friend-msg');
+    if (!btn) return;
+    const add = async () => {
+      const name = (inp.value || '').trim();
+      if (!/^[A-Za-z0-9_-]{3,20}$/.test(name)) { m.textContent = '✗ Name: 3-20 chars, letters/numbers/_-'; return; }
+      try {
+        const idxSnap = await get(ref(window.AYDEN_ID.db, `displayNameIndex/${name}`));
+        if (!idxSnap.exists()) { m.textContent = '✗ No user with that name. They need to set their display name first.'; return; }
+        const friendUid = idxSnap.val();
+        if (friendUid === myUid) { m.textContent = '✗ Can\'t add yourself.'; return; }
+        await set(ref(window.AYDEN_ID.db, `users/${myUid}/friends/${friendUid}`), {
+          name, addedAt: Date.now(),
+        });
+        inp.value = ''; m.textContent = '✓ Added ' + name;
+      } catch (e) {
+        m.textContent = '✗ ' + (e.message || 'failed');
+      }
+    };
+    btn.addEventListener('click', add);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+  }
+  function escH(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+  // Live-watch my friends list.
+  onValue(ref(window.AYDEN_ID.db, `users/${myUid}/friends`), (snap) => {
+    render(snap.exists() ? snap.val() : null);
+  });
 }
 
 let _postsBound = false;
@@ -1557,6 +1667,79 @@ async function boot() {
 }
 
 document.addEventListener('DOMContentLoaded', boot);
+
+// =====================================================================
+// CHAT-MINI WIDGET on Game HQ home — surfaces /posts/* live for everyone
+// who has a saved displayName. Anonymous Auth gives them a uid; the
+// shared identity layer auto-generates a name they can override in
+// Profile or the Friends tab.
+// =====================================================================
+(function chatMini() {
+  function $$(s){return document.querySelector(s);}
+  function escH(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  let bound = false;
+  function whenReady(cb) {
+    if (window.AYDEN_ID && window.AYDEN_ID.ready) {
+      window.AYDEN_ID.ready.then(cb).catch(()=>{});
+    } else {
+      let n=0; const i=setInterval(() => {
+        if (window.AYDEN_ID && window.AYDEN_ID.ready) { clearInterval(i);
+          window.AYDEN_ID.ready.then(cb).catch(()=>{}); }
+        else if (++n>40) clearInterval(i);
+      }, 250);
+    }
+  }
+  async function init() {
+    if (bound) return;
+    const feed   = $$('#chat-mini-feed');
+    const input  = $$('#chat-mini-input');
+    const send   = $$('#chat-mini-send');
+    const status = $$('#chat-mini-status');
+    const jump   = $$('#chat-jump');
+    if (!feed || !input || !send) return;        // widget not on this page
+    bound = true;
+    if (jump) jump.addEventListener('click', () => {
+      const t = document.querySelector('.tab[data-tab="friends"]');
+      if (t) t.click();
+    });
+    const { ref, push, query, limitToLast, onChildAdded } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js');
+    const q = query(ref(window.AYDEN_ID.db, 'posts'), limitToLast(20));
+    feed.innerHTML = '';
+    onChildAdded(q, snap => {
+      const v = snap.val(); if (!v) return;
+      const row = document.createElement('div');
+      const when = v.at ? new Date(v.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+      row.style.cssText = 'padding:6px 8px;border-bottom:1px dashed rgba(255,255,255,.06)';
+      row.innerHTML = `<strong style="color:#ff2bd6">${escH(v.username||'?')}</strong>
+        <span style="color:#9aa3c4;font-size:10px;margin-left:6px">${escH(when)}</span>
+        <div style="color:#f1f4ff;margin-top:2px">${escH(v.text||'')}</div>`;
+      feed.appendChild(row);
+      feed.scrollTop = feed.scrollHeight;
+    });
+    async function sendMini() {
+      const text = (input.value||'').trim(); if (!text) return;
+      if (text.length > 240) { status.textContent='Too long (240 max).'; return; }
+      const username = (window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName) || 'guest';
+      try {
+        await push(ref(window.AYDEN_ID.db, 'posts'), {
+          username, uid: window.AYDEN_ID.uid, text, at: Date.now(),
+        });
+        input.value=''; status.textContent='✓ Sent.';
+        setTimeout(()=>{ if(status) status.textContent=''; }, 2000);
+      } catch (e) {
+        status.textContent = '✗ ' + ((e && e.message) || 'Failed');
+      }
+    }
+    send.addEventListener('click', sendMini);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMini(); });
+    if (status) status.textContent = 'Posting as: ' + ((window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName) || '...');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => whenReady(init));
+  } else {
+    whenReady(init);
+  }
+})();
 
 // ===========================================================================
 // Reviews tab (Ayden's game reviews — synced via Firebase RTDB at /reviews/*)

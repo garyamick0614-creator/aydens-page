@@ -1718,7 +1718,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T09:45Z-v25-gamehq-tab-removed-from-hub';
+window.__KIDS_BUILD = '2026-04-28T10:15Z-v26-passwordless-friends-chatroom-study-fix';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
@@ -2597,7 +2597,10 @@ window.__KIDS_BUILD = '2026-04-28T09:45Z-v25-gamehq-tab-removed-from-hub';
       });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
-      const reply = d.response || d.text || d.message || d.content || JSON.stringify(d).slice(0,500);
+      // /api/public/chat returns {ok, rid, model, reply, eval_count}. Try reply FIRST,
+      // then fall back to other field names. Never echo the raw envelope to the user.
+      const reply = d.reply || d.response || d.text || d.message || d.content
+        || (typeof d === 'string' ? d : 'No response — try again.');
       aiBubble.querySelector('.study-body').innerHTML = mdToHtml(reply);
       // Persist history for follow-ups
       studyHistory.push({ role: 'user', content: fullPrompt });
