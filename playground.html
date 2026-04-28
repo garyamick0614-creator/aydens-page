@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0e14">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<title>🌌 Shared Playground — Ayden's Hub</title>
+<meta name="description" content="Real-time, multi-user playground. See your friends' cursors. Phase 1 of the PlaygroundArchitect framework.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(circle at 20% 20%, #5b21b6 0%, transparent 55%),
+      radial-gradient(circle at 80% 80%, #0e7490 0%, transparent 55%),
+      radial-gradient(circle at 50% 100%, #be185d 0%, transparent 60%),
+      #0a0e14;
+    color: #fff;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', system-ui, sans-serif;
+    cursor: none;     /* hide native cursor — we render our own halo */
+  }
+  /* Show native cursor on interactive overlays so the welcome card is usable. */
+  .playground-cursors a, .playground-cursors button, [style*="pointerEvents:auto"] { cursor: pointer }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    background-image:
+      linear-gradient(rgba(168,85,247,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168,85,247,.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  #playground-root { position: fixed; inset: 0; }
+  noscript {
+    display: block; padding: 30px; color: #f87171;
+    font: 600 14px sans-serif; text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<noscript>This Playground needs JavaScript. Please enable it and reload.</noscript>
+
+<!-- Firebase config — public values; safe to commit. -->
+<script src="firebase-config.js?v=20260427g"></script>
+
+<!-- React 18 UMD (production). Sets window.React + window.ReactDOM. -->
+<script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+
+<!-- Mount point -->
+<div id="playground-root"></div>
+
+<!-- Phase 1 modules. Native ESM — no bundler, no Babel, no unsafe-eval. -->
+<script type="module" src="./playground/main.js?v=20260428a"></script>
+</body>
+</html>

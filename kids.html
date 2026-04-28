@@ -228,6 +228,14 @@
   <button class="tab" data-pane="3d">🌌 3D scene</button>
   <button class="tab" data-pane="share">📸 Selfie + Share</button>
   <button class="tab" data-pane="xp">🏆 My XP</button>
+  <button class="tab" data-pane="pcgames">🖥 PC top 10</button>
+  <button class="tab" data-pane="xboxgames">🎮 Xbox top 10</button>
+  <button class="tab" data-pane="gamepass">🎯 Game Pass</button>
+  <button class="tab" data-pane="freeplay">🆓 Free play</button>
+  <button class="tab" data-pane="tips">🎩 Tips & codes</button>
+  <button class="tab" data-pane="cod">🎯 COD loadouts</button>
+  <button class="tab" data-pane="fnpro">🪂 Fortnite Pro</button>
+  <a class="tab" href="/playground.html" style="text-decoration:none;background:linear-gradient(135deg,#a855f7,#22d3ee);color:#fff;border:0">🌌 Multiplayer →</a>
 </nav>
 
 <!-- XP HUD -->
@@ -684,6 +692,340 @@
   </div>
 </section>
 
+<!-- ============================== PC GAMES ============================== -->
+<section class="pane" id="pane-pcgames">
+  <h2><span class="em">🖥</span> Top 10 PC games for kids 16 &amp; under</h2>
+  <p class="muted" style="margin-bottom:12px">Tap any card → watch real gameplay. Embedded videos pulled live from YouTube; sandboxed.</p>
+  <div class="grid grid-2" id="pcGameGrid"></div>
+</section>
+
+<!-- ============================== XBOX GAMES ============================== -->
+<section class="pane" id="pane-xboxgames">
+  <h2><span class="em">🎮</span> Top 10 Xbox games for kids 16 &amp; under</h2>
+  <p class="muted" style="margin-bottom:12px">Optimized for console play. Tap to watch gameplay clips.</p>
+  <div class="grid grid-2" id="xboxGameGrid"></div>
+</section>
+
+<!-- ============================== GAME PASS ============================== -->
+<section class="pane" id="pane-gamepass">
+  <h2><span class="em">🎯</span> Family-friendly Xbox Game Pass picks</h2>
+  <p class="muted" style="margin-bottom:12px">Highly rated for younger players — safe + engaging. Available with Xbox Game Pass subscription.</p>
+  <div class="grid grid-2" id="gamePassGrid"></div>
+</section>
+
+<!-- ============================== FREE-TO-PLAY ============================== -->
+<section class="pane" id="pane-freeplay">
+  <h2><span class="em">🆓</span> Free-to-play Xbox games (no subscription)</h2>
+  <p class="muted" style="margin-bottom:12px">Download &amp; play free on Xbox. No Game Pass required.</p>
+  <div class="grid grid-2" id="freePlayGrid"></div>
+</section>
+
+<!-- ============================== TIPS & CODES ============================== -->
+<section class="pane" id="pane-tips">
+  <h2><span class="em">🎩</span> Tips, codes &amp; safety</h2>
+
+  <div class="card tool" style="border-color:rgba(248,113,113,.5);background:linear-gradient(180deg,rgba(248,113,113,.08),rgba(15,12,45,.85))">
+    <h3 style="margin:0 0 8px;color:var(--red)">⚠ Important — read first</h3>
+    <ul style="line-height:1.8;padding-left:20px;font-size:14px">
+      <li><strong>Never download "Fortnite cheats"</strong> — they're 100% scams or malware. Will permanently ban your account + steal passwords.</li>
+      <li><strong>"Free Robux" sites are scams.</strong> The only way to get Robux is the official Roblox store or in-game gift cards.</li>
+      <li><strong>Cabined Accounts</strong> on Fortnite (for under 13) restrict chat + purchases — ask Gary to set one up if you don't have one.</li>
+      <li><strong>Single-player games are safe to mod</strong> (Minecraft commands, Cheat Engine on offline games). Multiplayer competitive games are NOT.</li>
+    </ul>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card tool">
+      <h3 style="margin:0 0 10px">⛏ Minecraft commands</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">Open chat with <kbd>T</kbd> or <kbd>/</kbd>. Cheats must be enabled in world settings.</p>
+      <ul id="mcCommands" style="list-style:none;padding:0;font-size:13px;line-height:1.7"></ul>
+    </div>
+
+    <div class="card tool">
+      <h3 style="margin:0 0 10px">⚙ How to enable Minecraft cheats</h3>
+      <ol style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>New world:</strong> when creating, toggle <em>Allow Cheats: ON</em>.</li>
+        <li><strong>Existing world:</strong> Pause → <em>Open to LAN</em> → toggle <em>Allow Cheats: ON</em> → <em>Start LAN World</em>.</li>
+        <li>Cheats work for the current session only when enabled via LAN.</li>
+        <li>To make it permanent, copy your world to creative mode or a new world with cheats.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card tool">
+      <h3 style="margin:0 0 10px">🎁 Roblox legacy promo codes</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">Most have expired by April 2026 — these may still grant cosmetic shoulder accessories. Redeem at <strong>roblox.com/promocodes</strong>.</p>
+      <ul id="robloxCodes" style="list-style:none;padding:0;font-size:13px;line-height:1.7"></ul>
+      <p style="font-size:12px;color:var(--red);margin-top:10px">⚠ Avoid any site offering "Free Robux generators" — every one is a scam.</p>
+    </div>
+
+    <div class="card tool">
+      <h3 style="margin:0 0 10px">🐱 Little Kitty, Big City — single-player trainers</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">Single-player only, so trainers are safe if downloaded from trusted sources (FLiNG, PLITCH, Cheat Engine).</p>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li>Unlimited Stamina — climb &amp; sprint forever</li>
+        <li>Friendly Dogs &amp; Birds — non-aggressive AI</li>
+        <li>Always Sneaky — easier bird-catching</li>
+      </ul>
+      <p style="font-size:12px;color:var(--gold);margin-top:10px">📂 Setup: start the game first → run trainer → attach to .exe → use F1/F2 hotkeys. Always virus-scan the download.</p>
+    </div>
+  </div>
+
+  <div class="card tool" style="margin-top:14px">
+    <h3 style="margin:0 0 10px">🎮 Xbox console commands — current state</h3>
+    <p style="font-size:13px;line-height:1.7">Most modern Xbox games <strong>do not</strong> have built-in cheat consoles, since achievements are tied to fair play. <em>Exceptions:</em> Minecraft (commands above) and certain indies. Standard difficulty settings &amp; accessibility options are how you adjust most games.</p>
+  </div>
+
+  <div class="card tool" style="margin-top:14px;border-color:rgba(168,85,247,.4);background:linear-gradient(180deg,rgba(168,85,247,.08),rgba(15,12,45,.85))">
+    <h3 style="margin:0 0 10px;color:var(--acc)">🛡 Stay safe online</h3>
+    <ul style="line-height:1.8;padding-left:20px;font-size:14px">
+      <li>Never share your real name, school, or address with players you don't know in real life</li>
+      <li>If someone says weird stuff, mute them and tell Gary</li>
+      <li>Don't click links in chat from strangers — even if they say "free skins"</li>
+      <li>Use a unique password for every gaming account (Gary can help with a password manager)</li>
+      <li>If you see something that scares you, close the game and come tell Gary right away — you won't be in trouble</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================== CALL OF DUTY ============================== -->
+<section class="pane" id="pane-cod">
+  <h2><span class="em">🎯</span> Call of Duty — loadouts &amp; strategies <span class="badge" style="background:rgba(248,113,113,.18);color:var(--red)">RATED M · Gary-approved</span></h2>
+  <p class="muted" style="margin-bottom:12px">Curated meta loadouts, map tactics, and Easter eggs across Warzone, Modern Warfare II, Black Ops Cold War, and BO6/BO7. Tap a card to expand.</p>
+
+  <div class="grid grid-2">
+    <!-- Merrick 556 -->
+    <div class="card tool" style="border-color:rgba(244,114,182,.4)">
+      <h3 style="margin:0 0 8px;color:var(--pink)">🔫 Merrick 556 — Warzone meta build</h3>
+      <p class="muted" style="font-size:13px;margin-bottom:8px">Versatile mid-to-long-range AR. Best paired with mobility perks &amp; an Overkill secondary.</p>
+      <ul style="font-size:13px;line-height:1.8;padding-left:20px">
+        <li><strong>Muzzle:</strong> Monolithic Suppressor</li>
+        <li><strong>Barrel:</strong> Reinforced Barrel</li>
+        <li><strong>Underbarrel:</strong> Vertical Foregrip</li>
+        <li><strong>Magazine:</strong> Extended Mag II</li>
+        <li><strong>Fire mod:</strong> Recoil Springs</li>
+      </ul>
+      <p style="font-size:13px;margin-top:8px"><strong style="color:var(--gold)">Perks:</strong> Overkill · Ghost · Amped · Scavenger</p>
+      <p style="font-size:13px"><strong style="color:var(--gold)">Equipment:</strong> Frag grenade + Grappling Hook for vertical reach</p>
+    </div>
+
+    <!-- Sokol 545 -->
+    <div class="card tool" style="border-color:rgba(168,85,247,.4)">
+      <h3 style="margin:0 0 8px;color:var(--acc)">💪 Sokol 545 — long-range LMG anchor</h3>
+      <p class="muted" style="font-size:13px;margin-bottom:8px">Slow but devastating sustained fire. You're the anchor — pin the lane while teammates flank.</p>
+      <ul style="font-size:13px;line-height:1.8;padding-left:20px">
+        <li><strong>Optic:</strong> Greaves AccuSpot 3X</li>
+        <li><strong>Muzzle:</strong> Monolithic Suppressor</li>
+        <li><strong>Barrel:</strong> 18.2" Parlous Heavy</li>
+        <li><strong>Stock:</strong> Taction Control</li>
+        <li><strong>Fire mod:</strong> Buffer Spring</li>
+      </ul>
+      <p style="font-size:13px;margin-top:8px;color:var(--gold)">⚡ Pre-aim high-traffic lanes. Burst fire only. Avoid CQB pushes.</p>
+    </div>
+
+    <!-- Voyak KT-3 vs M15 MOD 0 -->
+    <div class="card tool">
+      <h3 style="margin:0 0 8px;color:var(--pri)">🎯 Voyak KT-3 vs M15 MOD 0 (BO6/BO7)</h3>
+      <table style="width:100%;font-size:13px;border-collapse:collapse">
+        <tr style="background:rgba(34,211,238,.08)"><th style="text-align:left;padding:6px">Feature</th><th style="padding:6px">Voyak KT-3</th><th style="padding:6px">M15 MOD 0</th></tr>
+        <tr><td style="padding:6px;border-bottom:1px dashed var(--line)">Style</td><td style="text-align:center">Beam, low recoil</td><td style="text-align:center">Hit-scan to ~50m</td></tr>
+        <tr><td style="padding:6px;border-bottom:1px dashed var(--line)">Fire rate</td><td style="text-align:center">Slower</td><td style="text-align:center">Higher</td></tr>
+        <tr><td style="padding:6px;border-bottom:1px dashed var(--line)">Best at</td><td style="text-align:center">40-80m precision</td><td style="text-align:center">30-45m gunfights</td></tr>
+        <tr><td style="padding:6px">Verdict</td><td style="text-align:center;color:var(--gold)">Reliable ⭐</td><td style="text-align:center;color:var(--pink)">Meta now 🔥</td></tr>
+      </table>
+    </div>
+
+    <!-- Domination tactics -->
+    <div class="card tool" style="border-color:rgba(52,211,153,.4)">
+      <h3 style="margin:0 0 8px;color:var(--green)">🚩 Modern Warfare II — Domination</h3>
+      <p style="font-size:13px;line-height:1.6"><strong>Win condition:</strong> map control, not kills.</p>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px;margin-top:6px">
+        <li><strong>Rotate, don't camp</strong> — move between all three flags to support skirmishes</li>
+        <li><strong>Tactical Camera</strong> — monitor objectives from cover, react instantly to caps</li>
+        <li><strong>Mortar Strike</strong> — hold for the moment a flag flips, deny the cap</li>
+      </ul>
+      <p style="font-size:13px;margin-top:10px;color:var(--gold)"><strong>By map:</strong></p>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>Rust:</strong> control the central tower for high-ground sightlines, but keep moving — snipers will find you. Use peripheral ramps to flank B.</li>
+        <li><strong>Terminal:</strong> own the boarding ramps + balcony. Drop Tactical Cameras at choke points + Trophy Systems to eat grenades.</li>
+        <li><strong>Skidrow:</strong> manage the maze hallways + control the roof for sightlines over the apartment complex.</li>
+      </ul>
+    </div>
+
+    <!-- Cold War Zombies -->
+    <div class="card tool" style="border-color:rgba(251,191,36,.4)">
+      <h3 style="margin:0 0 8px;color:var(--gold)">🧟 Cold War Zombies — survival</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>Mobility = life.</strong> Always have a high-ground option or rappel ready</li>
+        <li><strong>Exfil at round 10:</strong> mark a radio → defend the X-File extraction → boss waves arrive → keep lethal/tactical equipment for the final horde before chopper</li>
+        <li><strong>Train zombies</strong> in big circles in open areas — never get cornered</li>
+      </ul>
+    </div>
+
+    <!-- Outbreak Easter Eggs -->
+    <div class="card tool">
+      <h3 style="margin:0 0 8px;color:var(--gold)">🥚 Outbreak Easter eggs</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>Ronald Raygun</strong> — pink mohawk + leather jacket zombie. RNG spawn from Tier 2 onwards (never Tier 1). Killing him drops a guaranteed Ray Gun.</li>
+        <li><strong>Fast warping</strong> — damage the beacon after a warp marker appears to jump <em>two</em> tiers. Subsequent rounds get harder (beacon HP scales).</li>
+        <li><strong>Main quest</strong> — infiltrate Silos A &amp; D, complete sequence triggers, end with coordinated lockdown + boss fight.</li>
+      </ul>
+    </div>
+
+    <!-- Xbox optimization -->
+    <div class="card tool">
+      <h3 style="margin:0 0 8px;color:var(--pri)">⚙ Xbox controller settings for COD</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>FOV 100-120</strong> for peripheral awareness without breaking aim accuracy</li>
+        <li><strong>Tactical layout</strong> — slide/crouch without lifting your aim thumb. Faster reaction = more kills.</li>
+        <li><strong>Sensitivity:</strong> low enough to track but high enough to flick. Most pros run 5-7 horizontal, 4-6 vertical.</li>
+        <li><strong>Aim-assist:</strong> Standard for casual, Black Ops for snappy magnetism on AR play.</li>
+      </ul>
+    </div>
+
+    <!-- YouTube embed for Merrick 556 build -->
+    <div class="card tool" style="border-color:rgba(244,114,182,.4)">
+      <h3 style="margin:0 0 8px">📺 Watch: Merrick 556 META loadouts</h3>
+      <iframe width="100%" height="220" loading="lazy"
+        src="https://www.youtube.com/embed?listType=search&list=Merrick+556+best+loadout+Warzone+meta&modestbranding=1&rel=0"
+        style="border:0;border-radius:10px;background:#000"
+        allow="encrypted-media;picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FORTNITE PRO ============================== -->
+<section class="pane" id="pane-fnpro">
+  <h2><span class="em">🪂</span> Fortnite Pro tier — Peterbot &amp; competitive setup</h2>
+  <p class="muted" style="margin-bottom:12px">Real settings from FNCS pros. Updated for 2026 meta. Mechanical drills + audio + keybinds.</p>
+
+  <div class="grid grid-2">
+    <!-- Peterbot vs Mongraal -->
+    <div class="card tool" style="border-color:rgba(168,85,247,.4)">
+      <h3 style="margin:0 0 8px;color:var(--acc)">⚙ Peterbot vs Mongraal — sensitivity (2026)</h3>
+      <table style="width:100%;font-size:13px;border-collapse:collapse;margin-top:8px">
+        <tr style="background:rgba(168,85,247,.1)"><th style="text-align:left;padding:6px">Setting</th><th style="padding:6px">Peterbot</th><th style="padding:6px">Mongraal</th></tr>
+        <tr><td style="padding:6px;border-bottom:1px dashed var(--line)">DPI</td><td style="text-align:center">800</td><td style="text-align:center">800</td></tr>
+        <tr><td style="padding:6px;border-bottom:1px dashed var(--line)">X/Y sens</td><td style="text-align:center;color:var(--gold)">6.4%</td><td style="text-align:center">6.7%</td></tr>
+        <tr><td style="padding:6px;border-bottom:1px dashed var(--line)">Build sens</td><td style="text-align:center">100% (1:1)</td><td style="text-align:center">~150%</td></tr>
+        <tr><td style="padding:6px">Edit sens</td><td style="text-align:center">100% (1:1)</td><td style="text-align:center">~150%</td></tr>
+      </table>
+      <p style="font-size:12px;color:var(--gold);margin-top:8px">💡 Peterbot's secret: same sensitivity across aim/build/edit. Single muscle memory for everything. Sluggish at first — devastating once it clicks.</p>
+    </div>
+
+    <!-- Peterbot keybinds -->
+    <div class="card tool" style="border-color:rgba(244,114,182,.4)">
+      <h3 style="margin:0 0 8px;color:var(--pink)">⌨ Peterbot's keybinds (2026)</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">Wider keyboard spread = no accidental presses during edit-spam.</p>
+      <table style="width:100%;font-size:13px;border-collapse:collapse">
+        <tr style="background:rgba(244,114,182,.1)"><th style="text-align:left;padding:6px">Action</th><th style="padding:6px">Key</th></tr>
+        <tr><td style="padding:5px">Wall</td><td style="text-align:center"><kbd>T</kbd></td></tr>
+        <tr><td style="padding:5px">Floor</td><td style="text-align:center"><kbd>Y</kbd></td></tr>
+        <tr><td style="padding:5px">Stairs</td><td style="text-align:center"><kbd>F</kbd></td></tr>
+        <tr><td style="padding:5px">Roof</td><td style="text-align:center"><kbd>V</kbd></td></tr>
+        <tr><td style="padding:5px">Trap</td><td style="text-align:center"><kbd>R</kbd></td></tr>
+        <tr><td style="padding:5px">Edit</td><td style="text-align:center"><kbd>G</kbd> / Mouse-Wheel-Down</td></tr>
+        <tr><td style="padding:5px">Harvest tool</td><td style="text-align:center">Mouse Btn 4</td></tr>
+        <tr><td style="padding:5px">Crouch</td><td style="text-align:center"><kbd>C</kbd></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <!-- Raider464 training -->
+    <div class="card tool" style="border-color:rgba(52,211,153,.4)">
+      <h3 style="margin:0 0 8px;color:var(--green)">🎯 Raider464 mechanics routine</h3>
+      <p style="font-size:13px;line-height:1.6"><strong>Map code:</strong> <code style="background:rgba(52,211,153,.15);color:var(--green);padding:2px 8px;border-radius:4px;font-family:monospace;font-weight:700">1997-0442-4892</code></p>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px;margin-top:8px">
+        <li><strong>Session:</strong> 10-15 min daily on Piece Control map</li>
+        <li><strong>Goal:</strong> hit 8+ of the 16 drills per session</li>
+        <li><strong>Crosshair efficiency:</strong> shortest mouse path from edit-start to edit-end. If you see the blue grid for &gt;200ms, too slow.</li>
+        <li><strong>One-tile drill:</strong> hit edit, select tile <em>instantly</em> — no flick, no over-correct</li>
+        <li><strong>Speed-down trick:</strong> divide your sens by 2-3, free-build at normal pace. Forces clean pathing before adding speed.</li>
+        <li><strong>Tunneling:</strong> 1 min × 12 sections — protected peaks + gap-building under pressure</li>
+      </ul>
+    </div>
+
+    <!-- Audio settings -->
+    <div class="card tool">
+      <h3 style="margin:0 0 8px;color:var(--pri)">🔊 Competitive audio</h3>
+      <ul style="font-size:13px;line-height:1.8;padding-left:20px">
+        <li><strong style="color:var(--gold)">Visualized Sound Effects: ON</strong> — footstep + chest icons on HUD. Single biggest setting for end-games.</li>
+        <li><strong>Sound Quality: LOW</strong> — frees up CPU, more FPS. Pros all run this.</li>
+        <li><strong>Music: 0%</strong></li>
+        <li><strong>SFX: 100%</strong></li>
+        <li><strong>3D Headphones: OFF</strong> — pros find standard stereo more reliable for pinpointing direction</li>
+        <li><strong>Voice chat: 0% to 50%</strong> based on whether you want teammates audible</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <!-- Optimization -->
+    <div class="card tool">
+      <h3 style="margin:0 0 8px;color:var(--gold)">⚡ FPS / latency optimization</h3>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>Resolution:</strong> 1920×1080 (1080p) — competitive standard, max FPS</li>
+        <li><strong>3D Resolution:</strong> 100% — never stretch</li>
+        <li><strong>View Distance:</strong> Epic — see structures further</li>
+        <li><strong>Shadows:</strong> Off</li>
+        <li><strong>Anti-Aliasing:</strong> Off</li>
+        <li><strong>Textures:</strong> Low (preserves enemy visibility)</li>
+        <li><strong>Effects:</strong> Low</li>
+        <li><strong>Post Processing:</strong> Low</li>
+        <li><strong>V-Sync:</strong> Off</li>
+        <li><strong>Motion Blur:</strong> Off</li>
+        <li><strong>Frame Rate:</strong> Unlimited (cap at monitor refresh -1 if you have a Reflex-capable GPU)</li>
+        <li><strong>Reflex Low Latency + Boost:</strong> ON if NVIDIA, AMD Anti-Lag if AMD</li>
+      </ul>
+    </div>
+
+    <!-- Legitimate edge -->
+    <div class="card tool" style="border-color:rgba(34,211,238,.4)">
+      <h3 style="margin:0 0 8px;color:var(--pri)">✅ Legit competitive edge tools</h3>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:8px">Allowed in tournaments. No bans, no malware.</p>
+      <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+        <li><strong>Crosshair X</strong> — overlay-based custom crosshair. Static image over screen, doesn't touch game code. Helps with no-scope/midgame aim.</li>
+        <li><strong>NVIDIA Reflex</strong> — kernel-level latency reduction baked into the driver. Always on.</li>
+        <li><strong>Disable background services</strong> — Win+R → <code>services.msc</code> → set Print Spooler / Windows Search to Manual when gaming</li>
+        <li><strong>Game Mode ON</strong> — Settings → Gaming → Game Mode</li>
+        <li><strong>Hardware-accelerated GPU scheduling: ON</strong></li>
+        <li><strong>Mouse polling rate:</strong> 1000 Hz (most gaming mice)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card tool" style="margin-top:14px;border-color:rgba(248,113,113,.5);background:linear-gradient(180deg,rgba(248,113,113,.08),rgba(15,12,45,.85))">
+    <h3 style="margin:0 0 8px;color:var(--red)">🚫 Why we don't list "cheat software"</h3>
+    <p style="font-size:13px;line-height:1.6">From the research itself: <em>"the overwhelming majority of files found online promising aimbots, ESP, or skin changers are malware, keyloggers, or phishing tools."</em> Easy Anti-Cheat is kernel-level and detects deep modifications instantly. Recent tournament rules require Secure Boot + TPM 2.0 + IOMMU — bypass attempts get permanent <strong>hardware</strong> bans (not just account). Epic also pursues legal action against users.</p>
+    <p style="font-size:13px;line-height:1.6;margin-top:8px"><strong style="color:var(--gold)">The only sustainable advantage</strong> is reps on Raider464 maps + clean settings + good sleep. Pros are pros because they grind, not because they cheat.</p>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card tool">
+      <h3 style="margin:0 0 8px">📺 Watch: Peterbot 2026 settings update</h3>
+      <iframe width="100%" height="220" loading="lazy"
+        src="https://www.youtube.com/embed?listType=search&list=Peterbot+updated+settings+2026+Fortnite&modestbranding=1&rel=0"
+        style="border:0;border-radius:10px;background:#000"
+        allow="encrypted-media;picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+    </div>
+    <div class="card tool">
+      <h3 style="margin:0 0 8px">📺 Watch: Raider464 mechanics routine</h3>
+      <iframe width="100%" height="220" loading="lazy"
+        src="https://www.youtube.com/embed?listType=search&list=Raider464+best+mechanics+training+routine+Fortnite&modestbranding=1&rel=0"
+        style="border:0;border-radius:10px;background:#000"
+        allow="encrypted-media;picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+    </div>
+  </div>
+</section>
+
 <!-- ============================== XP / ACHIEVEMENTS ============================== -->
 <section class="pane" id="pane-xp">
   <h2><span class="em">🏆</span> My XP & achievements</h2>
@@ -737,7 +1079,7 @@
 
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T00:30Z-v7-WOW-beats-avatar-3d-xp-selfie';
+window.__KIDS_BUILD = '2026-04-28T02:00Z-v9-pcgames-xbox-gamepass-freeplay-tips-cod-fnpro-multiplayer';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
@@ -1991,6 +2333,114 @@ window.__KIDS_BUILD = '2026-04-28T00:30Z-v7-WOW-beats-avatar-3d-xp-selfie';
     const c = $('drawCanvas'); if (!c) return;
     const a = document.createElement('a'); a.download = 'my-drawing.png'; a.href = c.toDataURL('image/png'); a.click();
   };
+
+  // ===== GAME LIBRARIES (curated, per Gary's lists) =====
+  function gameCard(g) {
+    const ytSearch = encodeURIComponent(g.q || `${g.title} gameplay`);
+    return `<div class="card tool">
+      <h3 style="margin:0 0 6px;color:var(--gold)">${esc(g.icon || '🎮')} ${esc(g.title)}</h3>
+      ${g.badge ? `<span class="badge" style="margin-bottom:6px;display:inline-block">${esc(g.badge)}</span>` : ''}
+      <p style="font-size:13px;line-height:1.5;color:var(--dim);margin:6px 0">${esc(g.desc)}</p>
+      ${g.tip ? `<p style="font-size:12px;color:var(--gold);margin:6px 0">💡 ${esc(g.tip)}</p>` : ''}
+      <iframe width="100%" height="180" loading="lazy"
+        src="https://www.youtube.com/embed?listType=search&list=${ytSearch}&modestbranding=1&rel=0"
+        style="border:0;border-radius:10px;background:#000;margin-top:8px"
+        allow="encrypted-media;picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+    </div>`;
+  }
+
+  const PC_GAMES = [
+    { title:'Minecraft',         icon:'⛏', badge:'Sandbox', desc:'The definitive sandbox — build anything, fight anything. Endless creative + survival mode.', tip:'F3 shows debug info. Try /give @s diamond_pickaxe in cheats-on world.', q:'Minecraft+kid+friendly+gameplay' },
+    { title:'Roblox',            icon:'🟪', badge:'Platform', desc:'Endless mini-games made by other kids. Social hub with millions of experiences.', tip:'Search "obby" for parkour challenges. Add friends only if you know them IRL.', q:'Roblox+kid+friendly+gameplay' },
+    { title:'Fortnite',          icon:'🪂', badge:'Battle Royale', desc:'Fast-paced battle royale + a massive social hangout for teens. Build, shoot, dance.', tip:'Practice building in Creative mode before jumping into Ranked.', q:'Fortnite+no+commentary+gameplay' },
+    { title:'Rocket League',     icon:'⚽', badge:'Sports', desc:'Soccer with rocket-powered cars. Easy to learn, brutally satisfying to master.', tip:'Train aerials in free-play. Good kickoff = mid boost grab.', q:'Rocket+League+gameplay+tips' },
+    { title:'Portal 2',          icon:'🟧', badge:'Puzzle', desc:'Mind-bending puzzle game with co-op mode. Builds logic + spatial reasoning.', tip:'Play co-op campaign with a friend — best part of the game.', q:'Portal+2+co-op+gameplay' },
+    { title:'Valorant',          icon:'🎯', badge:'Tactical FPS · 14+', desc:'Team-based tactical shooter. Aim + comms-heavy. For older teens.', tip:'Free-to-play. Practice in The Range before Unrated.', q:'Valorant+gameplay+beginner+guide' },
+    { title:'Terraria',          icon:'⛏', badge:'2D Sandbox', desc:'2D Minecraft-cousin with deep crafting + boss fights + huge progression tree.', tip:'Build a long flat platform for ground bosses like Eye of Cthulhu.', q:'Terraria+gameplay+beginner+guide' },
+    { title:'Stardew Valley',    icon:'🌾', badge:'Farming Sim', desc:'Cozy farming sim with great storyline + community. Endless content.', tip:'Plant parsnips Day 1. Keep cash for backpack upgrade.', q:'Stardew+Valley+gameplay+beginner' },
+    { title:'Sea of Thieves',    icon:'🏴‍☠', badge:'Co-op Pirates', desc:'Cooperative pirate adventure. Sail with friends, find treasure, fight kraken.', tip:'Friend Code system lets you crew up cross-platform.', q:'Sea+of+Thieves+gameplay+co-op' },
+    { title:'Human: Fall Flat',  icon:'🤸', badge:'Physics Comedy', desc:'Physics-based puzzle game. Hilarious wobbly characters. Perfect for couch co-op.', tip:'Up to 8-player online — pure chaos.', q:'Human+Fall+Flat+co-op+gameplay' },
+  ];
+
+  const XBOX_GAMES = [
+    { title:'Minecraft Dungeons',           icon:'⚔', badge:'Dungeon Crawler', desc:'Easy-to-pick-up co-op dungeon crawler set in the Minecraft universe.', q:'Minecraft+Dungeons+co-op+gameplay' },
+    { title:'LEGO Star Wars: Skywalker Saga',icon:'🟨', badge:'Adventure', desc:'All 9 movies, hundreds of characters, drop-in co-op, hilarious cutscenes.', q:'LEGO+Star+Wars+Skywalker+Saga+gameplay' },
+    { title:'Rocket League',                icon:'⚽', badge:'Sports', desc:'Best competitive cross-platform on Xbox. Plays smooth at 120fps on Series X.', q:'Rocket+League+Xbox+gameplay' },
+    { title:'Hot Wheels Unleashed 2',       icon:'🏎', badge:'Racing', desc:'Fast, imaginative arcade racing with split-screen for couch co-op.', q:'Hot+Wheels+Unleashed+2+gameplay' },
+    { title:'Ori and the Will of the Wisps',icon:'🌿', badge:'Platformer', desc:'Stunning hand-drawn platformer with emotional story + tight controls.', q:'Ori+Will+of+the+Wisps+gameplay' },
+    { title:'Sonic Frontiers',              icon:'💨', badge:'Open World', desc:'Open-world Sonic — fast, exploratory, big environments to zoom around.', q:'Sonic+Frontiers+gameplay' },
+    { title:'Super Lucky\'s Tale',          icon:'🦊', badge:'Platformer', desc:'Cheerful 3D platformer. Approachable for younger players.', q:'Super+Lucky+s+Tale+gameplay' },
+    { title:'Unravel 2',                    icon:'🧶', badge:'Co-op Puzzle', desc:'Beautiful co-op puzzle-platformer. Tied together by yarn — literally.', q:'Unravel+2+co-op+gameplay' },
+    { title:'Castle Crashers',              icon:'🏰', badge:'Beat-em-up', desc:'Chaotic 4-player beat-em-up. Local multiplayer gold.', q:'Castle+Crashers+gameplay' },
+    { title:'Plants vs Zombies: Battle for Neighborville', icon:'🌻', badge:'Family Shooter', desc:'Lighthearted family-friendly shooter with deep character customization.', q:'Plants+vs+Zombies+Battle+for+Neighborville+gameplay' },
+  ];
+
+  const GAMEPASS = [
+    { title:'Bluey: The Video Game',          icon:'🐕', badge:'Game Pass · Family', desc:'Gentle, interactive game based on the show. Drop-in co-op for siblings.', q:'Bluey+The+Video+Game+gameplay' },
+    { title:'Little Kitty, Big City',         icon:'🐈', badge:'Game Pass · Indie', desc:'Charming explorer where you play as a cat navigating a city. Knock things off shelves.', q:'Little+Kitty+Big+City+gameplay' },
+    { title:'LEGO Star Wars: Skywalker Saga', icon:'🟨', badge:'Game Pass · Adventure', desc:'Massive funny adventure covering all 9 films. Drop-in co-op.', q:'LEGO+Star+Wars+Skywalker+Saga+co-op' },
+    { title:'It Takes Two',                   icon:'❤', badge:'Game Pass · Co-op', desc:'Award-winning two-player co-op puzzle game. For older kids/teens.', q:'It+Takes+Two+co-op+gameplay' },
+    { title:'PowerWash Simulator',            icon:'🚿', badge:'Game Pass · Relax', desc:'Surprisingly satisfying — clean dirty objects with a power washer. Hypnotic.', q:'PowerWash+Simulator+gameplay' },
+    { title:'Disney Dreamlight Valley',       icon:'🏰', badge:'Game Pass · Sim', desc:'Life-sim with iconic Disney characters. Cooking, farming, friendship quests.', q:'Disney+Dreamlight+Valley+gameplay' },
+    { title:'Goat Simulator',                 icon:'🐐', badge:'Game Pass · Chaos', desc:'Hilarious chaotic sandbox where you play as a goat doing whatever you want.', q:'Goat+Simulator+gameplay' },
+    { title:'Donut County',                   icon:'🍩', badge:'Game Pass · Puzzle', desc:'Short, funny physics puzzle game where you control a hole that swallows everything.', q:'Donut+County+gameplay' },
+    { title:'Rare Replay',                    icon:'📀', badge:'Game Pass · Classic', desc:'Collection of classic kid-friendly games from Rare\'s history.', q:'Rare+Replay+gameplay' },
+    { title:'Minecraft Dungeons',             icon:'⚔', badge:'Game Pass · Co-op', desc:'Accessible dungeon-crawler — great for first-time co-op.', q:'Minecraft+Dungeons+co-op' },
+  ];
+
+  const FREEPLAY = [
+    { title:'Roblox',           icon:'🟪', badge:'FREE', desc:'Millions of user-created mini-games. Endless discovery, social gaming hub.', q:'Roblox+Xbox+gameplay' },
+    { title:'Fortnite',         icon:'🪂', badge:'FREE', desc:'Premier social battle royale. Most teens use it as their primary digital hangout.', q:'Fortnite+Xbox+gameplay' },
+    { title:'Rocket League',    icon:'⚽', badge:'FREE', desc:'High-octane sports + driving. Free-to-play with cosmetic shop. Cross-platform.', q:'Rocket+League+free+to+play+Xbox' },
+    { title:'Stumble Guys',     icon:'🏃', badge:'FREE', desc:'Fall Guys-style chaotic obstacle course. Quick rounds, easy to learn.', q:'Stumble+Guys+gameplay' },
+    { title:'Brawlhalla',       icon:'⚔', badge:'FREE', desc:'Fast-paced 2D platform fighter. Smash Bros vibes. Free + cross-platform.', q:'Brawlhalla+gameplay+beginner' },
+    { title:'Halo Infinite Multiplayer', icon:'🪖', badge:'FREE · 13+', desc:'Base multiplayer is 100% free. High-quality competitive shooter.', q:'Halo+Infinite+multiplayer+gameplay' },
+    { title:'Palia',            icon:'🌿', badge:'FREE', desc:'Cozy community-driven life-sim MMO. Cooking, farming, friendship.', q:'Palia+gameplay+beginner' },
+    { title:'Fishing Planet',   icon:'🎣', badge:'FREE', desc:'Surprisingly deep + relaxing realistic fishing simulator.', q:'Fishing+Planet+gameplay' },
+    { title:'Rec Room',         icon:'🕹', badge:'FREE · Social', desc:'Social VR-friendly space with thousands of user-created games.', q:'Rec+Room+gameplay+Xbox' },
+    { title:'Asphalt Legends',  icon:'🏁', badge:'FREE', desc:'Arcade-style visually impressive racing. Real cars, real tracks.', q:'Asphalt+Legends+Xbox+gameplay' },
+  ];
+
+  function renderGameGrid(mountId, list) {
+    const el = document.getElementById(mountId);
+    if (el) el.innerHTML = list.map(gameCard).join('');
+  }
+  renderGameGrid('pcGameGrid',  PC_GAMES);
+  renderGameGrid('xboxGameGrid',XBOX_GAMES);
+  renderGameGrid('gamePassGrid',GAMEPASS);
+  renderGameGrid('freePlayGrid',FREEPLAY);
+
+  // Tips & codes data fill
+  const MC_COMMANDS = [
+    { c:'/give @s diamond_sword', d:'Spawn any item to your inventory' },
+    { c:'/tp 100 70 200',          d:'Teleport to coordinates (X Y Z)' },
+    { c:'/gamerule doDaylightCycle false', d:'Stop time of day from changing' },
+    { c:'/difficulty peaceful',    d:'Change difficulty (peaceful/easy/normal/hard)' },
+    { c:'/summon zombie',          d:'Spawn any mob (zombie/cow/ender_dragon/...)' },
+    { c:'/effect give @s speed 99999 5', d:'Speed boost for ~27 hours' },
+    { c:'/setblock ~ ~ ~ tnt',     d:'Place a block at your feet' },
+    { c:'/weather clear',          d:'Stop the rain instantly' },
+    { c:'/time set day',           d:'Skip to daytime' },
+    { c:'/gamemode creative',      d:'Switch to creative mode (fly + infinite blocks)' },
+  ];
+  const ROBLOX_CODES = [
+    { c:'SPIDERCOLA',  d:'Spider Cola shoulder accessory' },
+    { c:'TWEETROBLOX', d:'The Bird Says shoulder pet' },
+  ];
+  const mc = document.getElementById('mcCommands');
+  if (mc) mc.innerHTML = MC_COMMANDS.map(x =>
+    `<li style="padding:6px 0;border-bottom:1px dashed var(--line)">
+      <code style="background:rgba(34,211,238,.1);color:var(--pri);padding:2px 6px;border-radius:4px;font-family:monospace">${esc(x.c)}</code>
+      <br><span style="color:var(--dim);font-size:12px">${esc(x.d)}</span>
+    </li>`).join('');
+  const rb = document.getElementById('robloxCodes');
+  if (rb) rb.innerHTML = ROBLOX_CODES.map(x =>
+    `<li style="padding:6px 0;border-bottom:1px dashed var(--line)">
+      <code style="background:rgba(244,114,182,.1);color:var(--pink);padding:2px 8px;border-radius:4px;font-family:monospace;font-weight:700">${esc(x.c)}</code>
+      <br><span style="color:var(--dim);font-size:12px">${esc(x.d)}</span>
+    </li>`).join('');
 
   setupSounds();
   renderDex();
