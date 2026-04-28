@@ -18,10 +18,13 @@ window.AYDEN_FIREBASE_CONFIG = {
   projectId:         "data-44017",
   storageBucket:     "data-44017.firebasestorage.app",
   messagingSenderId: "582095031655",
-  appId:             "1:582095031655:web:1d793237a9d6bb00f8b3c2"
-  // measurementId intentionally omitted — Google Analytics for Firebase is NOT
-  // COPPA-compliant for a child-targeted site (under-13). Do not add it back
-  // and do not call getAnalytics() anywhere in this codebase.
+  appId:             "1:582095031655:web:1d793237a9d6bb00f8b3c2",
+  measurementId:     "G-MYVW06F02Q"
+  // NOTE: measurementId is present in the config but Google Analytics is NOT
+  // activated. GA only runs when getAnalytics(app) is called from
+  // firebase-analytics.js — and this codebase never imports that module.
+  // Keep it that way (kid site, COPPA-conscious). If you add Analytics later,
+  // call setAnalyticsCollectionEnabled(false) before any logEvent.
 };
 
 window.AYDEN_ADMIN_USERNAME = "ayden";
