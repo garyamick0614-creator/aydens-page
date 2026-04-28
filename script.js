@@ -1405,7 +1405,10 @@ function bindFriendsAuth() {
       gate.classList.remove('hidden'); shell.classList.add('hidden'); return;
     }
     const sess = load(KEYS.friendSession, {});
-    const username = sess.username || user.email.split('@')[0];
+    // Anonymous users have no email — fall back to shared identity displayName, then uid prefix.
+    const fallback = (window.AYDEN_ID && window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName)
+                  || (user.uid || 'guest').slice(0, 10);
+    const username = sess.username || (user.email ? user.email.split('@')[0] : fallback);
     nameLbl.textContent = username;
     gate.classList.add('hidden'); shell.classList.remove('hidden');
     bindFriendsFeed(username);
@@ -1423,7 +1426,9 @@ function bindFriendsAuth() {
     if (!kidSafeAllow(text)) { msg.className='gate-msg err'; msg.textContent='Try clean wording.'; return; }
     const u = fbAuth.currentUser; if (!u) return;
     const sess = load(KEYS.friendSession, {});
-    const username = sess.username || u.email.split('@')[0];
+    const fallback2 = (window.AYDEN_ID && window.AYDEN_ID.profile && window.AYDEN_ID.profile.displayName)
+                   || (u.uid || 'guest').slice(0, 10);
+    const username = sess.username || (u.email ? u.email.split('@')[0] : fallback2);
     if (getBlocked().includes(username)) { msg.className='gate-msg err'; msg.textContent='You\'re blocked from posting. Talk to Ayden.'; return; }
     try {
       await window.__FB.push(window.__FB.ref(fbDB, 'posts'), {
