@@ -394,6 +394,7 @@
   <button class="tab" data-pane="fnpro">🪂 Fortnite Pro</button>
   <button class="tab" data-pane="pcmastery">⚙ PC Mastery</button>
   <button class="tab" data-pane="study">📚 Study Partner</button>
+  <button class="tab" data-pane="schools">🏫 Schools</button>
   <a class="tab" href="/" style="text-decoration:none">🏠 Home →</a>
   <a class="tab" href="/playground.html" style="text-decoration:none">🌌 Multiplayer →</a>
 </nav>
@@ -1653,6 +1654,37 @@
   </div>
 </section>
 
+<!-- ============================== SCHOOLS ============================== -->
+<section class="pane" id="pane-schools">
+  <h2><span class="em">🏫</span> Scott County school status — delays, closings, e-learning days</h2>
+  <p class="muted" style="margin-bottom:14px">Auto-checks the Scottsburg (SVCSC) + Austin district sites + WLKY/WHAS11/WAVE3 closings pages. Refreshed every 5 min. <strong>For the final word always call the district directly.</strong></p>
+
+  <div id="schoolsAggregate" class="card tool" style="text-align:center;padding:28px 18px;border-width:2px">
+    <div style="font:800 12px var(--font-display);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)">Today's status</div>
+    <div id="schoolsBigStatus" style="font:900 56px/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;margin:14px 0">⌛ CHECKING</div>
+    <div id="schoolsBigSub" style="color:var(--dim);font-size:13px"></div>
+    <div class="row" style="margin-top:14px;justify-content:center">
+      <button class="btn" onclick="loadSchools()">↻ REFRESH NOW</button>
+      <a href="https://www.svcsc.k12.in.us/" target="_blank" rel="noopener" class="btn green" style="text-decoration:none">SVCSC SITE →</a>
+      <a href="https://www.austin.k12.in.us/" target="_blank" rel="noopener" class="btn gold" style="text-decoration:none">AUSTIN SITE →</a>
+    </div>
+  </div>
+
+  <h3 style="margin-top:18px">📋 Source-by-source check</h3>
+  <div class="grid grid-2" id="schoolsFindings"></div>
+
+  <div class="card tool" style="margin-top:14px;border-color:rgba(168,85,247,.4)">
+    <h3 style="margin:0 0 10px;color:var(--neon-purple)">📞 Direct numbers (for the final word)</h3>
+    <ul style="font-size:13px;line-height:1.7;padding-left:20px">
+      <li><strong>Scottsburg Consolidated School Corp:</strong> (812) 752-8946</li>
+      <li><strong>Scottsburg High School:</strong> (812) 752-8920</li>
+      <li><strong>Scottsburg Middle School:</strong> (812) 752-8927</li>
+      <li><strong>Austin Community Schools:</strong> (812) 794-8750</li>
+      <li><strong>Crothersville Community Schools:</strong> (812) 793-2222</li>
+    </ul>
+  </div>
+</section>
+
 <!-- Game HQ tab + iframe removed 2026-04-28: Game HQ is the home page (/) now,
      hub.html is the side-tools dashboard. The 🏠 Home → tab in nav routes to /. -->
 
@@ -1718,7 +1750,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T10:15Z-v26-passwordless-friends-chatroom-study-fix';
+window.__KIDS_BUILD = '2026-04-28T10:45Z-v28-schools-nasa-cors-deeplinks';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
@@ -1732,14 +1764,33 @@ window.__KIDS_BUILD = '2026-04-28T10:15Z-v26-passwordless-friends-chatroom-study
   const UNSAFE = /\b(violence|violent|murder|murderer|killed|killing|kill|shoot|shooting|shooter|gun|guns|firearm|stab|stabbed|knife|sex|sexual|sexy|porn|pornography|nude|nudity|nsfw|hentai|onlyfans|escort|prostitut|abuse|abused|abusive|assault|assaulted|rape|raped|rapist|harass|molest|pedophile|drug|drugs|cocaine|heroin|fentanyl|meth|marijuana|weed|cannabis|alcohol|drunk|war|warfare|bomb|bombing|bomber|terror|terrorism|terrorist|hostage|massacre|genocide|isis|hamas|taliban|hezbollah|cartel|gang|gangster|riot|riots|protest|protests|trump|biden|harris|putin|netanyahu|epstein|hitler|nazi|racism|racist|hate|crime|crimes|criminal|arrest|arrested|prison|jail|convict|hanging|hanged|suicide|suicidal|self-harm|cutting|overdose|dies|died|death|dead|fatal|fatality|tragic|tragedy|horror|horrific|gruesome|brutal|bloody|blood|gore|graphic|disturb|kkk|qanon|opioid|addict|wound|injur|hospital|police|cop|cops|fbi|cia|swat|raid|warrant|investigation|charged|sentence|verdict|guilty|innocent|trial|killer|attacker|victim|victims|stalker|abductor|kidnap|kidnapped|kidnapping|missing-person|amber-alert|silver-alert|deadly|lethal|toxic|poison|poisoning|drown|drowned|drowning|crash|crashed|wreck|wrecked|fire|fires|wildfire|burning|burned|burnt|explosion|exploded|explode|blast|injured|trauma|hospitalized|fatally|deaths|killings|shootings|stabbings|robberies|robbery|burglary|burglar|theft|thief|steal|stolen|carjack|hijack|drone-strike|airstrike|missile|nuclear|warhead|hacker|breached|breach|leaked|exposed|whistleblower|scandal|allegation|alleged|accused|defendant|crackdown|deport|deportation|migrant|asylum|refugee|smuggling|trafficking|slavery|cult|extremist|extremism|radical|radicalized|jihad|civil-war|insurgent|insurgency|coup|dictator|tyrant|oppression|persecution|atrocity|war-crime|holocaust|slaughter|carnage|bloodbath|mass-shooting|serial-killer|cannibal|torture|tortured|hanged|guillotine|execution|executed|stoning|beheaded|beheading|decapitate|dismember|mutilate|disfigure|amputate|acid-attack|adult|mature)\b/i;
   function isSafe(text) { return !!text && !UNSAFE.test(String(text)); }
 
-  // ===== TABS =====
-  document.getElementById('tabs').addEventListener('click', (e) => {
-    const t = e.target.closest('.tab'); if (!t) return;
+  // ===== TABS — click + URL hash deep-link =====
+  function activateTab(paneId) {
+    if (!paneId) return false;
+    const tab = document.querySelector(`.tab[data-pane="${paneId}"]`);
+    const pane = document.getElementById('pane-' + paneId);
+    if (!tab || !pane) return false;
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
     document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('pane-' + t.dataset.pane).classList.add('active');
+    tab.classList.add('active');
+    pane.classList.add('active');
+    // Update hash without scrolling, so deep-links and sidebar buttons work
+    if (location.hash !== '#' + paneId) {
+      try { history.replaceState(null, '', '#' + paneId); } catch (_) {}
+    }
+    return true;
+  }
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const t = e.target.closest('.tab'); if (!t || !t.dataset.pane) return;
+    activateTab(t.dataset.pane);
   });
+  // Deep-link: hub.html#watch / #poke / #cod / etc → activate that tab on load.
+  function syncTabFromHash() {
+    const id = (location.hash || '').replace(/^#/, '');
+    if (id) activateTab(id);
+  }
+  syncTabFromHash();
+  window.addEventListener('hashchange', syncTabFromHash);
 
   // ===== WEATHER =====
   const CITIES = [
@@ -2529,6 +2580,50 @@ window.__KIDS_BUILD = '2026-04-28T10:15Z-v26-passwordless-friends-chatroom-study
       <img src="${esc(url + (url.includes('?') ? '&' : '?') + 'mt=' + Date.now())}" style="width:100%;max-height:60vh;object-fit:contain;background:#000;border-radius:10px" alt="${esc(name)}">
       <p style="margin-top:10px;color:var(--dim);font-size:12px">Refresh interval: 30s · Source: content.trafficwise.org</p>`);
   });
+
+  // ===== SCHOOLS (Scott Co district status checker) =====
+  window.loadSchools = async () => {
+    const big = $('schoolsBigStatus'); const sub = $('schoolsBigSub');
+    const grid = $('schoolsFindings'); const card = $('schoolsAggregate');
+    if (!big) return;
+    big.textContent = '⌛ CHECKING…';
+    sub.textContent = '';
+    try {
+      const r = await fetch(`${API}/api/proxy/scott-schools/status?_=${Date.now()}`, { cache:'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const map = {
+        open:   { label:'✅ OPEN',     color:'var(--neon-green)',  border:'var(--neon-green)' },
+        delay:  { label:'🟡 DELAY',    color:'var(--neon-yellow)', border:'var(--neon-yellow)' },
+        closed: { label:'🚫 CLOSED',   color:'var(--neon-pink)',   border:'var(--neon-pink)' },
+        unknown:{ label:'❓ UNKNOWN',  color:'var(--neon-cyan)',   border:'var(--neon-cyan)' },
+      };
+      const a = map[d.aggregate_status] || map.unknown;
+      big.textContent = a.label;
+      big.style.color = a.color;
+      big.style.textShadow = '0 0 24px ' + a.color;
+      card.style.borderColor = a.border;
+      sub.textContent = `Checked ${d.sources_fetched || 0} of ${d.sources_checked || 0} sources at ${d.checked_at || '—'}`;
+      grid.innerHTML = (d.findings || []).map(f => {
+        const st = map[f.status] || map.unknown;
+        return `<div class="card tool" style="border-color:${st.border}">
+          <h4 style="margin:0 0 6px;color:${st.color};font-family:var(--font-display);letter-spacing:.1em;font-size:13px">${esc(f.district)}</h4>
+          <div style="font-size:11px;color:var(--mute);margin-bottom:8px;font-family:var(--font-display);letter-spacing:.1em;text-transform:uppercase">${esc(f.kind)}</div>
+          <div style="font-size:18px;font-weight:800;color:${st.color};margin:6px 0">${st.label}</div>
+          <div style="font-size:12px;color:var(--dim);margin:6px 0">${esc(f.evidence||'no evidence')}</div>
+          <a href="${esc(f.url)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--neon-cyan)">→ open source</a>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      big.textContent = '❌ FAILED';
+      big.style.color = 'var(--neon-pink)';
+      sub.textContent = 'Could not reach the home server: ' + e.message;
+    }
+  };
+  // Auto-load when Schools tab is clicked + initial load on boot
+  document.querySelector('.tab[data-pane="schools"]')?.addEventListener('click', () => setTimeout(loadSchools, 50));
+  setTimeout(loadSchools, 1500);                  // initial pre-warm
+  setInterval(loadSchools, 300000);               // 5-min auto-refresh
 
   // ===== STUDY PARTNER (homework / research / detailed reports) =====
   const STUDY_API = 'https://api.thatcomputerguy26.org/api/public/chat';
