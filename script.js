@@ -1669,6 +1669,48 @@ async function boot() {
 document.addEventListener('DOMContentLoaded', boot);
 
 // =====================================================================
+// SCHOOLS-MINI WIDGET on Game HQ home — pulls /api/proxy/scott-schools/status
+// every 5 min and shows a big OPEN / DELAY / CLOSED badge. Click → full Hub tab.
+// =====================================================================
+(function schoolsMini() {
+  const API = 'https://api.thatcomputerguy26.org';
+  function $$(s){return document.querySelector(s);}
+  async function loadSchoolsMini() {
+    const big = $$('#schools-mini-status'); const detail = $$('#schools-mini-detail');
+    if (!big) return;
+    try {
+      const r = await fetch(`${API}/api/proxy/scott-schools/status?_=${Date.now()}`, { cache:'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const map = {
+        open:    { label:'✅ OPEN',    color:'#39ff14' },
+        delay:   { label:'🟡 DELAY',   color:'#ffd000' },
+        closed:  { label:'🚫 CLOSED',  color:'#ff2bd6' },
+        unknown: { label:'❓ UNKNOWN', color:'#00f0ff' },
+      };
+      const a = map[d.aggregate_status] || map.unknown;
+      big.textContent = a.label;
+      big.style.color = a.color;
+      big.style.textShadow = '0 0 18px ' + a.color;
+      const checkedAt = d.checked_at ? new Date(d.checked_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '—';
+      detail.textContent = `Checked ${d.sources_fetched || 0}/${d.sources_checked || 0} sources at ${checkedAt}`;
+    } catch (e) {
+      big.textContent = '❌';
+      big.style.color = '#f87171';
+      detail.textContent = 'Could not reach server: ' + e.message;
+    }
+  }
+  function bind() {
+    const btn = $$('#schools-mini-refresh');
+    if (btn) btn.addEventListener('click', loadSchoolsMini);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { bind(); loadSchoolsMini(); });
+  } else { bind(); loadSchoolsMini(); }
+  setInterval(loadSchoolsMini, 300000);   // 5 min
+})();
+
+// =====================================================================
 // CHAT-MINI WIDGET on Game HQ home — surfaces /posts/* live for everyone
 // who has a saved displayName. Anonymous Auth gives them a uid; the
 // shared identity layer auto-generates a name they can override in

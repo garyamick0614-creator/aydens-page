@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260428g">
+<link rel="stylesheet" href="styles.css?v=20260428h">
 <!-- Firebase config + shared identity layer. Loaded BEFORE script.js so any
      legacy email/password code can also read window.AYDEN_ID. Same uid + profile
      across index.html, kids.html, and playground.html. -->
@@ -20,7 +20,9 @@
 <script type="module" src="shared/firebase-identity.js?v=20260428d"></script>
 <!-- Chat monitor + JS error reporter — pipes Ayden's AI prompts + browser errors
      to home server, fires push to Gary on abuse-regex hit -->
-<script src="shared/chat-monitor.js?v=20260428d" defer></script>
+<script src="shared/chat-monitor.js?v=20260428h" defer></script>
+<!-- Floating chat widget — same UI on every page -->
+<script src="shared/chat-widget.js?v=20260428h" defer></script>
 </head>
 <body data-tab="home">
 
@@ -216,6 +218,16 @@
         <div class="widget-body" id="kids-news"><div class="skeleton"></div></div>
         <p class="inline-help">Real headlines. Bad words and scary stuff get auto-filtered.</p>
       </div>
+      <!-- School status — open / delay / closed at a glance -->
+      <div class="widget" id="widget-schools" style="border-color:rgba(57,166,178,.4)">
+        <div class="widget-head"><span class="section-tag">SCHOOL</span><h3>Today's School Status</h3><button class="refresh-mini" type="button" id="schools-mini-refresh" aria-label="Refresh school status">↻</button></div>
+        <div class="widget-body" id="schools-mini-body">
+          <div style="font:900 36px/1 'Russo One',sans-serif;letter-spacing:.04em;color:#39a6b2;text-align:center;margin:8px 0" id="schools-mini-status">⌛ CHECKING</div>
+          <div style="font-size:12px;color:#9aa3c4;text-align:center" id="schools-mini-detail">Scottsburg + Austin + Crothersville districts</div>
+        </div>
+        <p class="inline-help">Auto-checks district sites + WLKY/WHAS11/WAVE3 closings every 5 min. <a href="/hub.html#schools" target="_blank" style="color:#00f0ff">Full breakdown →</a></p>
+      </div>
+
       <!-- Friends Chat widget — surfaces /posts/* live so kids see it on home -->
       <div class="widget" id="widget-chat" style="border-color:rgba(255,43,214,.4)">
         <div class="widget-head"><span class="section-tag" style="background:rgba(255,43,214,.2);color:#ff2bd6;border-color:#ff2bd6">LIVE CHAT</span><h3>Friends Chat Room</h3><button class="refresh-mini" type="button" id="chat-jump" aria-label="Open full chat">→</button></div>
@@ -728,8 +740,8 @@
   <div class="foot-line" style="margin-top:6px;font-size:10.5px;letter-spacing:.2em;opacity:.7;">© 2026 TCG :: stay safe, game smart</div>
 </footer>
 
-<script src="background.js?v=20260428g" defer></script>
-<script src="firebase-config.js?v=20260428g" defer></script>
-<script src="script.js?v=20260428g" defer></script>
+<script src="background.js?v=20260428h" defer></script>
+<script src="firebase-config.js?v=20260428h" defer></script>
+<script src="script.js?v=20260428h" defer></script>
 </body>
 </html>
