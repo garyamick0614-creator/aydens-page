@@ -1,0 +1,31 @@
+# node / netlify
+node_modules/
+.netlify/
+.cache/
+.parcel-cache/
+
+# editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# build output (none expected for this static site)
+dist/
+build/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# claude internal
+.claude/settings.local.json

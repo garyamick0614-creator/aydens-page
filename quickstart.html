@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ayden's site — quickstart</title>
+<style>
+  :root { --bg:#0a0e14; --panel:#101622; --line:rgba(255,255,255,.08);
+          --text:#f0f6ff; --dim:#94a3b8; --pri:#22d3ee; --acc:#a855f7; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background: radial-gradient(ellipse at top, #1a1442 0%, var(--bg) 60%);
+         color: var(--text); font: 14px/1.55 system-ui, sans-serif; padding: 24px;
+         min-height: 100vh; }
+  .wrap { max-width: 720px; margin: 0 auto }
+  h1 { background: linear-gradient(90deg, var(--pri), var(--acc));
+       -webkit-background-clip: text; background-clip: text; color: transparent;
+       font-size: 28px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 8px }
+  .muted { color: var(--dim) }
+  .card { background: linear-gradient(180deg, rgba(20,26,62,.4), rgba(15,20,50,.6));
+          border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 16px 0 }
+  .card h2 { font-size: 14px; font-weight: 700; color: var(--pri); letter-spacing: .12em;
+             text-transform: uppercase; margin-bottom: 12px }
+  input, textarea, select {
+    width: 100%; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.16);
+    border-radius: 6px; color: var(--text); padding: 9px 11px; font: inherit; font-size: 13px;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--pri) }
+  button {
+    background: linear-gradient(135deg, var(--pri), var(--acc));
+    color: #050814; border: 0; padding: 9px 18px; border-radius: 6px;
+    font: inherit; font-weight: 700; cursor: pointer; font-size: 13px; margin-top: 8px;
+  }
+  button:disabled { opacity: .5; cursor: wait }
+  pre { background: rgba(0,0,0,.4); border: 1px solid var(--line); border-radius: 6px;
+        padding: 11px 13px; font: 12px/1.55 'JetBrains Mono', Consolas, monospace;
+        white-space: pre-wrap; word-wrap: break-word; max-height: 280px; overflow: auto;
+        margin-top: 10px; min-height: 40px; }
+  pre.ok { color: var(--text) }
+  pre.err { border-color: rgba(248,113,113,.4); color: #fca5a5 }
+  pre.muted { color: var(--dim) }
+  .hint { color: var(--dim); font-size: 11.5px; margin-top: 6px;
+          font-family: 'JetBrains Mono', Consolas, monospace }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ayden's site — quickstart</h1>
+  <p class="muted">Pre-wired to Gary's home server at <code>api.thatcomputerguy26.org</code>.
+    See <code>CONNECTION_POINTS.md</code> in this folder for the full API surface.</p>
+
+  <div class="card">
+    <h2>1. Try the AI chat</h2>
+    <input id="chatQ" placeholder="Ask anything (local Ollama, no cloud)…">
+    <button onclick="chat()">Send</button>
+    <pre id="chatOut" class="muted">Reply will appear here.</pre>
+  </div>
+
+  <div class="card">
+    <h2>2. Image analysis</h2>
+    <input type="file" id="visFile" accept="image/jpeg,image/png,image/webp">
+    <input id="visPrompt" value="Describe what is in this image." style="margin-top:8px">
+    <button onclick="vision()">Analyze</button>
+    <pre id="visOut" class="muted">Image analysis will appear here.</pre>
+  </div>
+
+  <div class="card">
+    <h2>3. Live data feed (Seymour, IN)</h2>
+    <button onclick="seymour()">Load Seymour sitrep</button>
+    <pre id="seyOut" class="muted">Sitrep will appear here.</pre>
+  </div>
+
+  <div class="card">
+    <h2>4. Stocks</h2>
+    <button onclick="stocks()">Load stock watchlist</button>
+    <pre id="stkOut" class="muted">Watchlist will appear here.</pre>
+  </div>
+</div>
+
+<script>
+const API = 'https://api.thatcomputerguy26.org';
+function el(id) { return document.getElementById(id); }
+function show(id, content, cls) {
+  const o = el(id);
+  o.textContent = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+  o.className = cls || 'ok';
+}
+
+async function chat() {
+  const q = el('chatQ').value.trim();
+  if (!q) { show('chatOut', 'Type a question first.', 'err'); return; }
+  show('chatOut', 'Thinking…', 'muted');
+  try {
+    const r = await fetch(API + '/api/public/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: q })
+    });
+    const d = await r.json();
+    show('chatOut', (d.reply || JSON.stringify(d, null, 2)), 'ok');
+  } catch (e) { show('chatOut', 'Error: ' + e.message, 'err'); }
+}
+
+async function vision() {
+  const f = el('visFile').files[0];
+  const p = el('visPrompt').value.trim();
+  if (!f) { show('visOut', 'Pick an image first.', 'err'); return; }
+  show('visOut', 'Analyzing…', 'muted');
+  try {
+    const fd = new FormData();
+    fd.append('file', f);
+    fd.append('prompt', p || 'Describe what is in this image.');
+    const r = await fetch(API + '/api/public/vision', { method: 'POST', body: fd });
+    const d = await r.json();
+    show('visOut', (d.analysis || JSON.stringify(d, null, 2)), 'ok');
+  } catch (e) { show('visOut', 'Error: ' + e.message, 'err'); }
+}
+
+async function seymour() {
+  show('seyOut', 'Loading…', 'muted');
+  try {
+    const r = await fetch(API + '/api/seymour/sitrep');
+    const d = await r.json();
+    show('seyOut', d, 'ok');
+  } catch (e) { show('seyOut', 'Error: ' + e.message, 'err'); }
+}
+
+async function stocks() {
+  show('stkOut', 'Loading…', 'muted');
+  try {
+    const r = await fetch(API + '/api/public/stocks/watchlist');
+    const d = await r.json();
+    const top5 = (d.items || []).slice(0, 5).map(i => ({
+      symbol: i.symbol, price: i.price, change_pct: i.change_pct, signal: (i.signal||{}).label
+    }));
+    show('stkOut', top5, 'ok');
+  } catch (e) { show('stkOut', 'Error: ' + e.message, 'err'); }
+}
+</script>
+</body>
+</html>

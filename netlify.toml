@@ -1,0 +1,15 @@
+[build]
+  publish = "."
+  command = ""
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Static-site, no build step. All assets are at the repo root.
+# _headers and _redirects (next to this file) handle security and routing.
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false

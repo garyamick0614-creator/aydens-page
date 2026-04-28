@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050310">
+<meta name="description" content="Ayden's Game HQ — gaming, tools, friends, and more.">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<title>AYDEN'S GAME HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-tab="home">
+
+<canvas id="bgcanvas" aria-hidden="true"></canvas>
+<div class="grid-overlay" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="logo">
+    <span class="logo-bracket">[</span>
+    <span class="logo-text" data-text="AYDEN'S GAME HQ">AYDEN'S GAME HQ</span>
+    <span class="logo-bracket">]</span>
+  </div>
+  <div class="status-strip">
+    <div class="status-item"><span class="dot"></span><span id="clock">--:--</span></div>
+    <div class="status-item"><span class="dot"></span><span id="weather-mini">loading…</span></div>
+    <div class="status-item"><span class="dot online"></span><span id="server-state">CHECKING…</span></div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Game hubs">
+  <button class="tab" role="tab" data-tab="home" aria-selected="true"><svg viewBox="0 0 24 24" class="tab-icon"><path d="M3 12 12 3l9 9v9h-6v-6h-6v6H3z"/></svg><span>HOME</span></button>
+  <button class="tab" role="tab" data-tab="xbox" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><circle cx="12" cy="12" r="9" fill="none" stroke-width="2"/><path d="M7 7c4 5 4 5 10 10M17 7c-4 5-4 5-10 10" stroke-width="2" fill="none"/></svg><span>XBOX</span></button>
+  <button class="tab" role="tab" data-tab="pc" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><rect x="3" y="4" width="18" height="13" rx="1" fill="none" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke-width="2"/></svg><span>PC POWER</span></button>
+  <button class="tab" role="tab" data-tab="minecraft" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z" fill="none" stroke-width="1.5"/></svg><span>MINECRAFT</span></button>
+  <button class="tab" role="tab" data-tab="rocket" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><path d="M12 2c4 3 6 7 6 12l-3 3-3-2-3 2-3-3c0-5 2-9 6-12z" fill="none" stroke-width="2"/><circle cx="12" cy="10" r="2" fill="none" stroke-width="2"/></svg><span>ROCKET LEAGUE</span></button>
+  <button class="tab" role="tab" data-tab="buddy" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><rect x="4" y="6" width="16" height="12" rx="2" fill="none" stroke-width="2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><path d="M12 6V3M9 3h6" stroke-width="2"/></svg><span>AI BUDDY</span></button>
+  <button class="tab" role="tab" data-tab="friends" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><circle cx="9" cy="9" r="3" fill="none" stroke-width="2"/><circle cx="17" cy="11" r="2.5" fill="none" stroke-width="2"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5M14 19c0-2 2-4 4-4s3 1 3 3" fill="none" stroke-width="2"/></svg><span>FRIENDS</span></button>
+  <button class="tab" role="tab" data-tab="panel" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><circle cx="12" cy="12" r="3" fill="none" stroke-width="2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke-width="2"/></svg><span>CONTROL</span></button>
+  <button class="tab" role="tab" data-tab="help" aria-selected="false"><svg viewBox="0 0 24 24" class="tab-icon"><circle cx="12" cy="12" r="9" fill="none" stroke-width="2"/><path d="M9 9c0-2 1.5-3 3-3s3 1 3 3c0 1.5-1 2-2 2.5s-1 1-1 2M12 17h.01" stroke-width="2" fill="none"/></svg><span>HELP</span></button>
+</nav>
+
+<main>
+
+  <!-- ============== HOME ============== -->
+  <section class="panel" data-panel="home" aria-hidden="false">
+    <div class="hero">
+      <h1 class="glitch" data-text="WELCOME, GAMER">WELCOME, GAMER</h1>
+      <p class="hero-sub">Your game HQ. Live news, weather, tools, and friends — all in one spot.</p>
+      <p class="inline-help">Click any tab up top to jump around. Each tab has its own neon vibe.</p>
+    </div>
+
+    <div class="widgets-row">
+      <div class="widget" id="widget-weather">
+        <div class="widget-head"><span class="section-tag">LIVE</span><h3>Local Weather</h3><button class="refresh-mini" data-action="refresh-weather" aria-label="Refresh weather">↻</button></div>
+        <div class="widget-body" id="weather-cities"><div class="skeleton"></div></div>
+        <p class="inline-help">Pulls live conditions for Scottsburg + nearby cities. Auto-refresh every 10 min.</p>
+      </div>
+      <div class="widget" id="widget-space">
+        <div class="widget-head"><span class="section-tag">LIVE</span><h3>Space Stats</h3><button class="refresh-mini" data-action="refresh-space" aria-label="Refresh space">↻</button></div>
+        <div class="widget-body" id="space-stats"><div class="skeleton"></div></div>
+        <p class="inline-help">Real earthquakes, asteroids, ISS pass info from Dad's home server.</p>
+      </div>
+      <div class="widget" id="widget-news">
+        <div class="widget-head"><span class="section-tag">LIVE</span><h3>Kids News</h3><button class="refresh-mini" data-action="refresh-news" aria-label="Refresh news">↻</button></div>
+        <div class="widget-body" id="kids-news"><div class="skeleton"></div></div>
+        <p class="inline-help">Real headlines. Bad words and scary stuff get auto-filtered.</p>
+      </div>
+      <div class="widget" id="widget-traffic">
+        <div class="widget-head"><span class="section-tag">LOCAL</span><h3>INDOT Traffic</h3><button class="refresh-mini" data-action="refresh-traffic" aria-label="Refresh traffic">↻</button></div>
+        <div class="widget-body" id="traffic-state"><div class="skeleton"></div></div>
+        <p class="inline-help">I-65 + US-31 incidents around Scottsburg. Activates when Dad's traffic proxy is live.</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <button class="hub-card" data-jump="xbox" style="--accent:#9bf00b"><div class="hub-num">01</div><h3>XBOX BOSS ZONE</h3><p>Top games, party tips, controller tricks.</p><div class="hub-go">ENTER →</div></button>
+      <button class="hub-card" data-jump="pc" style="--accent:#00f0ff"><div class="hub-num">02</div><h3>EXTREME PC POWER</h3><p>RGB rigs, FPS boosts, gaming gear.</p><div class="hub-go">ENTER →</div></button>
+      <button class="hub-card" data-jump="minecraft" style="--accent:#7CB342"><div class="hub-num">03</div><h3>MINECRAFT LAB</h3><p>Builds, mobs, palettes, redstone basics.</p><div class="hub-go">ENTER →</div></button>
+      <button class="hub-card" data-jump="rocket" style="--accent:#ff6b00"><div class="hub-num">04</div><h3>ROCKET ARENA</h3><p>Season 22 cars, ranks, flip resets.</p><div class="hub-go">ENTER →</div></button>
+      <button class="hub-card" data-jump="buddy" style="--accent:#ff00aa"><div class="hub-num">05</div><h3>AI BUDDY</h3><p>Ask anything. Powered by Dad's home server.</p><div class="hub-go">ENTER →</div></button>
+      <button class="hub-card" data-jump="friends" style="--accent:#00ffaa"><div class="hub-num">06</div><h3>FRIENDS CHAT</h3><p>Real-time blog with your crew.</p><div class="hub-go">ENTER →</div></button>
+      <button class="hub-card" data-jump="panel" style="--accent:#9d00ff"><div class="hub-num">07</div><h3>CONTROL PANEL</h3><p>25 kid tools, settings, reviews.</p><div class="hub-go">ENTER →</div></button>
+      <button class="hub-card" data-jump="help" style="--accent:#ffd000"><div class="hub-num">08</div><h3>HELP &amp; HOW-TO</h3><p>Step-by-step for every feature.</p><div class="hub-go">ENTER →</div></button>
+    </div>
+  </section>
+
+  <!-- ============== XBOX ============== -->
+  <section class="panel" data-panel="xbox" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch" data-text="XBOX BOSS ZONE">XBOX BOSS ZONE</h1>
+      <p class="hero-sub">Big games. Big wins. Easy mode for legends.</p>
+    </div>
+    <div class="section-head"><span class="section-tag">DAILY DROP</span><h2>What's Hot Today</h2><button class="refresh" data-ai-feed="xbox">REFRESH</button></div>
+    <div class="ai-feed" data-ai-feed-out="xbox"><div class="skeleton-line"></div><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
+    <p class="inline-help">Fresh tip generated by Dad's home AI. Press REFRESH for a new one.</p>
+
+    <div class="section-head"><span class="section-tag">TOP GAMES</span><h2>Boss-Tier Picks</h2></div>
+    <div class="card-grid">
+      <div class="game-card" style="--accent:#9bf00b"><div class="game-tag">SANDBOX</div><h3>Minecraft</h3><p>Build anything. Mine everything. Fight the dragon when you're ready.</p><div class="rating">RATED E10+</div></div>
+      <div class="game-card" style="--accent:#00d9ff"><div class="game-tag">ROCKET BALL</div><h3>Rocket League</h3><p>Cars + ball + rocket boost = pure chaos. Beat the ball into the goal.</p><div class="rating">RATED E</div></div>
+      <div class="game-card" style="--accent:#ff6b00"><div class="game-tag">RACING</div><h3>Forza Horizon 5</h3><p>Open-world racing across Mexico. Drift, drive, and unlock fast cars.</p><div class="rating">RATED E</div></div>
+      <div class="game-card" style="--accent:#9d00ff"><div class="game-tag">PARTY</div><h3>Roblox</h3><p>Millions of mini-games made by other kids. Hop in and out fast.</p><div class="rating">RATED E10+</div></div>
+      <div class="game-card" style="--accent:#ffd000"><div class="game-tag">ADVENTURE</div><h3>LEGO Star Wars</h3><p>Whole saga in LEGO. Smash bricks. Solve puzzles.</p><div class="rating">RATED E10+</div></div>
+      <div class="game-card" style="--accent:#39ff14"><div class="game-tag">BUILDER</div><h3>Fortnite LEGO</h3><p>Build a base. Survive. Co-op with friends. No sweaty pros.</p><div class="rating">RATED T</div></div>
+    </div>
+    <div class="section-head"><span class="section-tag">PRO TIPS</span><h2>Controller Tricks</h2></div>
+    <div class="tip-grid">
+      <div class="tip"><span class="tip-num">01</span><h4>Quick Resume</h4><p>Hold the Xbox button → switch games without losing progress.</p></div>
+      <div class="tip"><span class="tip-num">02</span><h4>Party Up Safe</h4><p>Only invite real friends. Block randoms. Mute trash talkers.</p></div>
+      <div class="tip"><span class="tip-num">03</span><h4>Game Pass</h4><p>One sub, hundreds of games. Try a new one every weekend.</p></div>
+      <div class="tip"><span class="tip-num">04</span><h4>Bumper Mash</h4><p>Most controller tricks live on LB+RB. Tap them in fights for combos.</p></div>
+    </div>
+  </section>
+
+  <!-- ============== PC POWER ============== -->
+  <section class="panel" data-panel="pc" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch" data-text="EXTREME PC POWER">EXTREME PC POWER</h1>
+      <p class="hero-sub">RGB everything. FPS for days. Be the boss of your battlestation.</p>
+    </div>
+    <div class="section-head"><span class="section-tag">DAILY DROP</span><h2>PC Tip Of The Day</h2><button class="refresh" data-ai-feed="pc">REFRESH</button></div>
+    <div class="ai-feed" data-ai-feed-out="pc"><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
+    <p class="inline-help">Fresh PC tip from Dad's home AI. Press REFRESH for another.</p>
+
+    <div class="section-head"><span class="section-tag">RIG SETUPS</span><h2>Build Your Battlestation</h2></div>
+    <div class="card-grid">
+      <div class="game-card" style="--accent:#00f0ff"><div class="game-tag">MOUSE</div><h3>Click-Snap Mouse</h3><p>Light + glowy. Look for ones under 80 grams. RGB optional but yes.</p><div class="rating">~$30-60</div></div>
+      <div class="game-card" style="--accent:#39ff14"><div class="game-tag">KEYBOARD</div><h3>Mech Keys</h3><p>Click-clack switches. Brown switches if mom hates noise.</p><div class="rating">~$50-100</div></div>
+      <div class="game-card" style="--accent:#ff00aa"><div class="game-tag">HEADSET</div><h3>Boom Headset</h3><p>Comfy ears. Boom mic. Hear footsteps before bad guys hear you.</p><div class="rating">~$40-80</div></div>
+      <div class="game-card" style="--accent:#ffd000"><div class="game-tag">CHAIR</div><h3>Throne Chair</h3><p>Legs up, back straight, win. Don't sit like a pretzel for 8 hours.</p><div class="rating">~$80-200</div></div>
+    </div>
+    <div class="section-head"><span class="section-tag">FPS BOOST</span><h2>Make Games Run Fast</h2></div>
+    <div class="tip-grid">
+      <div class="tip"><span class="tip-num">01</span><h4>Close Tabs</h4><p>Chrome with 47 tabs open = laggy game. Kill them before you queue.</p></div>
+      <div class="tip"><span class="tip-num">02</span><h4>Game Mode ON</h4><p>Windows Settings → Game Mode → ON. Frees up CPU for the game.</p></div>
+      <div class="tip"><span class="tip-num">03</span><h4>Lower Settings</h4><p>Drop graphics from Ultra to High. You won't see the difference.</p></div>
+      <div class="tip"><span class="tip-num">04</span><h4>Clean the Vents</h4><p>Hot PC = slow PC. Compressed air, once a month, gentle blasts.</p></div>
+    </div>
+  </section>
+
+  <!-- ============== MINECRAFT ============== -->
+  <section class="panel" data-panel="minecraft" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch pixel" data-text="MINECRAFT LAB">MINECRAFT LAB</h1>
+      <p class="hero-sub">Mine. Build. Explore. Don't dig straight down.</p>
+    </div>
+    <div class="section-head"><span class="section-tag">DAILY DROP</span><h2>Block Tip</h2><button class="refresh" data-ai-feed="minecraft">REFRESH</button></div>
+    <div class="ai-feed" data-ai-feed-out="minecraft"><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
+    <p class="inline-help">Build idea or survival tip from Dad's home AI. Refresh anytime.</p>
+
+    <div class="section-head"><span class="section-tag">PALETTE PICKER</span><h2>Build Color Combos</h2></div>
+    <div class="palette-grid">
+      <div class="palette" style="--c1:#7CB342;--c2:#A67C52;--c3:#4CAF50"><div class="swatches"><span></span><span></span><span></span></div><h4>FOREST CABIN</h4><p>Grass, oak logs, leaves.</p></div>
+      <div class="palette" style="--c1:#F4A460;--c2:#228B22;--c3:#FFD700"><div class="swatches"><span></span><span></span><span></span></div><h4>DESERT TEMPLE</h4><p>Sand, cactus, gold.</p></div>
+      <div class="palette" style="--c1:#FFFFFF;--c2:#A9A9A9;--c3:#A67C52"><div class="swatches"><span></span><span></span><span></span></div><h4>VILLAGE HOUSE</h4><p>Wool, cobble, oak.</p></div>
+      <div class="palette" style="--c1:#0288D1;--c2:#00FFFF;--c3:#1A237E"><div class="swatches"><span></span><span></span><span></span></div><h4>OCEAN BASE</h4><p>Prismarine + sea lanterns.</p></div>
+      <div class="palette" style="--c1:#37474F;--c2:#212121;--c3:#FFC107"><div class="swatches"><span></span><span></span><span></span></div><h4>NETHER FORTRESS</h4><p>Blackstone, basalt, gold.</p></div>
+      <div class="palette" style="--c1:#E1BEE7;--c2:#7B1FA2;--c3:#F8BBD0"><div class="swatches"><span></span><span></span><span></span></div><h4>END CITY</h4><p>Purpur, end stone, magenta.</p></div>
+    </div>
+    <p class="inline-help">Tap any palette to copy the hex codes for your next build.</p>
+    <div class="section-head"><span class="section-tag">SURVIVAL TIPS</span><h2>First Day Game Plan</h2></div>
+    <div class="tip-grid">
+      <div class="tip"><span class="tip-num">01</span><h4>Punch a Tree</h4><p>Wood first. 4 logs → 1 crafting table → tools.</p></div>
+      <div class="tip"><span class="tip-num">02</span><h4>Make a Bed</h4><p>3 wool + 3 planks. Sleep = skip night = no zombies.</p></div>
+      <div class="tip"><span class="tip-num">03</span><h4>Don't Dig Down</h4><p>Lava lake = instant death. Stair-dig instead.</p></div>
+      <div class="tip"><span class="tip-num">04</span><h4>Light It Up</h4><p>Torches everywhere. Mobs don't spawn in light.</p></div>
+    </div>
+  </section>
+
+  <!-- ============== ROCKET ============== -->
+  <section class="panel" data-panel="rocket" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch" data-text="ROCKET ARENA">ROCKET ARENA</h1>
+      <p class="hero-sub">Cars with rockets. Ball with attitude. Score and scream.</p>
+    </div>
+    <div class="section-head"><span class="section-tag">DAILY DROP</span><h2>Rocket Tip</h2><button class="refresh" data-ai-feed="rocket">REFRESH</button></div>
+    <div class="ai-feed" data-ai-feed-out="rocket"><div class="skeleton-line"></div><div class="skeleton-line"></div></div>
+    <p class="inline-help">Fresh RL strategy from Dad's home AI. Refresh anytime.</p>
+
+    <div class="section-head"><span class="section-tag">RANK UP</span><h2>Win More Games</h2></div>
+    <div class="tip-grid">
+      <div class="tip"><span class="tip-num">01</span><h4>First Touch Wins</h4><p>Don't ball-chase. Hit it once with control.</p></div>
+      <div class="tip"><span class="tip-num">02</span><h4>Boost Pads</h4><p>Grab small pads on the way up. Save big 100s for huge plays.</p></div>
+      <div class="tip"><span class="tip-num">03</span><h4>Rotate</h4><p>After your shot, drive back. Goalie spot covered = no easy goals.</p></div>
+      <div class="tip"><span class="tip-num">04</span><h4>Quick Chat</h4><p>"Nice shot!" + "What a save!" = good vibes. Toxic = mute fast.</p></div>
+    </div>
+    <div class="section-head"><span class="section-tag">CAR PICKS</span><h2>Best Hitboxes for Beginners</h2></div>
+    <div class="card-grid">
+      <div class="game-card" style="--accent:#ff6b00"><div class="game-tag">DOMINUS</div><h3>BMW M2 (S22)</h3><p>Long + flat. Chef's kiss for kicking the ball forward.</p><div class="rating">NEW S22 PASS</div></div>
+      <div class="game-card" style="--accent:#00d9ff"><div class="game-tag">OCTANE</div><h3>Octane</h3><p>Starter king. Balanced. Forgiving.</p><div class="rating">FREE</div></div>
+      <div class="game-card" style="--accent:#39ff14"><div class="game-tag">BATMOBILE</div><h3>Batmobile</h3><p>Long like Dominus but cooler. Earned in DC events.</p><div class="rating">EVENT DROP</div></div>
+      <div class="game-card" style="--accent:#9d00ff"><div class="game-tag">FENNEC</div><h3>Fennec</h3><p>Octane hitbox + boxy look. Pro favorite.</p><div class="rating">TRADE-IN</div></div>
+    </div>
+  </section>
+
+  <!-- ============== AI BUDDY ============== -->
+  <section class="panel" data-panel="buddy" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch" data-text="AI BUDDY">AI BUDDY</h1>
+      <p class="hero-sub">Ask anything. Runs on Dad's home server. No cloud. No spying.</p>
+    </div>
+    <div class="buddy-shell">
+      <div class="buddy-feed" id="buddy-feed">
+        <div class="buddy-msg buddy-msg-bot"><div class="buddy-avatar">AI</div><div class="buddy-bubble">Hey Ayden! I'm your gaming buddy. Ask me about Minecraft builds, Rocket League moves, Xbox tips, or anything you want to know.</div></div>
+      </div>
+      <div class="buddy-input">
+        <input id="buddy-q" type="text" placeholder="Ask anything…" autocomplete="off" maxlength="500">
+        <button id="buddy-send">SEND</button>
+      </div>
+      <div class="buddy-quick">
+        <button class="quick-q">How do I beat the Ender Dragon?</button>
+        <button class="quick-q">Best Rocket League car for beginners?</button>
+        <button class="quick-q">What is a flip reset?</button>
+        <button class="quick-q">Tell me a video game joke</button>
+      </div>
+      <p class="inline-help">Type a question and press SEND. Replies are filtered for kid-safe wording before showing.</p>
+      <div class="buddy-note" id="buddy-note"></div>
+    </div>
+  </section>
+
+  <!-- ============== FRIENDS ============== -->
+  <section class="panel" data-panel="friends" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch" data-text="FRIENDS CHAT">FRIENDS CHAT</h1>
+      <p class="hero-sub">Real-time blog with your crew. Posts show up live.</p>
+    </div>
+
+    <div class="friends-gate" id="friends-gate">
+      <div class="gate-card">
+        <h3 id="friends-gate-title">Sign in to chat</h3>
+        <p class="inline-help" id="friends-gate-help">Enter your username and password. New here? Tap Create Account. Ayden controls who can post.</p>
+        <input id="friend-user" type="text" placeholder="Username" maxlength="20" autocomplete="username">
+        <input id="friend-pass" type="password" placeholder="Password" maxlength="64" autocomplete="current-password">
+        <div class="gate-buttons">
+          <button id="friend-login-btn">SIGN IN</button>
+          <button id="friend-register-btn" class="btn-alt">CREATE ACCOUNT</button>
+        </div>
+        <div class="gate-msg" id="friend-gate-msg"></div>
+        <div class="gate-status" id="friend-gate-status"></div>
+      </div>
+    </div>
+
+    <div class="friends-shell hidden" id="friends-shell">
+      <div class="friends-bar">
+        <div class="friends-who"><span class="dot online"></span><span id="friend-current-user">—</span></div>
+        <div class="friends-actions">
+          <span class="online-count" id="online-count">0 online</span>
+          <button id="friend-logout-btn" class="btn-alt small">SIGN OUT</button>
+        </div>
+      </div>
+      <div class="friends-feed" id="friends-feed"></div>
+      <div class="friends-input">
+        <input id="friend-msg" type="text" placeholder="Say something nice…" maxlength="500" autocomplete="off">
+        <button id="friend-send">POST</button>
+      </div>
+      <p class="inline-help">Posts are public to everyone signed in. Be cool. Bad words get blocked.</p>
+    </div>
+  </section>
+
+  <!-- ============== CONTROL PANEL ============== -->
+  <section class="panel" data-panel="panel" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch" data-text="CONTROL PANEL">CONTROL PANEL</h1>
+      <p class="hero-sub">Ayden's command center — tools, settings, reviews, diagnostics.</p>
+    </div>
+
+    <div class="admin-gate" id="admin-gate">
+      <div class="gate-card">
+        <h3>Admin sign-in required</h3>
+        <p class="inline-help">Default password is <code>password123</code>. Change it under Account once you're in.</p>
+        <input id="admin-pass" type="password" placeholder="Password" autocomplete="current-password">
+        <button id="admin-login">UNLOCK</button>
+        <div class="gate-msg" id="admin-gate-msg"></div>
+      </div>
+    </div>
+
+    <div class="admin-shell hidden" id="admin-shell">
+      <aside class="admin-nav" role="tablist">
+        <button class="admin-link active" data-section="account">Account</button>
+        <button class="admin-link" data-section="tools">25 Tools</button>
+        <button class="admin-link" data-section="reviews">Reviews</button>
+        <button class="admin-link" data-section="users">Users &amp; Block</button>
+        <button class="admin-link" data-section="settings">Settings</button>
+        <button class="admin-link" data-section="diagnostics">Diagnostics</button>
+        <button class="admin-link" data-section="serverchat">Server Chat</button>
+        <button class="admin-link" data-section="sync">Sync &amp; Backup</button>
+      </aside>
+
+      <div class="admin-main">
+
+        <div class="admin-section active" data-section="account">
+          <h2>Account</h2>
+          <p class="inline-help">Your password protects this Control Panel. Change it from <code>password123</code> the first day.</p>
+          <div class="form-row">
+            <label>Old password</label>
+            <input type="password" id="acc-old" autocomplete="current-password">
+          </div>
+          <div class="form-row">
+            <label>New password (8+ chars)</label>
+            <input type="password" id="acc-new" autocomplete="new-password">
+          </div>
+          <div class="form-row">
+            <label>Confirm new password</label>
+            <input type="password" id="acc-new2" autocomplete="new-password">
+          </div>
+          <button id="acc-save">UPDATE PASSWORD</button>
+          <div class="form-msg" id="acc-msg"></div>
+          <hr>
+          <button id="acc-logout" class="btn-alt">SIGN OUT OF CONTROL PANEL</button>
+        </div>
+
+        <div class="admin-section" data-section="tools">
+          <h2>25 Kid Tools</h2>
+          <p class="inline-help">Tap any card to open the tool. Everything saves in your browser. Click <strong>Sync</strong> in the sidebar to back up to Dad's server.</p>
+          <div class="tool-grid" id="tool-grid"></div>
+        </div>
+
+        <div class="admin-section" data-section="reviews">
+          <h2>My Game Reviews</h2>
+          <p class="inline-help">Rate the games you play. Stars 1-5. Add a one-line note. Edit or delete anytime.</p>
+          <div class="form-row">
+            <label>Game name</label>
+            <input type="text" id="rev-game" maxlength="60">
+          </div>
+          <div class="form-row">
+            <label>Stars (1-5)</label>
+            <input type="number" id="rev-stars" min="1" max="5" value="5">
+          </div>
+          <div class="form-row">
+            <label>What you think</label>
+            <textarea id="rev-note" maxlength="300" rows="2"></textarea>
+          </div>
+          <button id="rev-add">ADD REVIEW</button>
+          <div class="review-list" id="review-list"></div>
+        </div>
+
+        <div class="admin-section" data-section="users">
+          <h2>Users &amp; Block List</h2>
+          <p class="inline-help">Friends sign up themselves on the Friends tab. You can promote, demote, or block anyone here. Blocked users can't post.</p>
+          <div class="user-toolbar">
+            <input type="text" id="user-search" placeholder="Search users…">
+            <button id="user-refresh">REFRESH LIST</button>
+          </div>
+          <div class="user-list" id="user-list"></div>
+          <div class="form-msg" id="user-msg"></div>
+        </div>
+
+        <div class="admin-section" data-section="settings">
+          <h2>Settings</h2>
+          <p class="inline-help">Change how the page looks and how often it updates.</p>
+          <div class="form-row inline">
+            <label>Animated background</label>
+            <input type="checkbox" id="set-bg" checked>
+          </div>
+          <div class="form-row inline">
+            <label>Scanlines effect</label>
+            <input type="checkbox" id="set-scan" checked>
+          </div>
+          <div class="form-row inline">
+            <label>Auto-refresh feeds (minutes)</label>
+            <select id="set-refresh"><option value="5">5</option><option value="10" selected>10</option><option value="30">30</option><option value="60">60</option></select>
+          </div>
+          <div class="form-row inline">
+            <label>Kid-safe filter strictness</label>
+            <select id="set-strict"><option value="strict" selected>Strict</option><option value="medium">Medium</option><option value="loose">Loose</option></select>
+          </div>
+          <button id="set-save">SAVE SETTINGS</button>
+          <div class="form-msg" id="set-msg"></div>
+        </div>
+
+        <div class="admin-section" data-section="diagnostics">
+          <h2>Diagnostics</h2>
+          <p class="inline-help">Real tests of your computer and internet. Run these if a game feels slow.</p>
+
+          <div class="diag-block">
+            <h3>Test My PC</h3>
+            <p class="inline-help">Pulls real specs from your browser and runs a quick CPU + GPU benchmark. Takes about 5 seconds.</p>
+            <button id="run-pc-test">RUN PC TEST</button>
+            <div class="diag-out" id="pc-test-out"></div>
+          </div>
+
+          <div class="diag-block">
+            <h3>Test My Internet</h3>
+            <p class="inline-help">Pings Dad's server, then measures real download speed using a known-size payload. Takes 8-15 seconds.</p>
+            <button id="run-net-test">RUN INTERNET TEST</button>
+            <div class="diag-out" id="net-test-out"></div>
+          </div>
+
+          <div class="diag-block">
+            <h3>Server Health</h3>
+            <p class="inline-help">Checks Dad's home server is reachable and which AI models are loaded.</p>
+            <button id="run-srv-test">CHECK SERVER</button>
+            <div class="diag-out" id="srv-test-out"></div>
+          </div>
+        </div>
+
+        <div class="admin-section" data-section="serverchat">
+          <h2>Direct Server Chat</h2>
+          <p class="inline-help">Talk straight to Dad's home AI. All replies pass through a kid-safe filter on the way back.</p>
+          <div class="srv-chat" id="srv-chat"></div>
+          <div class="form-row">
+            <textarea id="srv-q" rows="2" placeholder="Write a message to the home server…"></textarea>
+          </div>
+          <button id="srv-send">SEND TO SERVER</button>
+          <div class="form-msg" id="srv-msg"></div>
+        </div>
+
+        <div class="admin-section" data-section="sync">
+          <h2>Sync &amp; Backup</h2>
+          <p class="inline-help">Save all your tool data as a file (so it's safe). Or restore from a backup file. Cloud sync activates when Dad wires the sync endpoint.</p>
+          <button id="sync-export">EXPORT BACKUP FILE</button>
+          <button id="sync-import" class="btn-alt">IMPORT BACKUP FILE</button>
+          <input type="file" id="sync-import-file" accept="application/json" hidden>
+          <button id="sync-cloud" class="btn-alt">PUSH TO HOME SERVER</button>
+          <button id="sync-pull" class="btn-alt">PULL FROM HOME SERVER</button>
+          <div class="form-msg" id="sync-msg"></div>
+          <hr>
+          <h3>Storage in this browser</h3>
+          <div class="diag-out" id="storage-info"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== HELP ============== -->
+  <section class="panel" data-panel="help" aria-hidden="true">
+    <div class="hero">
+      <h1 class="glitch" data-text="HELP &amp; HOW-TO">HELP &amp; HOW-TO</h1>
+      <p class="hero-sub">Step-by-step for every feature. Tap a section to open it.</p>
+    </div>
+    <div class="help-list">
+      <details class="help-item" open><summary>Getting started</summary>
+        <p>Click the tabs at the top to move around. Each tab has its own neon color. Press the big colored cards on the home page to jump straight to a hub.</p>
+        <p>Your stuff (reviews, tools, settings) saves automatically in this browser. To copy your stuff to another device, go to <strong>Control → Sync &amp; Backup</strong> and Export.</p>
+      </details>
+      <details class="help-item"><summary>Home page widgets</summary>
+        <p><strong>Local Weather</strong> shows live conditions for Scottsburg + Seymour + Austin + Salem + Madison + North Vernon. Tap the ↻ button to refresh. Refreshes on its own every 10 minutes.</p>
+        <p><strong>Space Stats</strong> pulls real earthquakes and global signals from Dad's home server.</p>
+        <p><strong>Kids News</strong> grabs live headlines and runs them through a kid-safe filter. Bad words and scary topics get hidden.</p>
+        <p><strong>INDOT Traffic</strong> turns on once Dad adds the traffic proxy on his server.</p>
+      </details>
+      <details class="help-item"><summary>Game tabs (Xbox / PC / Minecraft / Rocket League)</summary>
+        <p>Each tab has a <strong>Daily Drop</strong> — a fresh tip generated by Dad's home AI. Press <strong>REFRESH</strong> for a new one.</p>
+        <p>Below that, real game cards, tip cards, and palettes. Click any palette in Minecraft to copy the hex codes.</p>
+      </details>
+      <details class="help-item"><summary>AI Buddy</summary>
+        <p>Type any question and press SEND. Or tap one of the quick-question buttons. The AI runs on Dad's home server (no cloud). All replies pass through a kid-safe filter before you see them.</p>
+        <p>If the buddy doesn't answer, check that you're online. First answer of the day takes a few extra seconds (the AI wakes up).</p>
+      </details>
+      <details class="help-item"><summary>Friends Chat</summary>
+        <p>Real-time chat with your crew. First time: tap <strong>Create Account</strong>, pick a username, pick a password. After that, just sign in.</p>
+        <p>Posts show up for everyone who's signed in. Bad words get blocked before posting. You can leave at any time with <strong>Sign Out</strong>.</p>
+        <p>Ayden is the boss of this chat — he can mute, block, edit, or delete users from <strong>Control → Users &amp; Block</strong>.</p>
+      </details>
+      <details class="help-item"><summary>Control Panel password</summary>
+        <p>Default password: <code>password123</code>. Change it the first time you sign in.</p>
+        <p>Inside Control: Account, 25 Tools, Reviews, Users, Settings, Diagnostics, Server Chat, Sync.</p>
+      </details>
+      <details class="help-item"><summary>The 25 Tools</summary>
+        <p>Game Tracker · Achievement Log · High Scores · Wishlist · Cheat Locker · Build Journal · Allowance · Savings Goal · Chore Tracker · Task List · Reminders · Bedtime Timer · Game Time Logger · Homework · Calendar · Notes · Vocabulary · Friend Codes · Mood Log · Random Game Picker · Music Playlist · Watchlist · Birthday Reminder · Quote Wall · Stats Dashboard.</p>
+        <p>Each tool has its own how-to inside it. Tap a tool card to open it.</p>
+      </details>
+      <details class="help-item"><summary>Diagnostics — Test My PC</summary>
+        <p>Reads real specs from your browser (CPU cores, memory, GPU, screen, battery). Then runs a 5-second math + WebGL benchmark to score how fast your PC is.</p>
+        <p>Numbers shown are real measurements, not guesses.</p>
+      </details>
+      <details class="help-item"><summary>Diagnostics — Test My Internet</summary>
+        <p>Pings Dad's server (5 times, gives average latency). Then downloads a known-size payload and measures real bytes-per-second to calculate Mbps.</p>
+        <p>If speed is under 10 Mbps, Wi-Fi is probably weak. Move closer to the router or try a wired cable.</p>
+      </details>
+      <details class="help-item"><summary>Sync &amp; Backup</summary>
+        <p><strong>Export Backup File</strong> downloads everything (tools, reviews, settings) as one JSON file. Save it somewhere safe.</p>
+        <p><strong>Import Backup File</strong> restores from a file you exported.</p>
+        <p><strong>Push / Pull to Home Server</strong> activates when Dad adds the sync endpoint on his server.</p>
+      </details>
+      <details class="help-item"><summary>Safety</summary>
+        <p>Everything Ayden types is checked client-side for kid-safe wording before posting. Server replies are checked again before showing. Dad's server has its own defensive agents that audit-log every request.</p>
+        <p>If anything ever feels wrong, tell a parent right away. Don't share your password with anyone.</p>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<!-- modal layer for tool dialogs -->
+<div class="modal hidden" id="modal" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-head"><h2 id="modal-title">Tool</h2><button id="modal-close" aria-label="Close">×</button></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="foot-line">Built for AYDEN <span class="foot-sep">::</span> created by <strong>Gary Amick</strong> at <strong>TCG</strong> <span class="foot-sep">::</span> powered by the TCG home server</div>
+  <div class="foot-line" style="margin-top:6px;font-size:10.5px;letter-spacing:.2em;opacity:.7;">© 2026 TCG :: stay safe, game smart</div>
+</footer>
+
+<script src="background.js" defer></script>
+<script src="firebase-config.js" defer></script>
+<script src="script.js" defer></script>
+</body>
+</html>
