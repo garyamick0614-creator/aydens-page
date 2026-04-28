@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260428b">
+<link rel="stylesheet" href="styles.css?v=20260428e">
 <!-- Firebase config + shared identity layer. Loaded BEFORE script.js so any
      legacy email/password code can also read window.AYDEN_ID. Same uid + profile
      across index.html, kids.html, and playground.html. -->
@@ -126,6 +126,7 @@
     <a class="sb-link" href="/playground.html" target="_blank"><span class="sb-em">🌐</span> Multiplayer Playground</a>
 
     <div class="sb-cat">🛠 Tools</div>
+    <a class="sb-link" href="/hub.html#study"  target="_blank"><span class="sb-em">📚</span> Study Partner — homework + research</a>
     <a class="sb-link" href="/hub.html#tools"  target="_blank"><span class="sb-em">🧮</span> Calculator + Drawing + Timer</a>
     <a class="sb-link" href="/hub.html#sound"  target="_blank"><span class="sb-em">🔊</span> Soundboard + Piano</a>
     <a class="sb-link" href="/hub.html#beats"  target="_blank"><span class="sb-em">🎵</span> Beat Maker</a>
@@ -152,6 +153,17 @@
   <footer>● Synced via Firebase ● Same XP across all pages</footer>
 </aside>
 
+<style>
+  /* Center status strip per Gary's request — clock + weather + server state in middle */
+  .masthead { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 16px; }
+  .masthead .logo { width: 100%; text-align: center; }
+  .masthead .status-strip { justify-content: center; }
+  @media (min-width: 720px) {
+    .masthead { flex-direction: row; justify-content: space-between; }
+    .masthead .logo { width: auto; text-align: left; }
+    .masthead .status-strip { justify-content: center; flex: 1; max-width: 60%; }
+  }
+</style>
 <header class="masthead">
   <div class="logo">
     <span class="logo-bracket">[</span>
@@ -635,8 +647,8 @@
   <div class="foot-line" style="margin-top:6px;font-size:10.5px;letter-spacing:.2em;opacity:.7;">© 2026 TCG :: stay safe, game smart</div>
 </footer>
 
-<script src="background.js?v=20260428b" defer></script>
-<script src="firebase-config.js?v=20260428b" defer></script>
-<script src="script.js?v=20260428b" defer></script>
+<script src="background.js?v=20260428e" defer></script>
+<script src="firebase-config.js?v=20260428e" defer></script>
+<script src="script.js?v=20260428e" defer></script>
 </body>
 </html>

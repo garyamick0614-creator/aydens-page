@@ -393,6 +393,7 @@
   <button class="tab" data-pane="cod">🎯 COD loadouts</button>
   <button class="tab" data-pane="fnpro">🪂 Fortnite Pro</button>
   <button class="tab" data-pane="pcmastery">⚙ PC Mastery</button>
+  <button class="tab" data-pane="study">📚 Study Partner</button>
   <button class="tab" data-pane="gamehq">🏠 Game HQ</button>
   <a class="tab" href="/playground.html" style="text-decoration:none">🌌 Multiplayer →</a>
 </nav>
@@ -1588,6 +1589,70 @@
   </div>
 </section>
 
+<!-- ============================== STUDY PARTNER ============================== -->
+<section class="pane" id="pane-study">
+  <h2><span class="em">📚</span> Study Partner — homework, research, real reports</h2>
+  <p class="muted" style="margin-bottom:14px">Powered by Gary's home server. Every chat is logged + auto-flagged for safety. Pick a mode below, type your question, get a detailed answer with sources you can follow up on.</p>
+
+  <div class="grid grid-2" style="margin-bottom:14px">
+    <div class="card tool" style="border-color:rgba(34,211,238,.5)">
+      <h3 style="margin:0 0 10px;color:var(--neon-cyan)">📝 Quick Answer</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">For a single homework question. Fast, focused.</p>
+      <button class="btn" onclick="studyMode('quick')">USE QUICK</button>
+    </div>
+    <div class="card tool" style="border-color:rgba(168,85,247,.5)">
+      <h3 style="margin:0 0 10px;color:var(--neon-purple)">📑 Detailed Report</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">Multi-paragraph answer with sources, structured sections, key takeaways.</p>
+      <button class="btn" onclick="studyMode('report')">USE REPORT</button>
+    </div>
+    <div class="card tool" style="border-color:rgba(57,255,20,.5)">
+      <h3 style="margin:0 0 10px;color:var(--neon-green)">🔬 Research Mode</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">Deep-dive on a topic. AI gives a multi-perspective synthesis with citations + 5 follow-up questions.</p>
+      <button class="btn green" onclick="studyMode('research')">USE RESEARCH</button>
+    </div>
+    <div class="card tool" style="border-color:rgba(255,208,0,.5)">
+      <h3 style="margin:0 0 10px;color:var(--neon-yellow)">💡 Explain Like I'm 14</h3>
+      <p class="muted" style="font-size:12px;margin-bottom:8px">Tough concept made simple. Examples + analogies a 14-year-old can use.</p>
+      <button class="btn gold" onclick="studyMode('eli14')">USE EXPLAIN</button>
+    </div>
+  </div>
+
+  <div class="card tool" style="border-color:var(--accent)">
+    <div class="row" style="margin-bottom:8px">
+      <strong style="color:var(--accent);font-family:var(--font-display);letter-spacing:.12em">MODE:</strong>
+      <span id="studyModeLbl" style="font-family:var(--font-display);color:var(--neon-cyan);letter-spacing:.1em">QUICK ANSWER</span>
+      <span style="flex:1"></span>
+      <select id="studyTopic" class="input" style="font-size:12px">
+        <option value="">subject (optional)</option>
+        <option>Math</option><option>Science</option><option>Biology</option><option>Chemistry</option><option>Physics</option>
+        <option>History</option><option>English</option><option>Writing</option><option>Geography</option>
+        <option>Computer Science</option><option>Art</option><option>Music</option><option>Social Studies</option>
+      </select>
+    </div>
+    <textarea id="studyPrompt" rows="4" placeholder="Type your homework question, research topic, or what you need explained…"
+      style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--accent);border-radius:6px;color:var(--text);padding:12px;font:600 14px var(--font-body);resize:vertical"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn green" onclick="studyAsk()" id="studyAskBtn">▶ ASK STUDY PARTNER</button>
+      <button class="btn red" onclick="studyClear()">🗑 Clear chat</button>
+      <span id="studyStatus" class="muted" style="font-size:12px;flex:1;text-align:right"></span>
+    </div>
+  </div>
+
+  <div id="studyChatLog" style="margin-top:14px"></div>
+
+  <div class="card tool" style="margin-top:14px;border-color:rgba(255,43,214,.4)">
+    <h3 style="margin:0 0 10px;color:var(--neon-pink)">📖 Study tips for getting great answers</h3>
+    <ul style="font-size:13px;line-height:1.7;padding-left:20px;color:var(--dim)">
+      <li><strong>Be specific.</strong> "Explain photosynthesis with a diagram of a leaf" beats "tell me about plants."</li>
+      <li><strong>Show your work.</strong> "I got 17 for question 4 — is that right?" lets the AI verify your math.</li>
+      <li><strong>Ask for examples.</strong> Add "with 3 examples" or "with a kid-friendly analogy" to any question.</li>
+      <li><strong>Follow up.</strong> The AI remembers the last few exchanges in this chat — you can say "explain that part more."</li>
+      <li><strong>Sources.</strong> In Research mode, ask "what's your source?" — it'll list textbooks/sites you can verify.</li>
+      <li><strong>Don't copy-paste.</strong> Read the answer, then write your homework in your OWN words. Teachers can tell.</li>
+    </ul>
+  </div>
+</section>
+
 <!-- ============================== GAME HQ (full embed of original index) ============================== -->
 <section class="pane" id="pane-gamehq" style="padding:0;margin:-14px;height:calc(100vh - 80px);min-height:600px">
   <iframe src="/gamehq.html" id="gamehqFrame" style="width:100%;height:100%;border:0;border-radius:0;background:transparent" title="Game HQ — original 9-tab Xbox / PC / Minecraft / Rocket League / AI Buddy / Friends / Control / Help"></iframe>
@@ -1653,7 +1718,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T07:45Z-v20-canvas-forced-gaming-absolute-first';
+window.__KIDS_BUILD = '2026-04-28T08:30Z-v22-study-partner-tab';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
@@ -2464,6 +2529,90 @@ window.__KIDS_BUILD = '2026-04-28T07:45Z-v20-canvas-forced-gaming-absolute-first
       <img src="${esc(url + (url.includes('?') ? '&' : '?') + 'mt=' + Date.now())}" style="width:100%;max-height:60vh;object-fit:contain;background:#000;border-radius:10px" alt="${esc(name)}">
       <p style="margin-top:10px;color:var(--dim);font-size:12px">Refresh interval: 30s · Source: content.trafficwise.org</p>`);
   });
+
+  // ===== STUDY PARTNER (homework / research / detailed reports) =====
+  const STUDY_API = 'https://api.thatcomputerguy26.org/api/public/chat';
+  let studyHistory = [];      // [{role:'user'|'assistant', content:str}]
+  let studyCurMode = 'quick';
+  const STUDY_PROMPTS = {
+    quick:    'You are a friendly homework helper for a 14-year-old gamer. Give a SHORT, focused answer. Use plain language. If math, show work step-by-step.',
+    report:   'You are a study partner producing a detailed structured report for a 14-year-old. Use these sections: ## Overview · ## Key Points · ## Examples · ## Sources (cite real textbooks/websites where possible) · ## Quick Quiz (3 short questions to test understanding). Plain markdown, no emoji clutter.',
+    research: 'You are a research assistant. Give a multi-perspective analysis of the topic. Structure: ## What it is · ## How it works · ## Different viewpoints (at least 2) · ## Sources (3-5 real sources I can google) · ## 5 follow-up questions. Audience is a curious teen who has internet access. Cite real, verifiable references.',
+    eli14:    'Explain this concept the way you would to a 14-year-old who plays Fortnite and Minecraft. Use a gaming or pop-culture analogy if it helps. Plain English. No condescension. End with one sentence: "In one line:" + a one-line summary.',
+  };
+  window.studyMode = (m) => {
+    studyCurMode = m;
+    const labels = { quick:'QUICK ANSWER', report:'DETAILED REPORT', research:'RESEARCH MODE', eli14:'EXPLAIN LIKE I\'M 14' };
+    const lbl = $('studyModeLbl'); if (lbl) lbl.textContent = labels[m];
+  };
+  window.studyClear = () => {
+    studyHistory = [];
+    const log = $('studyChatLog'); if (log) log.innerHTML = '';
+    const stat = $('studyStatus'); if (stat) stat.textContent = 'Cleared.';
+  };
+  function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function mdToHtml(s) {
+    return escapeHtml(s)
+      .replace(/^### (.+)$/gm,'<h4 style="color:var(--neon-yellow);margin:14px 0 6px;font-family:var(--font-display);letter-spacing:.1em;text-transform:uppercase;font-size:13px">$1</h4>')
+      .replace(/^## (.+)$/gm,'<h3 style="color:var(--neon-cyan);margin:18px 0 8px;font-family:var(--font-display);letter-spacing:.12em;text-transform:uppercase;font-size:14px">$1</h3>')
+      .replace(/^# (.+)$/gm,'<h2 style="color:var(--neon-purple);margin:20px 0 10px">$1</h2>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/`([^`]+)`/g,'<code style="background:rgba(0,240,255,.12);color:var(--neon-cyan);padding:2px 6px;border-radius:3px;font-family:JetBrains Mono,monospace">$1</code>')
+      .replace(/^- (.+)$/gm,'<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n?)+/g,'<ul style="padding-left:20px;line-height:1.7">$&</ul>')
+      .replace(/\n\n+/g,'</p><p style="margin:8px 0;line-height:1.7;color:var(--text)">')
+      .replace(/^/,'<p style="margin:8px 0;line-height:1.7;color:var(--text)">') + '</p>';
+  }
+  window.studyAsk = async () => {
+    const ta = $('studyPrompt'); const q = (ta.value || '').trim();
+    if (!q) { $('studyStatus').textContent = 'Type a question first.'; return; }
+    const topic = $('studyTopic').value;
+    const sysPrompt = STUDY_PROMPTS[studyCurMode];
+    const fullPrompt = (topic ? `[Subject: ${topic}] ` : '') + q;
+
+    const log = $('studyChatLog');
+    const userBubble = document.createElement('div');
+    userBubble.style.cssText = 'background:rgba(0,240,255,.08);border:1px solid var(--neon-cyan);border-radius:8px;padding:12px 14px;margin:10px 0;color:var(--text)';
+    userBubble.innerHTML = `<div style="font-family:var(--font-display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--neon-cyan);margin-bottom:6px">YOU · ${(topic||'general').toUpperCase()} · ${studyCurMode.toUpperCase()}</div><div style="white-space:pre-wrap">${escapeHtml(q)}</div>`;
+    log.appendChild(userBubble);
+    ta.value = '';
+
+    const aiBubble = document.createElement('div');
+    aiBubble.style.cssText = 'background:rgba(180,0,255,.08);border:1px solid var(--neon-purple);border-radius:8px;padding:14px 16px;margin:10px 0;color:var(--text);min-height:60px';
+    aiBubble.innerHTML = `<div style="font-family:var(--font-display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--neon-purple);margin-bottom:6px">📚 STUDY PARTNER</div><div class="study-body">⏳ Thinking…</div>`;
+    log.appendChild(aiBubble);
+
+    const btn = $('studyAskBtn'); btn.disabled = true; btn.textContent = '⏳ THINKING...';
+    $('studyStatus').textContent = 'Calling AI…';
+    try {
+      // Build messages list with conversation history (last 6 exchanges).
+      const messages = [{ role: 'system', content: sysPrompt }];
+      studyHistory.slice(-6).forEach(m => messages.push(m));
+      messages.push({ role: 'user', content: fullPrompt });
+      const r = await fetch(STUDY_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages, prompt: fullPrompt, max_tokens: studyCurMode === 'quick' ? 400 : 1200 }),
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const reply = d.response || d.text || d.message || d.content || JSON.stringify(d).slice(0,500);
+      aiBubble.querySelector('.study-body').innerHTML = mdToHtml(reply);
+      // Persist history for follow-ups
+      studyHistory.push({ role: 'user', content: fullPrompt });
+      studyHistory.push({ role: 'assistant', content: reply });
+      // Keep last 12 turns
+      if (studyHistory.length > 24) studyHistory = studyHistory.slice(-24);
+      $('studyStatus').textContent = '✓ Done. Ask a follow-up below.';
+    } catch (e) {
+      aiBubble.querySelector('.study-body').innerHTML = `<span style="color:var(--neon-pink)">Couldn't reach the AI: ${escapeHtml(e.message)}. Make sure you're online.</span>`;
+      $('studyStatus').textContent = '✗ Failed.';
+    } finally {
+      btn.disabled = false; btn.textContent = '▶ ASK STUDY PARTNER';
+      log.scrollIntoView({ behavior:'smooth', block:'end' });
+    }
+  };
 
   // ===== SHARED IDENTITY HOOK (Firebase Anonymous Auth via shared/firebase-identity.js) =====
   // Fires once Anonymous Auth completes + profile loads. Then we hydrate local XP / Pokédex

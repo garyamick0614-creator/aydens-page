@@ -430,10 +430,26 @@ async function loadTraffic() {
       return;
     }
     for (const it of items.slice(0, 6)) {
-      host.appendChild(el('div', { class: 'news-item' }, [
-        el('div', {}, escapeHtml(it.title || it.summary || it.description || 'Incident')),
-        el('div', { class: 'news-source' }, escapeHtml(it.location || it.road || '')),
-      ]));
+      const title = it.title || it.summary || it.description || 'Incident';
+      const meta  = it.location || it.road || it.county || '';
+      const url   = it.url || it.link || '';
+      const sev   = (it.severity || '').toLowerCase();
+      const icon  = sev.indexOf('extreme') > -1 ? '🚨' : sev.indexOf('severe') > -1 ? '⚠️' : sev.indexOf('moderate') > -1 ? '🟡' : 'ℹ️';
+      const titleNode = url
+        ? el('a', {
+            href: url, target: '_blank', rel: 'noopener',
+            style: 'color:#00f0ff;text-decoration:none;font-weight:600;text-shadow:0 0 6px rgba(0,240,255,.4);display:block',
+          }, icon + ' ' + escapeHtml(title))
+        : el('div', {}, icon + ' ' + escapeHtml(title));
+      const item = el('div', { class: 'news-item' }, [
+        titleNode,
+        el('div', { class: 'news-source' }, escapeHtml(meta) + (sev ? ' · ' + escapeHtml(sev) : '')),
+      ]);
+      if (url) {
+        item.style.cursor = 'pointer';
+        item.title = 'Click to open full alert';
+      }
+      host.appendChild(item);
     }
   } catch {
     host.appendChild(el('div', { class: 'inline-help' }, 'INDOT traffic feed activates when Dad enables /api/proxy/indot/traffic on the home server.'));
