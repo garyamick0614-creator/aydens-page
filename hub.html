@@ -394,7 +394,7 @@
   <button class="tab" data-pane="fnpro">🪂 Fortnite Pro</button>
   <button class="tab" data-pane="pcmastery">⚙ PC Mastery</button>
   <button class="tab" data-pane="study">📚 Study Partner</button>
-  <button class="tab" data-pane="gamehq">🏠 Game HQ</button>
+  <a class="tab" href="/" style="text-decoration:none">🏠 Home →</a>
   <a class="tab" href="/playground.html" style="text-decoration:none">🌌 Multiplayer →</a>
 </nav>
 
@@ -1653,10 +1653,8 @@
   </div>
 </section>
 
-<!-- ============================== GAME HQ (full embed of original index) ============================== -->
-<section class="pane" id="pane-gamehq" style="padding:0;margin:-14px;height:calc(100vh - 80px);min-height:600px">
-  <iframe src="/gamehq.html" id="gamehqFrame" style="width:100%;height:100%;border:0;border-radius:0;background:transparent" title="Game HQ — original 9-tab Xbox / PC / Minecraft / Rocket League / AI Buddy / Friends / Control / Help"></iframe>
-</section>
+<!-- Game HQ tab + iframe removed 2026-04-28: Game HQ is the home page (/) now,
+     hub.html is the side-tools dashboard. The 🏠 Home → tab in nav routes to /. -->
 
 <!-- ============================== XP / ACHIEVEMENTS ============================== -->
 <section class="pane" id="pane-xp">
@@ -1720,7 +1718,7 @@
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
-window.__KIDS_BUILD = '2026-04-28T09:30Z-v24-firebase-csp-null-guards';
+window.__KIDS_BUILD = '2026-04-28T09:45Z-v25-gamehq-tab-removed-from-hub';
 (function () {
   'use strict';
   const API = 'https://api.thatcomputerguy26.org';
