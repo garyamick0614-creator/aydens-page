@@ -1669,6 +1669,46 @@ async function boot() {
 document.addEventListener('DOMContentLoaded', boot);
 
 // =====================================================================
+// PROFILE PROPAGATION — when displayName/avatar/hue changes (via the
+// Profile customizer in the Control panel, or from another tab), update
+// the HUD + name labels live without a page reload.
+// =====================================================================
+(function profilePropagation() {
+  function whenIdReady(cb) {
+    if (window.AYDEN_ID && window.AYDEN_ID.ready) {
+      window.AYDEN_ID.ready.then(cb).catch(() => {});
+    } else {
+      let n = 0;
+      const i = setInterval(() => {
+        if (window.AYDEN_ID && window.AYDEN_ID.ready) {
+          clearInterval(i);
+          window.AYDEN_ID.ready.then(cb).catch(() => {});
+        } else if (++n > 40) clearInterval(i);
+      }, 250);
+    }
+  }
+  whenIdReady(() => {
+    if (!window.AYDEN_ID || !window.AYDEN_ID.onUser) return;
+    window.AYDEN_ID.onUser(({ profile }) => {
+      if (!profile) return;
+      // Update Friends tab nameLbl if visible.
+      const nameLbl = document.querySelector('#friend-current-user');
+      if (nameLbl && profile.displayName) nameLbl.textContent = profile.displayName;
+      // Re-paint the chat-mini status line with the new name.
+      const chatStatus = document.querySelector('#chat-mini-status');
+      if (chatStatus) chatStatus.textContent = 'Posting as: ' + (profile.displayName || '...');
+      // Re-paint the floating chat widget status (built by chat-widget.js).
+      const fStatus = document.querySelector('#ay-chat-status');
+      if (fStatus) fStatus.textContent = 'Posting as: ' + (profile.displayName || '...');
+      // Update CSS accent color from hue (cosmetic).
+      if (typeof profile.hue === 'number') {
+        document.documentElement.style.setProperty('--user-hue', String(profile.hue));
+      }
+    });
+  });
+})();
+
+// =====================================================================
 // SCHOOLS-MINI WIDGET on Game HQ home — pulls /api/proxy/scott-schools/status
 // every 5 min and shows a big OPEN / DELAY / CLOSED badge. Click → full Hub tab.
 // =====================================================================

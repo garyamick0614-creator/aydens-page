@@ -11,6 +11,7 @@ import { PlaygroundProvider } from './core/PlaygroundProvider.js';
 import { usePresence } from './hooks/usePresence.js';
 import { PresenceManager } from './components/PresenceManager.js';
 import { ParticleField } from './components/ParticleField.js';
+import { LiveReactions } from './components/LiveReactions.js';
 
 const h = window.React.createElement;
 
@@ -20,6 +21,7 @@ function PlaygroundContent() {
   return h('div', { className: 'playground-root' },
     h(ParticleField,    { mouseRef, identity }),
     h(PresenceManager,  { showSelfHalo: true, showLabels: true }),
+    h(LiveReactions,    { mouseRef, identity }),     // Phase 2-lite: floating emoji bursts everyone sees
     h(WelcomeOverlay,   { identity }),
   );
 }
