@@ -12,6 +12,9 @@ import { usePresence } from './hooks/usePresence.js';
 import { PresenceManager } from './components/PresenceManager.js';
 import { ParticleField } from './components/ParticleField.js';
 import { LiveReactions } from './components/LiveReactions.js';
+import { ThemeBus } from './components/ThemeBus.js';
+import { AudioOrchestrator } from './components/AudioOrchestrator.js';
+import { ScrollyTeller } from './components/ScrollyTeller.js';
 
 const h = window.React.createElement;
 
@@ -19,10 +22,14 @@ function PlaygroundContent() {
   // Single source of truth for local mouse + identity. Children read the same ref.
   const { mouseRef, identity } = usePresence();
   return h('div', { className: 'playground-root' },
-    h(ParticleField,    { mouseRef, identity }),
-    h(PresenceManager,  { showSelfHalo: true, showLabels: true }),
-    h(LiveReactions,    { mouseRef, identity }),     // Phase 2-lite: floating emoji bursts everyone sees
-    h(WelcomeOverlay,   { identity }),
+    h('a', { id: 'top' }),
+    h(ParticleField,      { mouseRef, identity }),
+    h(PresenceManager,    { showSelfHalo: true, showLabels: true }),
+    h(LiveReactions,      { mouseRef, identity }),  // Phase 2-lite: shared emoji bursts
+    h(ThemeBus,           null),                     // Phase 4: shared theme bus
+    h(AudioOrchestrator,  { mouseRef, identity }),  // Phase 3: procedural soundscape
+    h(WelcomeOverlay,     { identity }),
+    h(ScrollyTeller,      null),                     // Phase 4: scroll-tell story below the fold
   );
 }
 
