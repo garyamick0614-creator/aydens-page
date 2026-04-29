@@ -15,6 +15,7 @@ import { LiveReactions } from './components/LiveReactions.js';
 import { ThemeBus } from './components/ThemeBus.js';
 import { AudioOrchestrator } from './components/AudioOrchestrator.js';
 import { ScrollyTeller } from './components/ScrollyTeller.js';
+import { LiveChat } from './components/LiveChat.js';
 
 const h = window.React.createElement;
 
@@ -26,6 +27,7 @@ function PlaygroundContent() {
     h(ParticleField,      { mouseRef, identity }),
     h(PresenceManager,    { showSelfHalo: true, showLabels: true }),
     h(LiveReactions,      { mouseRef, identity }),  // Phase 2-lite: shared emoji bursts
+    h(LiveChat,           { identity, collapsed: true }),  // Phase 2: in-playground chat panel
     h(ThemeBus,           null),                     // Phase 4: shared theme bus
     h(AudioOrchestrator,  { mouseRef, identity }),  // Phase 3: procedural soundscape
     h(WelcomeOverlay,     { identity }),
