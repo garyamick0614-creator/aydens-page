@@ -1650,9 +1650,9 @@
 </div>
 
 <!-- Firebase config — public Web SDK values, safe to commit -->
-<script src="firebase-config.js?v=20260428b"></script>
+<script src="firebase-config.js?v=20260508a"></script>
 <!-- Shared identity layer (Anonymous Auth + profile + XP/Pokédex sync) -->
-<script type="module" src="shared/firebase-identity.js?v=20260428b"></script>
+<script type="module" src="shared/firebase-identity.js?v=20260508a"></script>
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
@@ -1749,31 +1749,40 @@ window.__KIDS_BUILD = '2026-04-28T05:00Z-v14-cyber-theme-shared-identity';
   }
 
   // ===== NEWS =====
+  // Tries the dedicated kids-safe endpoint first; if it's empty (server filter sometimes
+  // returns 0 items), falls back to /api/proxy/news/headlines and applies the local filter.
+  // Payload key may be `url` (current API) or `link` (older builds) — accept either.
   async function loadNews() {
-    try {
-      const r = await fetch(`${API}/api/proxy/news/kids-safe?limit=30&_=${Date.now()}`, { cache:'no-store' });
+    const fetchFeed = async (path) => {
+      const r = await fetch(`${API}${path}${path.includes('?') ? '&' : '?'}_=${Date.now()}`, { cache:'no-store' });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
-      const all = d.items || [];
+      return d.items || [];
+    };
+    try {
+      let all = [];
+      try { all = await fetchFeed('/api/proxy/news/kids-safe?limit=30'); } catch (_) { all = []; }
+      if (!all.length) { try { all = await fetchFeed('/api/proxy/news/headlines?limit=40'); } catch (_) { all = []; } }
       const safe = all.filter(n => {
         if (!n || !n.title) return false;
-        return isSafe(`${n.title} ${n.summary || ''} ${n.source_name || ''}`);
+        return isSafe(`${n.title} ${n.summary || ''} ${n.source_name || n.source || ''}`);
       });
       const renderItem = (n) => {
         const pillClass = (n.region === 'local' || n.category === 'local') ? 'local'
                         : n.category === 'tech' ? 'tech'
                         : n.category === 'space' ? 'space' : 'world';
+        const href = n.url || n.link || '#';
         return `<li><span class="pill ${pillClass}">${esc((n.category || 'NEWS').toUpperCase())}</span>
-          <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
-          <span class="meta">${esc(n.source_name || '')}</span></li>`;
+          <a href="${esc(href)}" target="_blank" rel="noopener">${esc(n.title)}</a>
+          <span class="meta">${esc(n.source_name || n.source || '')}</span></li>`;
       };
-      const top = safe.slice(0, 10).map(renderItem).join('') || '<li class="muted">No headlines right now.</li>';
-      const full = safe.slice(0, 30).map(renderItem).join('') || '<li class="muted">No headlines right now.</li>';
+      const top = safe.slice(0, 10).map(renderItem).join('') || '<li class="muted">No headlines pass the kid-safe filter right now. That\'s a good thing — go play a game! 🎮</li>';
+      const full = safe.slice(0, 30).map(renderItem).join('') || '<li class="muted">No headlines pass the kid-safe filter right now. That\'s a good thing — go play a game! 🎮</li>';
       $('newsFeedToday').innerHTML = top;
-      $('newsFeedFull').innerHTML = full;
+      const fullHost = $('newsFeedFull'); if (fullHost) fullHost.innerHTML = full;
     } catch (e) {
       $('newsFeedToday').innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
-      $('newsFeedFull').innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
+      const fullHost = $('newsFeedFull'); if (fullHost) fullHost.innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
     }
   }
 

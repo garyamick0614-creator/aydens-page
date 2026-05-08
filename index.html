@@ -12,17 +12,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260428j">
+<link rel="stylesheet" href="styles.css?v=20260508a">
 <!-- Firebase config + shared identity layer. Loaded BEFORE script.js so any
      legacy email/password code can also read window.AYDEN_ID. Same uid + profile
      across index.html, kids.html, and playground.html. -->
-<script src="firebase-config.js?v=20260428d"></script>
-<script type="module" src="shared/firebase-identity.js?v=20260428d"></script>
+<script src="firebase-config.js?v=20260508a"></script>
+<script type="module" src="shared/firebase-identity.js?v=20260508a"></script>
 <!-- Chat monitor + JS error reporter — pipes Ayden's AI prompts + browser errors
      to home server, fires push to Gary on abuse-regex hit -->
-<script src="shared/chat-monitor.js?v=20260428j" defer></script>
+<script src="shared/chat-monitor.js?v=20260508a" defer></script>
 <!-- Floating chat widget — same UI on every page -->
-<script src="shared/chat-widget.js?v=20260428j" defer></script>
+<script src="shared/chat-widget.js?v=20260508a" defer></script>
 </head>
 <body data-tab="home">
 
@@ -306,7 +306,109 @@
         <div class="widget-body" id="traffic-state"><div class="skeleton"></div></div>
         <p class="inline-help">I-65 + US-31 incidents around Scottsburg. Activates when Dad's traffic proxy is live.</p>
       </div>
+
+      <!-- Cool Reads — kid-safe Hacker News + science headlines from Dad's server.
+           Filtered hard client-side — anything matching the strict blocklist gets hidden. -->
+      <div class="widget" id="widget-coolreads" style="border-color:rgba(57,255,20,.4)">
+        <div class="widget-head"><span class="section-tag" style="background:rgba(57,255,20,.15);color:#39ff14;border-color:#39ff14">DISCOVER</span><h3>Cool Reads</h3><button class="refresh-mini" type="button" id="coolreads-refresh" aria-label="Refresh cool reads">↻</button></div>
+        <div class="widget-body" id="coolreads-feed"><div class="skeleton"></div></div>
+        <p class="inline-help">Curated tech + science headlines from across the web — auto-filtered to keep things clean.</p>
+      </div>
+
+      <!-- Live ISS — pulled from /api/proxy/iss. Refreshes every 30s. -->
+      <div class="widget" id="widget-iss" style="border-color:rgba(180,0,255,.4)">
+        <div class="widget-head"><span class="section-tag" style="background:rgba(180,0,255,.15);color:#b400ff;border-color:#b400ff">SPACE</span><h3>ISS Tracker</h3><button class="refresh-mini" type="button" id="iss-refresh" aria-label="Refresh ISS">↻</button></div>
+        <div class="widget-body" id="iss-feed"><div class="skeleton"></div></div>
+        <p class="inline-help">Where the International Space Station is right now. 17,500 mph!</p>
+      </div>
     </div>
+
+    <!-- Inline helpers — load Cool Reads + ISS without bloating script.js. -->
+    <script>
+    (function () {
+      const API = 'https://api.thatcomputerguy26.org';
+      const $  = (id) => document.getElementById(id);
+      const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+      // Same strict blocklist used by kids.html — defense in depth.
+      const UNSAFE_RX = /\b(violence|murder|kill|shoot|gun|stab|sex|porn|nude|nsfw|abuse|rape|drug|cocaine|heroin|fentanyl|alcohol|drunk|war|bomb|terror|hostage|massacre|nazi|hitler|epstein|racism|hate|crime|criminal|prison|suicide|overdose|dies|died|dead|fatal|tragic|gore|graphic|opioid|wound|injur|police|swat|arrest|kidnap|deadly|toxic|poison|drown|crash|wreck|wildfire|burned|explosion|exploded|blast|hospitalized|kill|stabbed|robbery|hijack|airstrike|missile|nuclear|hacker-arrest|breach|leaked|scandal|allegation|alleged|accused|crackdown|deport|smuggling|trafficking|cult|extremist|jihad|insurgent|coup|dictator|atrocity|war-crime|holocaust|carnage|cannibal|torture|execution|behead|mutilate|trump|biden|harris|putin|netanyahu|adult|mature)\b/i;
+      const isSafe = (txt) => !!txt && !UNSAFE_RX.test(String(txt));
+
+      async function loadCoolReads() {
+        const host = $('coolreads-feed');
+        host.innerHTML = '<div class="skeleton"></div>';
+        try {
+          const r = await fetch(`${API}/api/proxy/news/headlines?limit=30&_=${Date.now()}`, { cache: 'no-store' });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const d = await r.json();
+          const items = (d.items || []).filter(it => it && it.title && isSafe(it.title));
+          if (!items.length) {
+            host.innerHTML = '<div class="inline-help">Nothing fresh + clean right now. Try again in a minute.</div>';
+            return;
+          }
+          host.innerHTML = items.slice(0, 5).map(it => {
+            const url = esc(it.url || it.link || '#');
+            return `<div class="news-item" style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+              <a href="${url}" target="_blank" rel="noopener noreferrer nofollow" style="color:#39ff14;text-decoration:none;font-weight:600;font-size:13px;display:block;line-height:1.4">▸ ${esc(it.title)}</a>
+              <div style="color:#9aa3c4;font-size:11px;margin-top:3px">${esc(it.source || it.source_name || '')}</div>
+            </div>`;
+          }).join('');
+        } catch (e) {
+          host.innerHTML = `<div class="inline-help" style="color:#ff5577">Cool Reads unreachable: ${esc(e.message)}</div>`;
+        }
+      }
+
+      let issTimer = null;
+      async function loadISS() {
+        const host = $('iss-feed');
+        host.innerHTML = '<div class="skeleton"></div>';
+        try {
+          const r = await fetch(`${API}/api/proxy/iss?_=${Date.now()}`, { cache: 'no-store' });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const d = await r.json();
+          const lat = (typeof d.latitude === 'number') ? d.latitude.toFixed(2) : '—';
+          const lon = (typeof d.longitude === 'number') ? d.longitude.toFixed(2) : '—';
+          const alt = (typeof d.altitude === 'number') ? d.altitude.toFixed(0) : '—';
+          const vel = (typeof d.velocity === 'number') ? d.velocity.toFixed(0) : '—';
+          const vis = esc(d.visibility || 'unknown');
+          host.innerHTML = `
+            <div style="font-family:'Russo One',sans-serif;letter-spacing:.04em">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:32px;line-height:1">🛰</span>
+                <div>
+                  <div style="font-size:13px;color:#b400ff;letter-spacing:.12em">ISS · ZARYA</div>
+                  <div style="font-size:11px;color:#9aa3c4">Daylight: ${vis}</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:12px">
+                <div><span style="color:#9aa3c4">Lat:</span> <strong style="color:#f1f4ff">${lat}°</strong></div>
+                <div><span style="color:#9aa3c4">Lon:</span> <strong style="color:#f1f4ff">${lon}°</strong></div>
+                <div><span style="color:#9aa3c4">Alt:</span> <strong style="color:#f1f4ff">${alt} km</strong></div>
+                <div><span style="color:#9aa3c4">Spd:</span> <strong style="color:#f1f4ff">${vel} km/h</strong></div>
+              </div>
+            </div>
+          `;
+        } catch (e) {
+          host.innerHTML = `<div class="inline-help" style="color:#ff5577">ISS unreachable: ${esc(e.message)}</div>`;
+        }
+      }
+
+      function init() {
+        const cr = $('coolreads-refresh'); if (cr) cr.addEventListener('click', loadCoolReads);
+        const ir = $('iss-refresh'); if (ir) ir.addEventListener('click', loadISS);
+        loadCoolReads();
+        loadISS();
+        // Auto-refresh ISS every 30s while page is visible.
+        if (issTimer) clearInterval(issTimer);
+        issTimer = setInterval(() => { if (!document.hidden) loadISS(); }, 30000);
+        // Cool Reads refreshes every 8 min.
+        setInterval(() => { if (!document.hidden) loadCoolReads(); }, 480000);
+      }
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+      else init();
+    })();
+    </script>
 
     <div class="card-grid">
       <button class="hub-card" data-jump="xbox" style="--accent:#9bf00b"><div class="hub-num">01</div><h3>XBOX BOSS ZONE</h3><p>Top games, party tips, controller tricks.</p><div class="hub-go">ENTER →</div></button>
@@ -803,9 +905,9 @@
   </div>
 </footer>
 
-<script src="background.js?v=20260428j" defer></script>
-<script src="firebase-config.js?v=20260428j" defer></script>
-<script src="script.js?v=20260428j" defer></script>
+<script src="background.js?v=20260508a" defer></script>
+<script src="firebase-config.js?v=20260508a" defer></script>
+<script src="script.js?v=20260508a" defer></script>
 <script defer src="https://api.thatcomputerguy26.org/static/tcg-visitor.js"></script>
 </body>
 </html>

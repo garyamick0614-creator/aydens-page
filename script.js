@@ -405,8 +405,10 @@ async function loadKidsNews() {
     return;
   }
   for (const it of safe) {
+    // API returns `url` (current), older builds returned `link` — accept either.
+    const href = it.url || it.link || '#';
     const row = el('div', { class: 'news-item' }, [
-      el('a', { href: it.link, target: '_blank', rel: 'noopener noreferrer nofollow' }, kidSafeText(it.title)),
+      el('a', { href, target: '_blank', rel: 'noopener noreferrer nofollow' }, kidSafeText(it.title)),
       el('div', { class: 'news-source' }, `${escapeHtml(it.source || '')} · ${escapeHtml(it.category || '')}`),
     ]);
     host.appendChild(row);
@@ -486,12 +488,17 @@ async function ensureAIFeed(tab, force=false) {
   try {
     const reply = await callAI(AI_PROMPTS[tab]);
     const safe = kidSafeText(reply);
+    if (!safe || /ollama|service unavailable|model not loaded/i.test(safe)) {
+      throw new Error('AI_OFFLINE');
+    }
     out.textContent = safe;
     cache[key] = { t: now, v: safe };
     save(KEYS.cache, cache);
   } catch (e) {
     out.classList.add('error');
-    out.textContent = 'Buddy is sleeping. Tap REFRESH to wake him up. (' + e.message + ')';
+    out.textContent = e.message === 'AI_OFFLINE'
+      ? '🛌 Buddy is napping. The home AI is offline right now — check back in a few minutes.'
+      : 'Buddy is sleeping. Tap REFRESH to wake him up. (' + e.message + ')';
   }
 }
 
@@ -519,12 +526,18 @@ function bindBuddy() {
     const thinking = buddyAdd(feed, 'bot', 'Thinking…', 'thinking');
     try {
       const reply = await callAI(q, 'You are a fun, kid-friendly gaming buddy for a 13-year-old. Keep replies under 80 words. No swearing. Be encouraging.');
+      const safe = kidSafeText(reply);
+      if (!safe || /ollama|service unavailable|model not loaded/i.test(safe)) {
+        throw new Error('AI_OFFLINE');
+      }
       thinking.classList.remove('thinking');
-      thinking.textContent = kidSafeText(reply);
+      thinking.textContent = safe;
     } catch (e) {
       thinking.classList.remove('thinking');
       thinking.classList.add('err');
-      thinking.textContent = 'Buddy got tired (' + e.message + '). Try again.';
+      thinking.textContent = e.message === 'AI_OFFLINE'
+        ? '🛌 Buddy is napping right now (home AI is offline). Try again in a few minutes!'
+        : 'Buddy got tired (' + e.message + '). Try again.';
     } finally {
       btn.disabled = false;
       feed.scrollTop = feed.scrollHeight;

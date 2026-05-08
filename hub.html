@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
 <!-- Inherit the Game HQ visual system site-wide (canvas bg + neon-tab system + same design tokens) -->
-<link rel="stylesheet" href="styles.css?v=20260428e">
+<link rel="stylesheet" href="styles.css?v=20260508a">
 <style>
   /* === Cyber theme — same design tokens as index.html for unified look === */
   :root {
@@ -1880,15 +1880,15 @@
 </div>
 
 <!-- Animated canvas background (Game HQ visual system, ported site-wide) -->
-<script src="background.js?v=20260428e" defer></script>
+<script src="background.js?v=20260508a" defer></script>
 <!-- Firebase config — public Web SDK values, safe to commit -->
-<script src="firebase-config.js?v=20260428e"></script>
+<script src="firebase-config.js?v=20260508a"></script>
 <!-- Shared identity layer (Anonymous Auth + profile + XP/Pokédex sync) -->
-<script type="module" src="shared/firebase-identity.js?v=20260428e"></script>
+<script type="module" src="shared/firebase-identity.js?v=20260508a"></script>
 <!-- Chat monitor + JS error reporter -->
-<script src="shared/chat-monitor.js?v=20260428h" defer></script>
+<script src="shared/chat-monitor.js?v=20260508a" defer></script>
 <!-- Floating chat widget — same UI on every page -->
-<script src="shared/chat-widget.js?v=20260428h" defer></script>
+<script src="shared/chat-widget.js?v=20260508a" defer></script>
 <!-- 3D scene library -->
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script>
@@ -2004,31 +2004,40 @@ window.__KIDS_BUILD = '2026-04-28T12:00Z-v31-release-ticker-hide-unknown-schools
   }
 
   // ===== NEWS =====
+  // Tries the dedicated kids-safe endpoint first; if it's empty (server filter sometimes
+  // returns 0 items), falls back to /api/proxy/news/headlines and applies the local filter.
+  // Payload key may be `url` (current API) or `link` (older builds) — accept either.
   async function loadNews() {
-    try {
-      const r = await fetch(`${API}/api/proxy/news/kids-safe?limit=30&_=${Date.now()}`, { cache:'no-store' });
+    const fetchFeed = async (path) => {
+      const r = await fetch(`${API}${path}${path.includes('?') ? '&' : '?'}_=${Date.now()}`, { cache:'no-store' });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
-      const all = d.items || [];
+      return d.items || [];
+    };
+    try {
+      let all = [];
+      try { all = await fetchFeed('/api/proxy/news/kids-safe?limit=30'); } catch (_) { all = []; }
+      if (!all.length) { try { all = await fetchFeed('/api/proxy/news/headlines?limit=40'); } catch (_) { all = []; } }
       const safe = all.filter(n => {
         if (!n || !n.title) return false;
-        return isSafe(`${n.title} ${n.summary || ''} ${n.source_name || ''}`);
+        return isSafe(`${n.title} ${n.summary || ''} ${n.source_name || n.source || ''}`);
       });
       const renderItem = (n) => {
         const pillClass = (n.region === 'local' || n.category === 'local') ? 'local'
                         : n.category === 'tech' ? 'tech'
                         : n.category === 'space' ? 'space' : 'world';
+        const href = n.url || n.link || '#';
         return `<li><span class="pill ${pillClass}">${esc((n.category || 'NEWS').toUpperCase())}</span>
-          <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
-          <span class="meta">${esc(n.source_name || '')}</span></li>`;
+          <a href="${esc(href)}" target="_blank" rel="noopener">${esc(n.title)}</a>
+          <span class="meta">${esc(n.source_name || n.source || '')}</span></li>`;
       };
-      const top = safe.slice(0, 10).map(renderItem).join('') || '<li class="muted">No headlines right now.</li>';
-      const full = safe.slice(0, 30).map(renderItem).join('') || '<li class="muted">No headlines right now.</li>';
+      const top = safe.slice(0, 10).map(renderItem).join('') || '<li class="muted">No headlines pass the kid-safe filter right now. That\'s a good thing — go play a game! 🎮</li>';
+      const full = safe.slice(0, 30).map(renderItem).join('') || '<li class="muted">No headlines pass the kid-safe filter right now. That\'s a good thing — go play a game! 🎮</li>';
       $('newsFeedToday').innerHTML = top;
-      $('newsFeedFull').innerHTML = full;
+      const fullHost = $('newsFeedFull'); if (fullHost) fullHost.innerHTML = full;
     } catch (e) {
       $('newsFeedToday').innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
-      $('newsFeedFull').innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
+      const fullHost = $('newsFeedFull'); if (fullHost) fullHost.innerHTML = `<li class="err-text">News unavailable: ${esc(e.message)}</li>`;
     }
   }
 
@@ -2976,12 +2985,22 @@ window.__KIDS_BUILD = '2026-04-28T12:00Z-v31-release-ticker-hide-unknown-schools
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages, prompt: fullPrompt, max_tokens: studyCurMode === 'quick' ? 400 : 1200 }),
       });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
+      if (!r.ok) {
+        // 503 specifically means Ollama is down — surface a kid-friendly note.
+        if (r.status === 503 || r.status === 502) {
+          throw new Error('AI_OFFLINE');
+        }
+        throw new Error('HTTP ' + r.status);
+      }
       const d = await r.json();
       // /api/public/chat returns {ok, rid, model, reply, eval_count}. Try reply FIRST,
       // then fall back to other field names. Never echo the raw envelope to the user.
       const reply = d.reply || d.response || d.text || d.message || d.content
         || (typeof d === 'string' ? d : 'No response — try again.');
+      // If reply is empty / blank or matches "ollama not running" style, treat as offline.
+      if (!reply || /ollama|not running|service unavailable|model not loaded/i.test(reply)) {
+        throw new Error('AI_OFFLINE');
+      }
       aiBubble.querySelector('.study-body').innerHTML = mdToHtml(reply);
       // Persist history for follow-ups
       studyHistory.push({ role: 'user', content: fullPrompt });
@@ -2990,8 +3009,11 @@ window.__KIDS_BUILD = '2026-04-28T12:00Z-v31-release-ticker-hide-unknown-schools
       if (studyHistory.length > 24) studyHistory = studyHistory.slice(-24);
       $('studyStatus').textContent = '✓ Done. Ask a follow-up below.';
     } catch (e) {
-      aiBubble.querySelector('.study-body').innerHTML = `<span style="color:var(--neon-pink)">Couldn't reach the AI: ${escapeHtml(e.message)}. Make sure you're online.</span>`;
-      $('studyStatus').textContent = '✗ Failed.';
+      const offline = e.message === 'AI_OFFLINE';
+      aiBubble.querySelector('.study-body').innerHTML = offline
+        ? `<div style="color:var(--neon-yellow);background:rgba(255,208,0,.06);padding:10px 14px;border-radius:6px;border:1px dashed rgba(255,208,0,.5)"><strong>🛌 The AI is taking a nap.</strong><br>Dad's home AI is offline right now — it'll be back soon. Try the <a href="/hub.html#news" style="color:var(--neon-cyan)">News tab</a>, the <a href="/kids.html" style="color:var(--neon-cyan)">Kids Hub</a>, or check <a href="/hub.html#sky" style="color:var(--neon-cyan)">Sky Tracker</a> while you wait.</div>`
+        : `<span style="color:var(--neon-pink)">Couldn't reach the AI: ${escapeHtml(e.message)}. Make sure you're online.</span>`;
+      $('studyStatus').textContent = offline ? 'AI is offline — try again later.' : '✗ Failed.';
     } finally {
       btn.disabled = false; btn.textContent = '▶ ASK STUDY PARTNER';
       log.scrollIntoView({ behavior:'smooth', block:'end' });
