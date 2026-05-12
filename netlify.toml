@@ -13,3 +13,13 @@
   to = "/index.html"
   status = 200
   force = false
+
+# csp-audit-2026-05-11: harden frame-ancestors to 'none' (clickjacking
+# protection). Full CSP lives in _headers (per-site convention); this block
+# layers on stricter X-Frame-Options and Permissions-Policy that complement
+# (not override) the existing CSP _headers entry.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
