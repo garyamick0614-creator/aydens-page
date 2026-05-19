@@ -560,11 +560,28 @@ function buddyAdd(feed, who, text, cls='') {
 }
 
 /* ============== ADMIN GATE / PASSWORD ============== */
-const DEFAULT_PWD = 'password123';
+// 2026-05-19: NO hardcoded password literal per operator security directive.
+// Generate-on-first-run, hashed, with a one-time-show key the gate banner
+// reveals to the parent so the child can be told. Cleared on first password
+// change in Account. Tracked in Desktop\new passwords.txt.
+const KEY_ADMIN_PWD_BOOTSTRAP = 'aydenhq:adminPwdBootstrapOnce:v1';
+function generateBootstrapPin() {
+  // 10-char unambiguous alphanumeric, ~58-bit entropy. Readable for a child.
+  const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  const bytes = new Uint8Array(10);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(b => charset[b % charset.length]).join('');
+}
 async function ensureDefaultAdminPwd() {
   if (!localStorage.getItem(KEYS.adminPwd)) {
-    save(KEYS.adminPwd, await sha256Hex(DEFAULT_PWD));
+    const pin = generateBootstrapPin();
+    save(KEYS.adminPwd, await sha256Hex(pin));
+    save(KEY_ADMIN_PWD_BOOTSTRAP, pin);
+    console.warn('[aydenhq] First-run admin PIN generated (one-time, change in Account):', pin);
   }
+}
+function clearBootstrapPin() {
+  try { localStorage.removeItem(KEY_ADMIN_PWD_BOOTSTRAP); } catch (e) {}
 }
 function isAdminAuthed() {
   const sess = load(KEYS.adminAuthed, null);
@@ -582,6 +599,14 @@ async function initAdminPanel() {
   const gate = $('#admin-gate'), shell = $('#admin-shell');
   if (isAdminAuthed()) { gate.classList.add('hidden'); shell.classList.remove('hidden'); }
   else                 { gate.classList.remove('hidden'); shell.classList.add('hidden'); }
+  // 2026-05-19: surface one-time bootstrap PIN on the gate so the parent can
+  // see it on first install. Cleared after a successful password change.
+  const bootMsg = $('#admin-gate-msg');
+  const bootPin = localStorage.getItem(KEY_ADMIN_PWD_BOOTSTRAP);
+  if (bootPin && bootMsg) {
+    bootMsg.className = 'gate-msg ok';
+    bootMsg.textContent = 'First-time PIN (write it down NOW): ' + bootPin;
+  }
   bindAdminLogin();
   bindAdminNav();
   bindAccount();
@@ -605,12 +630,14 @@ function bindAdminLogin() {
   if (btn.dataset.bound) return; btn.dataset.bound = '1';
   if (resetBtn) {
     resetBtn.addEventListener('click', async () => {
-      if (!confirm('Reset password back to "password123"? This wipes any custom password Ayden set.')) return;
+      if (!confirm('Reset admin password? This generates a brand new bootstrap PIN — the gate will reveal it once.')) return;
       rmkey(KEYS.adminPwd);
       rmkey(KEYS.adminAuthed);
-      save(KEYS.adminPwd, await sha256Hex(DEFAULT_PWD));
+      clearBootstrapPin();
+      await ensureDefaultAdminPwd();
+      const newPin = localStorage.getItem(KEY_ADMIN_PWD_BOOTSTRAP) || '';
       msg.className = 'gate-msg ok';
-      msg.textContent = 'Password reset. Type password123 and tap UNLOCK.';
+      msg.textContent = 'Reset done. New PIN (write it down NOW): ' + newPin;
     });
   }
   const tryLogin = async () => {
@@ -625,7 +652,7 @@ function bindAdminLogin() {
       showAdminSection('account');
     } else {
       msg.className = 'gate-msg err';
-      msg.textContent = 'Wrong password. Default is password123 — change it under Account.';
+      msg.textContent = 'Wrong password. Ask your parent for the default — change it under Account once you sign in.';
     }
   };
   btn.addEventListener('click', tryLogin);

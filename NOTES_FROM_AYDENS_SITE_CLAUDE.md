@@ -35,7 +35,7 @@ need to pick up cleanly.
 
 3. **Two-sided kid-safe filter** runs on AI Buddy + Server Chat: input must pass `kidSafeAllow` before send; output is run through `kidSafeText` before display.
 
-4. **Admin password defaults to `password123`**, sha256-hashed in localStorage at key `aydenhq:adminPwdHash:v2`. The `:v2` suffix exists because v1 had a JSON-stringify mismatch bug that made login impossible — bumping the key forced a clean reset for existing users. There's a "RESET TO DEFAULT" button on the gate as a permanent failsafe.
+4. **Admin password is generated-on-first-run** (2026-05-19 security refactor per operator directive — no hardcoded password literal in source). On first load, `ensureDefaultAdminPwd()` (script.js) creates a 10-char random PIN with `crypto.getRandomValues`, stores the SHA-256 at `aydenhq:adminPwdHash:v2`, and surfaces the plaintext ONCE in `aydenhq:adminPwdBootstrapOnce:v1` so the gate UI displays it on the first install. The `:v2` suffix exists because v1 had a JSON-stringify mismatch bug that made login impossible — bumping the key forced a clean reset for existing users. The "RESET (NEW PIN)" button regenerates and reveals a fresh PIN; previous behavior of resetting to a known literal default was removed.
 
 5. **Cache strategy**: all asset URLs in `index.html` are cache-busted with `?v=20260427e`. `_headers` enforces `Cache-Control: no-cache, no-store, must-revalidate` for `index.html` and `kids.html`, plus `max-age=0, must-revalidate` for JS/CSS. If you change JS/CSS, **bump the `?v=` query string in index.html** — that's the actual cache invalidator (header-only revalidation isn't reliable across browsers).
 
