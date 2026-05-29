@@ -577,7 +577,9 @@ async function ensureDefaultAdminPwd() {
     const pin = generateBootstrapPin();
     save(KEYS.adminPwd, await sha256Hex(pin));
     save(KEY_ADMIN_PWD_BOOTSTRAP, pin);
-    console.warn('[aydenhq] First-run admin PIN generated (one-time, change in Account):', pin);
+    // 2026-05-29 security fix: PIN is surfaced only by the first-run admin
+    // gate banner (which reads KEY_ADMIN_PWD_BOOTSTRAP). Never log to console —
+    // any visitor with DevTools could read it. Cleared on first password change.
   }
 }
 function clearBootstrapPin() {
